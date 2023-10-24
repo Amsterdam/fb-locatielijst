@@ -1,15 +1,12 @@
-# Django template
+# Datafundament-fb
 
-Dit is een repo die als sjabloon kan dienen voor een op Docker gebasseerde Python/Django omgeving met een Microsoft SQL als database
+Dit is een repo vor de applicatie datafundament-fb.
+Een applicatie voor het opslaan en inlezen van gegevens van het faciliteiten bureau over de locaties waar zij werkzaamheden doen.
 
 # Demo
 Na het klonen kan je de Docker images starten vanuit de makefile:
-- Bepaal welke database nodig is
-  > De standaard database van de template is postgresql, als de applicatie gebruik moet maken van mssql dan kan je de inhoud van de 'mssql_version' folder naar de root folder kopieren. Dit vervangt alle bestanden die postgresql opzetten met bestanden die mssql opzetten. 
 - Configureer de enviroment bestanden
-  > Verwijder de suffix '.example' van de environment bestanden die nodig zijn. Dit is altijd het 'app.env.example' bestand en '' of '' gebaseerd op welke database de applicatie gebruikt. 
-- Hernoem het example project naar de naam van de applicatie
-  > Vervang overal in de code de tekst 'example_project' met de naam van de applicatie, en hernoem ook alle 'example_project' folders.
+  > Kopieer de 'app.env.example' en '.postgress.env.example' environment bestanden. Verwijder dan de suffix '.example' van deze gekopieerde environment bestanden.
 - Bouw de images:
   ```
   make init

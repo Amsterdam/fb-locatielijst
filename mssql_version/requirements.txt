@@ -1,8 +1,0 @@
-asgiref
-Django
-django-extensions
-mssql-django
-pyodbc
-pytz
-sqlparse
-tzdata

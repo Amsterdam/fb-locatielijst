@@ -8,7 +8,7 @@ FROM python:3.11-slim-buster as app
   RUN apt-get update \
   && apt-get -y install libpq-dev gcc
 
-  WORKDIR /app/src/example_project
+  WORKDIR /app/src/datafundament_fb
   COPY requirements.txt requirements.txt
   COPY . /app/src/
 
