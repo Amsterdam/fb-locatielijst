@@ -1,0 +1,7 @@
+.local
+.idea
+.git
+.env*
+venv
+.venv
+docker-compose.override.yml

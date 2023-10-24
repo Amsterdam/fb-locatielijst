@@ -1,0 +1,2 @@
+-- Define basic database schema here for non-django applications
+-- django migrations will fill the database so no schema is needed 

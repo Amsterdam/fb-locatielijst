@@ -1,0 +1,8 @@
+asgiref
+Django
+django-extensions
+psycopg2
+pyodbc
+pytz
+sqlparse
+tzdata

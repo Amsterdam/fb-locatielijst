@@ -1,0 +1,59 @@
+FROM python:3.11-slim-buster as app
+
+  # build variables.
+  ENV DEBIAN_FRONTEND noninteractive
+
+  # install Microsoft SQL Server requirements.
+  ENV ACCEPT_EULA=Y
+  RUN apt-get update \
+  && apt-get -y install libpq-dev gcc
+
+  WORKDIR /app/src/example_project
+  COPY requirements.txt requirements.txt
+  COPY . /app/src/
+
+  RUN pip install --upgrade pip
+  RUN pip install -r requirements.txt
+  # TODO tijdens het draaien van collectstatic moet de env ENVIRONMENT gegeven zijn
+  # anders kan settings\init.py niet de juiste settings laden;
+  # behalve met een work-around waarbij een default settings wordt gezet
+  # dit werkt niet in combinatie met args: - NODE_ENV = development in docker-compose.yml:
+  # ARG NODE_ENV
+  # ENV ENVIRONMENT $NODE_ENV
+  RUN python manage.py collectstatic --no-input
+
+  # Build metadata
+  ENV BUILD_DATE=$BUILD_DATE
+  ENV BUILD_REVISION=$BUILD_REVISION
+  ENV BUILD_VERSION=$BUILD_VERSION
+
+  # CMD ["/app/deploy/docker-run.sh"]
+
+# stage 2, dev
+FROM app as dev
+
+  USER root
+  ADD requirements_dev.txt requirements_dev.txt
+  RUN pip install -r requirements_dev.txt
+
+  USER ITforCare
+
+  # Any process that requires to write in the home dir
+  # we write to /tmp since we have no home dir
+  ENV HOME /tmp
+
+
+# stage 3, test
+FROM dev as test
+
+  USER ITforCare
+
+  ENV AUDIT_LOG_ENABLED=false
+  ENV COVERAGE_FILE=/tmp/.coverage
+  ENV PYTHONPATH=/app/src
+
+  CMD ["pytest"]
+
+
+FROM postgres as postgres
+  COPY deploy/db/setup.sql /docker-entrypoint-initdb.d/

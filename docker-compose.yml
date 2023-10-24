@@ -1,0 +1,64 @@
+version: "3"
+x-app: &base-app
+  build:
+    context: .
+    target: app
+  env_file: 
+    - ./.app.env
+
+services:
+  app:
+    <<: *base-app
+    build:
+      context: .
+      target: app
+      args:
+        - BUILD_DATE
+        - BUILD_REVISION
+        - BUILD_VERSION
+    # @TODO update image to location of official image for app deployments 
+    image: djangotemplate-app
+    command: /app/deploy/app/docker-run.sh
+
+  dev:
+    <<: *base-app
+    build:
+      context: .
+      target: dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./:/app/src
+    ports:
+      - "8000:8000"
+
+  test:
+    <<: *base-app
+    build:
+      context: .
+      target: test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PYTEST_ADDOPTS:
+
+  postgres:
+    build:
+      context: .
+      target: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresqldata:/data/db
+    env_file:
+      - ./.postgres.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10  
+volumes:
+  postgresqldata:
