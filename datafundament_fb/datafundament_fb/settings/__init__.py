@@ -12,4 +12,4 @@ elif environment == 'acceptance':
 elif environment == 'production':
     from datafundament_fb.settings.production import *
 else:
-    from datafundament_fb.settings.development import *
+    from datafundament_fb.settings.base import *
