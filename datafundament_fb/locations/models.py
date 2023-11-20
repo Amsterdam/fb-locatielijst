@@ -1,34 +1,45 @@
 from django.db import models
+from django.db.models import Max
 
 # Create your models here.
+
+# Auto generate a new building_code based on the current highest in the database
+def compute_building_code() -> int:
+    return (Location.objects.aggregate(Max('building_code'))['building_code__max'] or 0) + 1
+
+
 class Location(models.Model):
     '''
     Base class for the location with location typical information
     '''
-    building_code = models.CharField(verbose_name='Pandcode',max_length=10) # TODO automatisch generen; hoogste numnme + 1 
+    building_code = models.IntegerField(
+        verbose_name='Pandcode', default=compute_building_code) # possible race condition when a location is added simultaneously; not worried about it now
     name = models.CharField(verbose_name='Locatie naam',max_length=100)
     description = models.CharField(verbose_name='Beschrijving', max_length=255)
-    active = models.BooleanField(verbose_name='Actief')
-    last_change = models.DateField(verbose_name='Laatste wijziging') # TODO auto update veld
+    active = models.BooleanField(verbose_name='Actief', default=True)
+    last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True) # TODO non mutable field, must be displayed in the form
     street = models.CharField(verbose_name='Straat', max_length=100)
     street_number = models.IntegerField(verbose_name='Straatnummer')
     street_number_extension = models.CharField(
-        verbose_name='Toevoeging', max_length=10, null=True, blank=True)  # TODO validator voor postcode??
+        verbose_name='Toevoeging', max_length=10, null=True, blank=True)
     postal_code = models.CharField(verbose_name='Postcode', max_length=7)
     city = models.CharField(verbose_name='Plaats', max_length=100)
-    construction_year = models.IntegerField(verbose_name='Bouwjaar')
-    floor_area = models.IntegerField(verbose_name='Vloeroppervlak')
-    longitude = models.FloatField()
-    latitude = models.FloatField()
-    rd_x = models.FloatField()
-    rd_y = models.FloatField()
-    note = models.TextField(verbose_name='Notitie')
+    construction_year = models.IntegerField(verbose_name='Bouwjaar', null=True, blank=True)
+    floor_area = models.IntegerField(
+        verbose_name='Vloeroppervlak', null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    rd_x = models.FloatField(null=True, blank=True)
+    rd_y = models.FloatField(null=True, blank=True)
+    note = models.TextField(verbose_name='Notitie', null=True, blank=True)
 
     def __str__(self):
         return f'{self.building_code}, {self.name}'
 
     class Meta:
         verbose_name = 'Locatie'
+        constraints = [models.UniqueConstraint(
+            fields=['building_code'], name='unique_building_code')]
 
 
 class LocationProperty(models.Model):
@@ -40,7 +51,8 @@ class LocationProperty(models.Model):
     label = models.CharField(max_length=100)
     required = models.BooleanField(verbose_name='Verplicht veld')
     multiple = models.BooleanField(verbose_name='Meervoudige invoer')
-    description = models.CharField(verbose_name='Locatie data')
+    description = models.CharField(
+        verbose_name='Locatie data', null=True, blank=True, max_length=255)
     property_type = models.CharField(verbose_name='Gegevens type', max_length=50)
 
     class Meta:
