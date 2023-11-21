@@ -14,8 +14,10 @@ class Location(models.Model):
     '''
     building_code = models.IntegerField(
         verbose_name='Pandcode', default=compute_building_code) # possible race condition when a location is added simultaneously; not worried about it now
-    name = models.CharField(verbose_name='Locatie naam',max_length=100)
-    description = models.CharField(verbose_name='Beschrijving', max_length=255)
+    short_name = models.CharField(verbose_name='Afkorting', max_length=12)
+    name = models.CharField(verbose_name='Locatie naam',max_length=100,)
+    description = models.CharField(
+        verbose_name='Beschrijving', max_length=255)
     active = models.BooleanField(verbose_name='Actief', default=True)
     last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True) # TODO non mutable field, must be displayed in the form
     street = models.CharField(verbose_name='Straat', max_length=100)
