@@ -44,18 +44,25 @@ class Location(models.Model):
             fields=['building_code'], name='unique_building_code')]
 
 
+class LocationPropertyType(models.TextChoices):
+    BOOL = "BOOL", "Boolean"
+    INT = "INT", "Integer"
+    TEXT = "TEXT", "Tekst"
+
+
 class LocationProperty(models.Model):
     '''
     Custom entries for location specific data.
     Each location will have all the extra entries; not every location will have all the entries filled necessarily
     '''
-    order = models.IntegerField(verbose_name='Volgorde')
+    order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
     label = models.CharField(max_length=100)
     required = models.BooleanField(verbose_name='Verplicht veld')
     multiple = models.BooleanField(verbose_name='Meervoudige invoer')
     description = models.CharField(
-        verbose_name='Locatie data', null=True, blank=True, max_length=255)
-    property_type = models.CharField(verbose_name='Gegevens type', max_length=50)
+        verbose_name='Omschrijving', null=True, blank=True, max_length=255)
+    property_type = models.CharField(
+        verbose_name='Gegevens type', choices=LocationPropertyType.choices, max_length=4)
 
     class Meta:
         verbose_name = 'Locatie eigenschap'
