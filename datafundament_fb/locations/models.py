@@ -19,7 +19,7 @@ class Location(models.Model):
     description = models.CharField(
         verbose_name='Beschrijving', max_length=255)
     active = models.BooleanField(verbose_name='Actief', default=True)
-    last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True) # TODO non mutable field, must be displayed in the form
+    last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True)
     street = models.CharField(verbose_name='Straat', max_length=100)
     street_number = models.IntegerField(verbose_name='Straatnummer')
     street_number_extension = models.CharField(
