@@ -1,11 +1,22 @@
+import re
+from datetime import datetime
 from django.db import models
 from django.db.models import Max
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
 # Auto generate a new building_code based on the current highest in the database
 def compute_building_code() -> int:
     return (Location.objects.aggregate(Max('building_code'))['building_code__max'] or 0) + 1
+
+
+def validate_postal_code(value):
+    postal_code_regex = '^[1-9][0-9]{3}\s(?!SA|SD|SS)[A-Z]{2}$'
+    if re.match(postal_code_regex, value):
+        return value
+    else:
+        raise ValidationError("This is not a valid postal code in the format 0000 XX")
 
 
 class Location(models.Model):
@@ -24,7 +35,7 @@ class Location(models.Model):
     street_number = models.IntegerField(verbose_name='Straatnummer')
     street_number_extension = models.CharField(
         verbose_name='Toevoeging', max_length=10, null=True, blank=True)
-    postal_code = models.CharField(verbose_name='Postcode', max_length=7)
+    postal_code = models.CharField(verbose_name='Postcode', max_length=7, validators=[validate_postal_code])
     city = models.CharField(verbose_name='Plaats', max_length=100)
     construction_year = models.IntegerField(verbose_name='Bouwjaar', null=True, blank=True)
     floor_area = models.IntegerField(
