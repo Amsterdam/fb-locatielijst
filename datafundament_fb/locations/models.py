@@ -52,8 +52,8 @@ class LocationPropertyType(models.TextChoices):
     BOOL = "BOOL", "Boolean"
     DATE = "DATE", "Datum"
     INT = "INT", "Numeriek"
-    TEXT = "TEXT", "Tekst"
-    LIST = "LIST", "Lijst" # Indicates related property option
+    STR = "STR", "Tekst"
+    CHOICE = "CHOICE", "Keuzelijst" # Indicates related property option for a choice list
 
 
 class LocationProperty(models.Model):
@@ -68,7 +68,7 @@ class LocationProperty(models.Model):
     description = models.CharField(
         verbose_name='Omschrijving', null=True, blank=True, max_length=255)
     property_type = models.CharField(
-        verbose_name='Gegevens type', choices=LocationPropertyType.choices, max_length=4)
+        verbose_name='Gegevens type', choices=LocationPropertyType.choices, max_length=10)
 
     class Meta:
         verbose_name = 'Locatie eigenschap'
