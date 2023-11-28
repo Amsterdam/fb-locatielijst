@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 from django.db import models
 from django.db.models import Max
 from django.core.exceptions import ValidationError
@@ -37,7 +36,7 @@ class Location(models.Model):
         verbose_name='Huisletter', max_length=10, null=True, blank=True)
     street_number_extension = models.CharField(
         verbose_name='Nummer toevoeging', max_length=10, null=True, blank=True)
-    postal_code = models.CharField(verbose_name='Postcode', max_length=7)
+    postal_code = models.CharField(verbose_name='Postcode', max_length=7, validators=[validate_postal_code])
     city = models.CharField(verbose_name='Plaats', max_length=100)
     construction_year = models.IntegerField(verbose_name='Bouwjaar', null=True, blank=True)
     floor_area = models.IntegerField(
