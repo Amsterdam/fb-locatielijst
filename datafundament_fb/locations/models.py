@@ -137,7 +137,7 @@ class LocationData(models.Model):
 
     def clean(self) -> None:
         # Ensure location property validation when submitted via a form
-        LocationDataValidator.validate(
+        LocationDataValidator().validate(
             location_property=self.location_property, value=self.value)
 
 
