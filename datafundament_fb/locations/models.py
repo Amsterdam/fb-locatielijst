@@ -11,11 +11,11 @@ def compute_building_code() -> int:
     return (Location.objects.aggregate(Max('building_code'))['building_code__max'] or 0) + 1
 
 def validate_postal_code(value):
-    postal_code_regex = '^[1-9][0-9]{3}\s(?!SA|SD|SS)[A-Z]{2}$'
+    postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
     if re.match(postal_code_regex, value):
         return value
     else:
-        raise ValidationError("This is not a valid postal code in the format 0000 XX")
+        raise ValidationError("This is not a valid postal code in the format 0000XX")
 
 
 class Location(models.Model):

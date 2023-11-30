@@ -39,16 +39,14 @@ class TestModelFunctions(TestCase):
         """
 
         # Test the validator
+        self.location1.postal_code = '1234AA'
+        self.assertEqual(validate_postal_code(self.location1.postal_code), self.location1.postal_code)
         self.location1.postal_code = '1234 AA'
         self.assertEqual(validate_postal_code(self.location1.postal_code), self.location1.postal_code)
 
         # Test for validation errors
-        # No space between the numbers and letters
-        self.location1.postal_code = '1234AA'
-        self.assertRaises(ValidationError, self.location1.full_clean)
-
         # Only one letter
-        self.location1.postal_code = '1234 A'
+        self.location1.postal_code = '1234A'
         self.assertRaises(ValidationError, self.location1.full_clean)
 
         # Only 3 numbers
@@ -56,7 +54,7 @@ class TestModelFunctions(TestCase):
         self.assertRaises(ValidationError, self.location1.full_clean)
 
         # Letters in lower case
-        self.location1.postal_code = '1234 aa'
+        self.location1.postal_code = '1234aa'
         self.assertRaises(ValidationError, self.location1.full_clean)
 
         # Leading with a zero
@@ -64,7 +62,7 @@ class TestModelFunctions(TestCase):
         self.assertRaises(ValidationError, self.location1.full_clean)
 
         # Prohibited combination of letters (SA, SD, SS)
-        self.location1.postal_code = '1234 SS'
+        self.location1.postal_code = '1234SS'
         self.assertRaises(ValidationError, self.location1.full_clean)
 
 
