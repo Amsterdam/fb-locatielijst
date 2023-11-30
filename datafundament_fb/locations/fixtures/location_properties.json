@@ -1,0 +1,290 @@
+[
+{
+    "model": "locations.locationproperty",
+    "pk": 1,
+    "fields": {
+        "order": null,
+        "label": "Afstoten",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "DATE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 2,
+    "fields": {
+        "order": null,
+        "label": "Ambtenaren huisvesting",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "BOOL"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 3,
+    "fields": {
+        "order": null,
+        "label": "Soort locatie",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 4,
+    "fields": {
+        "order": null,
+        "label": "Gelieerde partij",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 5,
+    "fields": {
+        "order": null,
+        "label": "Locatieteam",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 6,
+    "fields": {
+        "order": null,
+        "label": "Mailadres Locatieteam",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 7,
+    "fields": {
+        "order": null,
+        "label": "Gewenste Cat. dienstverlenings kader",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 8,
+    "fields": {
+        "order": null,
+        "label": "Categorie Dienstverleningskader",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 9,
+    "fields": {
+        "order": null,
+        "label": "Budget verantwoordelijke directie",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 10,
+    "fields": {
+        "order": null,
+        "label": "Routecode indien geen budget FB",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 11,
+    "fields": {
+        "order": null,
+        "label": "Adres validatie",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 12,
+    "fields": {
+        "order": null,
+        "label": "Locatiemanager",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 13,
+    "fields": {
+        "order": null,
+        "label": "Contactpersoon vanuit Directies",
+        "required": true,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 14,
+    "fields": {
+        "order": null,
+        "label": "Eigendom / Huur",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 15,
+    "fields": {
+        "order": null,
+        "label": "Energielabel",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 16,
+    "fields": {
+        "order": null,
+        "label": "Aantal werkplekken",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 17,
+    "fields": {
+        "order": null,
+        "label": "TOM",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 18,
+    "fields": {
+        "order": null,
+        "label": "TSC",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 19,
+    "fields": {
+        "order": null,
+        "label": "Adviseur beveiliging",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 20,
+    "fields": {
+        "order": null,
+        "label": "Adviseur veiligheid",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 21,
+    "fields": {
+        "order": null,
+        "label": "Assetmanager/contact vastgoed",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 22,
+    "fields": {
+        "order": null,
+        "label": "1s1p",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 23,
+    "fields": {
+        "order": null,
+        "label": "A-net",
+        "required": false,
+        "multiple": false,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 24,
+    "fields": {
+        "order": null,
+        "label": "Vlekken",
+        "required": false,
+        "multiple": true,
+        "description": null,
+        "property_type": "CHOICE"
+    }
+}
+]

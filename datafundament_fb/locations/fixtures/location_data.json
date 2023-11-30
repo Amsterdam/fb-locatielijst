@@ -1,0 +1,642 @@
+[
+{
+    "model": "locations.locationdata",
+    "pk": 1,
+    "fields": {
+        "location": 1,
+        "location_property": 2,
+        "property_option": null,
+        "value": "Ja"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 3,
+    "fields": {
+        "location": 1,
+        "location_property": 3,
+        "property_option": 1,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 4,
+    "fields": {
+        "location": 1,
+        "location_property": 5,
+        "property_option": null,
+        "value": "1"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 5,
+    "fields": {
+        "location": 1,
+        "location_property": 6,
+        "property_option": null,
+        "value": "team1@example.org"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 6,
+    "fields": {
+        "location": 1,
+        "location_property": 7,
+        "property_option": null,
+        "value": "1"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 7,
+    "fields": {
+        "location": 1,
+        "location_property": 8,
+        "property_option": 5,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 8,
+    "fields": {
+        "location": 1,
+        "location_property": 9,
+        "property_option": 8,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 9,
+    "fields": {
+        "location": 1,
+        "location_property": 12,
+        "property_option": null,
+        "value": "Tom Poes"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 10,
+    "fields": {
+        "location": 1,
+        "location_property": 14,
+        "property_option": 10,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 11,
+    "fields": {
+        "location": 1,
+        "location_property": 13,
+        "property_option": null,
+        "value": "Steenbreek"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 12,
+    "fields": {
+        "location": 1,
+        "location_property": 15,
+        "property_option": null,
+        "value": "A"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 13,
+    "fields": {
+        "location": 1,
+        "location_property": 16,
+        "property_option": null,
+        "value": "1872"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 14,
+    "fields": {
+        "location": 1,
+        "location_property": 17,
+        "property_option": null,
+        "value": "Kweetal"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 15,
+    "fields": {
+        "location": 1,
+        "location_property": 18,
+        "property_option": null,
+        "value": "Dorknoper"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 16,
+    "fields": {
+        "location": 1,
+        "location_property": 19,
+        "property_option": null,
+        "value": "Pee Pastinakel"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 17,
+    "fields": {
+        "location": 1,
+        "location_property": 21,
+        "property_option": null,
+        "value": "Sickbock"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 18,
+    "fields": {
+        "location": 1,
+        "location_property": 22,
+        "property_option": 12,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 19,
+    "fields": {
+        "location": 2,
+        "location_property": 2,
+        "property_option": null,
+        "value": "Nee"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 20,
+    "fields": {
+        "location": 2,
+        "location_property": 3,
+        "property_option": 2,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 21,
+    "fields": {
+        "location": 2,
+        "location_property": 5,
+        "property_option": null,
+        "value": "1"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 22,
+    "fields": {
+        "location": 2,
+        "location_property": 6,
+        "property_option": null,
+        "value": "team1@example.org"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 23,
+    "fields": {
+        "location": 2,
+        "location_property": 7,
+        "property_option": null,
+        "value": "0"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 24,
+    "fields": {
+        "location": 2,
+        "location_property": 8,
+        "property_option": 6,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 25,
+    "fields": {
+        "location": 2,
+        "location_property": 9,
+        "property_option": 8,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 26,
+    "fields": {
+        "location": 2,
+        "location_property": 12,
+        "property_option": null,
+        "value": "Pee Pastinakel"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 27,
+    "fields": {
+        "location": 2,
+        "location_property": 14,
+        "property_option": 10,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 28,
+    "fields": {
+        "location": 2,
+        "location_property": 13,
+        "property_option": null,
+        "value": "Sickbock"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 29,
+    "fields": {
+        "location": 2,
+        "location_property": 17,
+        "property_option": null,
+        "value": "Doddeltje"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 30,
+    "fields": {
+        "location": 2,
+        "location_property": 18,
+        "property_option": null,
+        "value": "Joost"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 31,
+    "fields": {
+        "location": 2,
+        "location_property": 19,
+        "property_option": null,
+        "value": "Kweetal"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 32,
+    "fields": {
+        "location": 2,
+        "location_property": 20,
+        "property_option": null,
+        "value": "Wammes Waggel"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 33,
+    "fields": {
+        "location": 2,
+        "location_property": 21,
+        "property_option": null,
+        "value": "De Canteclaer"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 34,
+    "fields": {
+        "location": 3,
+        "location_property": 2,
+        "property_option": null,
+        "value": "Ja"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 35,
+    "fields": {
+        "location": 3,
+        "location_property": 3,
+        "property_option": 3,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 36,
+    "fields": {
+        "location": 3,
+        "location_property": 5,
+        "property_option": null,
+        "value": "2"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 37,
+    "fields": {
+        "location": 3,
+        "location_property": 6,
+        "property_option": null,
+        "value": "team2@example.org"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 38,
+    "fields": {
+        "location": 3,
+        "location_property": 7,
+        "property_option": null,
+        "value": "1"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 39,
+    "fields": {
+        "location": 3,
+        "location_property": 8,
+        "property_option": 5,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 40,
+    "fields": {
+        "location": 3,
+        "location_property": 9,
+        "property_option": 8,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 41,
+    "fields": {
+        "location": 3,
+        "location_property": 12,
+        "property_option": null,
+        "value": "Dickerdack"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 42,
+    "fields": {
+        "location": 3,
+        "location_property": 14,
+        "property_option": 10,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 43,
+    "fields": {
+        "location": 3,
+        "location_property": 13,
+        "property_option": null,
+        "value": "Amos W. Steinhacker"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 44,
+    "fields": {
+        "location": 3,
+        "location_property": 17,
+        "property_option": null,
+        "value": "Terpen Tijn"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 45,
+    "fields": {
+        "location": 3,
+        "location_property": 18,
+        "property_option": null,
+        "value": "Pee Pastinakel"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 46,
+    "fields": {
+        "location": 3,
+        "location_property": 19,
+        "property_option": null,
+        "value": "Bul Super"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 47,
+    "fields": {
+        "location": 3,
+        "location_property": 20,
+        "property_option": null,
+        "value": "Steenbreek"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 48,
+    "fields": {
+        "location": 3,
+        "location_property": 21,
+        "property_option": null,
+        "value": "Zielknijper"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 49,
+    "fields": {
+        "location": 4,
+        "location_property": 2,
+        "property_option": null,
+        "value": "Ja"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 50,
+    "fields": {
+        "location": 4,
+        "location_property": 3,
+        "property_option": 4,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 51,
+    "fields": {
+        "location": 4,
+        "location_property": 5,
+        "property_option": null,
+        "value": "4"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 52,
+    "fields": {
+        "location": 4,
+        "location_property": 6,
+        "property_option": null,
+        "value": "team4@example.org"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 53,
+    "fields": {
+        "location": 4,
+        "location_property": 7,
+        "property_option": null,
+        "value": "3"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 54,
+    "fields": {
+        "location": 4,
+        "location_property": 8,
+        "property_option": 7,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 55,
+    "fields": {
+        "location": 4,
+        "location_property": 9,
+        "property_option": 9,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 56,
+    "fields": {
+        "location": 4,
+        "location_property": 12,
+        "property_option": null,
+        "value": "Tom Poes"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 57,
+    "fields": {
+        "location": 4,
+        "location_property": 14,
+        "property_option": 11,
+        "value": null
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 58,
+    "fields": {
+        "location": 4,
+        "location_property": 13,
+        "property_option": null,
+        "value": "Wammes Waggel"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 59,
+    "fields": {
+        "location": 4,
+        "location_property": 15,
+        "property_option": null,
+        "value": "A"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 60,
+    "fields": {
+        "location": 4,
+        "location_property": 17,
+        "property_option": null,
+        "value": "Doddeltje"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 61,
+    "fields": {
+        "location": 4,
+        "location_property": 18,
+        "property_option": null,
+        "value": "De Canteclaer"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 62,
+    "fields": {
+        "location": 4,
+        "location_property": 19,
+        "property_option": null,
+        "value": "Dorknoper"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 63,
+    "fields": {
+        "location": 4,
+        "location_property": 20,
+        "property_option": null,
+        "value": "Zielknijper"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 64,
+    "fields": {
+        "location": 4,
+        "location_property": 21,
+        "property_option": null,
+        "value": "Terpen Tijn"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 65,
+    "fields": {
+        "location": 4,
+        "location_property": 22,
+        "property_option": 13,
+        "value": null
+    }
+}
+]
