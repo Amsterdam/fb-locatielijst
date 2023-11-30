@@ -1,6 +1,8 @@
 import unittest.mock as mock
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
+from django.db import transaction
 from locations.models import compute_building_code, validate_postal_code, Location, LocationProperty, PropertyOption, LocationData
 from locations.validators import LocationDataValidator
 
@@ -233,48 +235,85 @@ class TestLocationDataValidate(TestCase):
     @mock.patch('locations.validators.LocationDataValidator.valid_boolean')
     def test_clean_boolean(self, mock):
         # Test if valid_boolean() is called
-        self.location_data.location_property = self.boolean_property
-        self.location_data.value = 'Ja'
-        self.assertEqual(self.location_data.clean(), None)
+        value = 'Ja'
+        LocationDataValidator().validate(
+            location_property=self.boolean_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.LocationDataValidator.valid_date')
     def test_clean_date(self, mock):
         # Test if valid_date() is called
-        self.location_data.location_property = self.date_property
-        self.location_data.value = '31-12-2000'
-        self.assertEqual(self.location_data.clean(), None)
+        value = '31-12-2000'
+        LocationDataValidator().validate(
+            location_property=self.date_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.LocationDataValidator.valid_integer')
     def test_clean_integer(self, mock):
         # Test if valid_integer is called
-        self.location_data.location_property = self.integer_property
-        self.location_data.value = '1'
-        self.assertEqual(self.location_data.clean(), None)
+        value = '1'
+        LocationDataValidator().validate(
+            location_property=self.integer_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.LocationDataValidator.valid_string')
     def test_clean_string(self, mock):
         # Test if valid string is called
-        self.location_data.location_property = self.string_property
-        self.location_data.value = 'string'
-        self.assertEqual(self.location_data.clean(), None)
+        value = 'string'
+        LocationDataValidator().validate(
+            location_property=self.string_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.LocationDataValidator.valid_url')
     def test_clean_url(self, mock):
         # Test if valid_url is called
-        self.location_data.location_property = self.url_property
-        self.location_data.value = 'http://example.org'
-        self.assertEqual(self.location_data.clean(), None)
+        value = 'http://example.org'
+        LocationDataValidator().validate(
+            location_property=self.url_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.LocationDataValidator.valid_choice')
-    def test_clean_choice(self, mock):
+    def test_validate_choice(self, mock):
         # Test if valid_choice is called
+        value = 'Yellow'
+        LocationDataValidator().validate(
+            location_property=self.choice_property, value=value)
+        self.assertTrue(mock.called)
+
+
+class TestLocationDataModel(TestCase):
+    """
+    Test added code to the LocationData model
+    """
+
+    def setUp(self) -> None:
+        self.location = Location.objects.create(building_code='25000', name='Stopera', description='Stadhuis',
+                                                 street='Amstel1', street_number=1, postal_code='1000 AA',
+                                                 city='Amsterdam')
+        self.choice_property = LocationProperty.objects.create(
+            label='Choice', property_type='CHOICE')
+        self.choice_option = PropertyOption.objects.create(
+            location_property=self.choice_property, option='Yellow')
+        self.location_data = LocationData(location=self.location)
+    
+    def test_model_constraint(self):
+        # Test when either field is filled, not both TODO there is not validation on choice field + option, or other field + value
         self.location_data.location_property = self.choice_property
-        self.location_data.property_option = self.choice_option_1
+        self.location_data.property_option = self.choice_option
+        self.assertEqual(self.location_data.clean(), None)
+
+        self.location_data.property_option = None
         self.location_data.value = 'Yellow'
         self.assertEqual(self.location_data.clean(), None)
-        self.assertTrue(mock.called)
+
+        # Integrity error is raised when neither or both fields are filled
+        self.location_data.property_option = self.choice_option
+        self.location_data.value = 'Yellow'
+        # Prevent the error from breaking the transaction, atomic is needed
+        with transaction.atomic():
+            self.assertRaises(IntegrityError, self.location_data.save)
+
+        self.location_data.property_option = None
+        self.location_data.value = None
+        with transaction.atomic():
+            self.assertRaises(IntegrityError, self.location_data.save)

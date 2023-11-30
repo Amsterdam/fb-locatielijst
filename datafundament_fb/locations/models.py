@@ -1,6 +1,7 @@
 import re
 from django.db import models
-from django.db.models import Max
+from django.db.models import Max, Q
+from django.db.models.functions import Length
 from django.core.exceptions import ValidationError
 from locations.validators import LocationDataValidator
 
@@ -104,7 +105,7 @@ class PropertyOption(models.Model):
     Choice list for (some) custom entries 
     '''
     location_property = models.ForeignKey(
-        LocationProperty, on_delete=models.CASCADE)
+        LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     option = models.CharField(verbose_name='Optie', max_length=100)
 
     class Meta:
@@ -117,28 +118,46 @@ class PropertyOption(models.Model):
         return f'{self.location_property}, {self.option}'
 
 
+
+
 class LocationData(models.Model):
     '''
     Holds each custom data entry for each location
     '''
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    # Register a lookup on a charfield; for use in the model constaint 
+    models.CharField.register_lookup(Length)
+
+
+    location = models.ForeignKey(
+        Location, on_delete=models.CASCADE, verbose_name='Locatie')
     location_property = models.ForeignKey(
-        LocationProperty, on_delete=models.CASCADE)
+        LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     property_option = models.ForeignKey(
-        PropertyOption, on_delete=models.PROTECT, null=True, blank=True)
+        PropertyOption, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Optie')
     value = models.CharField(verbose_name='Waarde', max_length=255, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie gegeven'
         verbose_name_plural = 'Locatie gegevens'
+        constraints = [
+            # Constraint so that either property_option or value is filled
+            models.CheckConstraint(
+                check=Q(property_option__isnull=False, value__isnull=True) | Q(
+                    property_option__isnull=True, value__isnull=False),
+                name='either_field_filled',
+                violation_error_message=f'Either option or value must be filled.',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.location}, {self.location_property}, {self.property_option}, {self.value}'
 
     def clean(self) -> None:
         # Ensure location property validation when submitted via a form
-        LocationDataValidator().validate(
-            location_property=self.location_property, value=self.value)
+        # Skip for choice validation, because value should be empty
+        if self.location_property.property_type != 'CHOICE': 
+            LocationDataValidator().validate(
+                location_property=self.location_property, value=self.value)
 
 
 class ExternalService(models.Model):
@@ -159,9 +178,10 @@ class LocationExternalService(models.Model):
     '''
     Join table between external services and the location (pandcode) and the external code for the location (externe pandcode)
     '''
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(
+        Location, on_delete=models.CASCADE, verbose_name='Locatie')
     external_service = models.ForeignKey(
-        ExternalService, on_delete=models.CASCADE)
+        ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
     external_location_code = models.CharField(
         verbose_name='Externe locatie code', max_length=100)
 
