@@ -1,0 +1,106 @@
+[
+{
+    "model": "locations.propertyoption",
+    "pk": 1,
+    "fields": {
+        "location_property": 3,
+        "option": "Stadhuis"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 2,
+    "fields": {
+        "location_property": 3,
+        "option": "Overig"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 3,
+    "fields": {
+        "location_property": 3,
+        "option": "Ambtswoning"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 4,
+    "fields": {
+        "location_property": 3,
+        "option": "Kantoor"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 5,
+    "fields": {
+        "location_property": 8,
+        "option": "Basis"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 6,
+    "fields": {
+        "location_property": 8,
+        "option": "onderdeel van Amstel 1"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 7,
+    "fields": {
+        "location_property": 8,
+        "option": "Contract"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 8,
+    "fields": {
+        "location_property": 9,
+        "option": "Facilitair Bureau"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 9,
+    "fields": {
+        "location_property": 9,
+        "option": "Werk"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 10,
+    "fields": {
+        "location_property": 14,
+        "option": "Eigendom"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 11,
+    "fields": {
+        "location_property": 14,
+        "option": "Gehuurd"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 12,
+    "fields": {
+        "location_property": 22,
+        "option": "AEOS"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 13,
+    "fields": {
+        "location_property": 22,
+        "option": "CardAccess"
+    }
+}
+]

@@ -10,7 +10,7 @@ from locations.validators import LocationDataValidator
 def compute_building_code() -> int:
     return (Location.objects.aggregate(Max('building_code'))['building_code__max'] or 0) + 1
 
-def validate_postal_code(value):
+def validate_postal_code(value)-> str:
     postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
     if re.match(postal_code_regex, value):
         return value
@@ -125,8 +125,8 @@ class LocationData(models.Model):
     location_property = models.ForeignKey(
         LocationProperty, on_delete=models.CASCADE)
     property_option = models.ForeignKey(
-        PropertyOption, on_delete=models.PROTECT, null=True)
-    value = models.CharField(verbose_name='Waarde', max_length=255)
+        PropertyOption, on_delete=models.PROTECT, null=True, blank=True)
+    value = models.CharField(verbose_name='Waarde', max_length=255, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie gegeven'
@@ -170,4 +170,4 @@ class LocationExternalService(models.Model):
         verbose_name_plural = 'Locatie koppeling'
 
     def __str__(self):
-        return f'{self.location}, {self.external_service}, {self.external_code} '
+        return f'{self.location}, {self.external_service}, {self.external_location_code} '

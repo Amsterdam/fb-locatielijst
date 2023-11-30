@@ -1,0 +1,110 @@
+[
+{
+    "model": "locations.locationexternalservice",
+    "pk": 2,
+    "fields": {
+        "location": 1,
+        "external_service": 1,
+        "external_location_code": "363100012186092"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 3,
+    "fields": {
+        "location": 2,
+        "external_service": 1,
+        "external_location_code": "363100012186092"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 4,
+    "fields": {
+        "location": 3,
+        "external_service": 1,
+        "external_location_code": "363100012179338"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 5,
+    "fields": {
+        "location": 4,
+        "external_service": 1,
+        "external_location_code": "437100000000244"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 6,
+    "fields": {
+        "location": 4,
+        "external_service": 2,
+        "external_location_code": "VDM26"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 7,
+    "fields": {
+        "location": 1,
+        "external_service": 4,
+        "external_location_code": "gebouwen;ca2736"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 8,
+    "fields": {
+        "location": 2,
+        "external_service": 4,
+        "external_location_code": "gebouwen;ca2736"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 9,
+    "fields": {
+        "location": 3,
+        "external_service": 4,
+        "external_location_code": "gebouwen;1200"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 10,
+    "fields": {
+        "location": 4,
+        "external_service": 4,
+        "external_location_code": "gebouwen;3428"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 11,
+    "fields": {
+        "location": 1,
+        "external_service": 5,
+        "external_location_code": "10193"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 12,
+    "fields": {
+        "location": 2,
+        "external_service": 5,
+        "external_location_code": "64668"
+    }
+},
+{
+    "model": "locations.locationexternalservice",
+    "pk": 13,
+    "fields": {
+        "location": 3,
+        "external_service": 5,
+        "external_location_code": "10212"
+    }
+}
+]

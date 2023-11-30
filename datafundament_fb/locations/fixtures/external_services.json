@@ -1,0 +1,44 @@
+[
+{
+    "model": "locations.externalservice",
+    "pk": 1,
+    "fields": {
+        "name": "BAG id"
+    }
+},
+{
+    "model": "locations.externalservice",
+    "pk": 2,
+    "fields": {
+        "name": "1s1p locatie"
+    }
+},
+{
+    "model": "locations.externalservice",
+    "pk": 3,
+    "fields": {
+        "name": "A-net locatie"
+    }
+},
+{
+    "model": "locations.externalservice",
+    "pk": 4,
+    "fields": {
+        "name": "GV"
+    }
+},
+{
+    "model": "locations.externalservice",
+    "pk": 5,
+    "fields": {
+        "name": "Energiemissie object"
+    }
+},
+{
+    "model": "locations.externalservice",
+    "pk": 6,
+    "fields": {
+        "name": "P&O locatie code"
+    }
+}
+]
