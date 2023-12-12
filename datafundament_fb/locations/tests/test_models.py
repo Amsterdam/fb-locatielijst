@@ -236,7 +236,7 @@ class TestLocationDataValidate(TestCase):
     def test_clean_boolean(self, mock):
         # Test if valid_boolean() is called
         value = 'Ja'
-        LocationDataValidator().validate(
+        LocationDataValidator.validate(
             location_property=self.boolean_property, value=value)
         self.assertTrue(mock.called)
 
@@ -244,7 +244,7 @@ class TestLocationDataValidate(TestCase):
     def test_clean_date(self, mock):
         # Test if valid_date() is called
         value = '31-12-2000'
-        LocationDataValidator().validate(
+        LocationDataValidator.validate(
             location_property=self.date_property, value=value)
         self.assertTrue(mock.called)
 
@@ -252,7 +252,7 @@ class TestLocationDataValidate(TestCase):
     def test_clean_integer(self, mock):
         # Test if valid_integer is called
         value = '1'
-        LocationDataValidator().validate(
+        LocationDataValidator.validate(
             location_property=self.integer_property, value=value)
         self.assertTrue(mock.called)
 
@@ -260,7 +260,7 @@ class TestLocationDataValidate(TestCase):
     def test_clean_string(self, mock):
         # Test if valid string is called
         value = 'string'
-        LocationDataValidator().validate(
+        LocationDataValidator.validate(
             location_property=self.string_property, value=value)
         self.assertTrue(mock.called)
 
@@ -268,7 +268,7 @@ class TestLocationDataValidate(TestCase):
     def test_clean_url(self, mock):
         # Test if valid_url is called
         value = 'http://example.org'
-        LocationDataValidator().validate(
+        LocationDataValidator.validate(
             location_property=self.url_property, value=value)
         self.assertTrue(mock.called)
 
@@ -276,7 +276,7 @@ class TestLocationDataValidate(TestCase):
     def test_validate_choice(self, mock):
         # Test if valid_choice is called
         value = 'Yellow'
-        LocationDataValidator().validate(
+        LocationDataValidator.validate(
             location_property=self.choice_property, value=value)
         self.assertTrue(mock.called)
 
