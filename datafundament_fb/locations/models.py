@@ -1,7 +1,6 @@
 import re
 from django.db import models
 from django.db.models import Max, Q
-from django.db.models.functions import Length
 from django.core.exceptions import ValidationError
 from locations.validators import LocationDataValidator
 
@@ -118,16 +117,10 @@ class PropertyOption(models.Model):
         return f'{self.location_property}, {self.option}'
 
 
-
-
 class LocationData(models.Model):
     '''
     Holds each custom data entry for each location
     '''
-    # Register a lookup on a charfield; for use in the model constaint 
-    models.CharField.register_lookup(Length)
-
-
     location = models.ForeignKey(
         Location, on_delete=models.CASCADE, verbose_name='Locatie')
     location_property = models.ForeignKey(

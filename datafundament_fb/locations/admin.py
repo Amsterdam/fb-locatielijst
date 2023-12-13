@@ -17,7 +17,7 @@ class PropertyOptionAdmin(admin.ModelAdmin):
             request, obj, **kwargs)
         # list only property options of the list type
         form.base_fields['location_property'].queryset = LocationProperty.objects.filter(
-            property_type__iexact='CHOICE')
+            property_type=LocationProperty.LocationPropertyType.CHOICE)
         return form
 
 
