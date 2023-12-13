@@ -102,5 +102,21 @@
         "location_property": 22,
         "option": "CardAccess"
     }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 14,
+    "fields": {
+        "location_property": 11,
+        "option": "Ja"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 15,
+    "fields": {
+        "location_property": 11,
+        "option": "Nee"
+    }
 }
 ]

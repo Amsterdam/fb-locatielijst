@@ -64,22 +64,26 @@ class LocationDataValidator():
         if value in allowed_options:
             return value
         else:
-            raise ValidationError(f"{value} is not a valid choice")
+            raise ValidationError(f"{value} is not a valid choice for {location_property.label}")
 
-    def validate(self, location_property, value) -> str:
+    @classmethod
+    def validate(cls, location_property, value) -> str:
         # match the property_type to the proper validation method
-        match location_property.property_type:
-            case 'BOOL':
-                return self.valid_boolean(value)
-            case 'DATE':
-                return self.valid_date(value)
-            case 'EMAIL':
-                return self.valid_email(value)
-            case 'INT':
-                return self.valid_integer(value)
-            case 'STR':
-                return self.valid_string(value)
-            case 'URL':
-                return self.valid_url(value)
-            case 'CHOICE':
-                return self.valid_choice(location_property, value)
+        if location_property.required and value == None:
+            raise ValidationError(f'Value required for {location_property.label}')
+        if value != None:
+            match location_property.property_type:
+                case 'BOOL':
+                    return cls.valid_boolean(value)
+                case 'DATE':
+                    return cls.valid_date(value)
+                case 'EMAIL':
+                    return cls.valid_email(value)
+                case 'INT':
+                    return cls.valid_integer(value)
+                case 'STR':
+                    return cls.valid_string(value)
+                case 'URL':
+                    return cls.valid_url(value)
+                case 'CHOICE':
+                    return cls.valid_choice(location_property, value)
