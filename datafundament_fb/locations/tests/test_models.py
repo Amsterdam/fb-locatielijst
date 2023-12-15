@@ -18,6 +18,8 @@ class TestModelFunctions(TestCase):
         self.location2 = Location(building_code='24000', name='GGD', description='Gemeentelijke Gezondheidsdienst',
                                   street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
                                   city='Amsterdam')
+        self.choice_property = LocationProperty.objects.create(
+            label='Choice', property_type='CHOICE')
 
     def test_compute_building_code(self):
         """
@@ -66,6 +68,19 @@ class TestModelFunctions(TestCase):
         # Prohibited combination of letters (SA, SD, SS)
         self.location1.postal_code = '1234SS'
         self.assertRaises(ValidationError, self.location1.full_clean)
+
+    def test_required_field(self):
+        # Test when location_property is required and no value or option is passed
+        # Make the location property required
+        self.choice_property.required = True
+
+        # Set LocationData without value
+        self.location_data = LocationData(
+            location=self.location1,
+            location_property=self.choice_property,
+        )
+        with self.assertRaises(ValidationError):
+            self.location_data.clean()
 
 
 class TestLocationDataValidation(TestCase):
