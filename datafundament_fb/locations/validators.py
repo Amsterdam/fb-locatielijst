@@ -47,7 +47,7 @@ class LocationDataValidator():
         return value
 
     @staticmethod
-    def valid_url(value):
+    def valid_url(value) -> str:
         url = URLValidator()
         try:
             url(value)

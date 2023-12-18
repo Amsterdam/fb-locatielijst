@@ -6,7 +6,6 @@ from locations.validators import LocationDataValidator
 
 class LocationDataProcessor():
     location_model = None
-    #TODO ook external service in deze class verwerken?
 
     def _set_location_properties(self)-> None:
         """
@@ -105,7 +104,6 @@ class LocationDataProcessor():
         for field in self.location_model_fields:
             setattr(self.location_model, field.name, getattr(self, field.name))
 
-        # TODO update or create?
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():

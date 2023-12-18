@@ -1,13 +1,14 @@
-import  unittest.mock as mock
+import unittest.mock as mock
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.test import TestCase
 from locations.models import Location, LocationProperty, PropertyOption
 from locations.processors import LocationDataProcessor
 
+
 class TestDataLocationProcessor(TestCase):
-    """
+    '''
     Test processing of location property data
-    """
+    '''
 
     def setUp(self) -> None:
         self.boolean_property = LocationProperty.objects.create(
@@ -26,282 +27,248 @@ class TestDataLocationProcessor(TestCase):
             label='building_type', property_type='CHOICE', required=True)
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Office')
-
-        # self.location = Location.objects.create(
-        #     building_code='24000', name='Amstel 1',
-        #     description='Stadhuis', active=True,
-        #     street='Amstel', street_number='1',
-        #     postal_code='1000 AA', city='Amsterdam',
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.boolean_property, value = 'Ja'
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.date_property, value = '01-12-2023'
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.email_property, value = 'mail@example.org'
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.integer_property, value = '11'
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.string_property, value = 'Yellow'
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.url_property, value = 'https://example.org'
-        # )
-        # self.location.locationdata_set.create(
-        #     location_property = self.choice_property, property_option = self.choice_option
-        # )
+        self.location_data_dict = dict({
+            'building_code': 24000,
+            'name': 'Amstel 1',
+            'description': 'Stadhuis',
+            'active': True,
+            'street': 'Amstel',
+            'street_number': 1,
+            'postal_code': '1000 AA',
+            'city': 'Amsterdam',
+            'occupied': 'Ja',
+            'build_year': '01-12-2023',
+            'mail_address': 'mail@example.org',
+            'number_of_floors': '11',
+            'building_color': 'Yellow',
+            'web_address': 'https://example.org',
+            'building_type': 'Office',
+        })
 
     def test_set_location_properties(self):
-        """
-        Verify if all the expected location fields and properties are filtered 
+        '''
+        Verify if all the expected location fields and properties are filtered
         correctly and present as attribute
-        """
+        '''
         # Field which are defined in the model
         expected_location_fields = {
-            'building_code', 'name', 'short_name', 'description',
-            'active', 'last_modified', 'street', 'street_number', 'street_number_letter',
-            'street_number_extension', 'postal_code', 'city', 'construction_year',
-            'floor_area', 'longitude', 'latitude', 'rd_x', 'rd_y', 'note'
+            'building_code',
+            'name',
+            'short_name',
+            'description',
+            'active',
+            'last_modified',
+            'street',
+            'street_number',
+            'street_number_letter',
+            'street_number_extension',
+            'postal_code',
+            'city',
+            'construction_year',
+            'floor_area',
+            'longitude',
+            'latitude',
+            'rd_x',
+            'rd_y',
+            'note',
         }
-        # Location properties defined in the setup
+        # Dynamic location properties defined for this test
         expected_location_properties = {
-            'occupied', 'build_year', 'mail_address', 'number_of_floors', 'building_color',
-            'web_address', 'building_type'
+            'occupied',
+            'build_year',
+            'mail_address',
+            'number_of_floors',
+            'building_color',
+            'web_address',
+            'building_type',
         }
 
-        # Combined list
-        combined_location_properties = expected_location_fields.union(expected_location_properties)
+        # Combined list of both types of properties
+        expected_properties_combined = expected_location_fields.union(
+            expected_location_properties
+        )
 
         # Location fields and properties filtered by _set_location_properties()
         processor = LocationDataProcessor()
-        found_location_fields = set([
-            field.name for field in processor.location_model_fields
-        ])
-        found_location_properties = set([
-            instance.label for instance in processor.location_property_instances
-        ])
-        combined_found_properties = set(processor.location_properties_list)
+        found_location_fields = set([field.name for field in processor.location_model_fields])
+        found_location_properties = set([instance.label for instance in processor.location_property_instances])
+        found_properties_combined = set(processor.location_properties_list)
 
         # Location field sets should be equal
         self.assertEqual(expected_location_fields, found_location_fields)
         # Location property sets should be equal
         self.assertEqual(expected_location_properties, found_location_properties)
         # Combined set should be equal
-        self.assertEqual(combined_location_properties, combined_found_properties)
+        self.assertEqual(expected_properties_combined, found_properties_combined)
 
-        # All expected fields should have an attribute
-        for field in combined_location_properties:
+        # All expected fields should have an attribute in the LocationProcessorData object
+        for field in expected_properties_combined:
             self.assertTrue(hasattr(processor, field), field)
 
     def test_init_with_data(self):
-        """
+        '''
         Test if an instancve of LocationDataProcessor is created
         and if the attributes have the correct value
-        """
-        location = LocationDataProcessor({
-            'building_code': '24000',
-            'name': 'Amstel 1',
-            'description': 'Stadhuis',
-            'active': True,
-            'street': 'Amstel',
-            'street_number': '1',
-            'postal_code': '1000 AA',
-            'city': 'Amsterdam',
-            'occupied': 'Ja',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Office',
-        })
-
+        '''
+        location_processor = LocationDataProcessor(self.location_data_dict)
         # Verifiy the instance and the attribute values
-        self.assertIsInstance(location, LocationDataProcessor)
-        self.assertEqual(location.building_code, '24000')
-        self.assertEqual(location.name, 'Amstel 1')
-        self.assertEqual(location.description, 'Stadhuis')
-        self.assertEqual(location.active, True)
-        self.assertEqual(location.street, 'Amstel')
-        self.assertEqual(location.street_number, '1')
-        self.assertEqual(location.postal_code, '1000 AA')
-        self.assertEqual(location.city, 'Amsterdam')
-        self.assertEqual(location.occupied, 'Ja')
-        self.assertEqual(location.build_year, '01-12-2023')
-        self.assertEqual(location.mail_address, 'mail@example.org')
-        self.assertEqual(location.number_of_floors, '11')
-        self.assertEqual(location.building_color, 'Yellow')
-        self.assertEqual(location.web_address, 'https://example.org')
-        self.assertEqual(location.building_type, 'Office')
+        self.assertIsInstance(location_processor, LocationDataProcessor)
+        self.assertEqual(location_processor.building_code, self.location_data_dict['building_code'])
+        self.assertEqual(location_processor.name, self.location_data_dict['name'])
+        self.assertEqual(location_processor.description, self.location_data_dict['description'])
+        self.assertEqual(location_processor.active, self.location_data_dict['active'])
+        self.assertEqual(location_processor.street, self.location_data_dict['street'])
+        self.assertEqual(location_processor.street_number, self.location_data_dict['street_number'])
+        self.assertEqual(location_processor.postal_code, self.location_data_dict['postal_code'])
+        self.assertEqual(location_processor.city, self.location_data_dict['city'])
+        self.assertEqual(location_processor.occupied, self.location_data_dict['occupied'])
+        self.assertEqual(location_processor.build_year, self.location_data_dict['build_year'])
+        self.assertEqual(location_processor.mail_address, self.location_data_dict['mail_address'])
+        self.assertEqual(location_processor.number_of_floors, self.location_data_dict['number_of_floors'])
+        self.assertEqual(location_processor.building_color, self.location_data_dict['building_color'])
+        self.assertEqual(location_processor.web_address, self.location_data_dict['web_address'])
+        self.assertEqual(location_processor.building_type, self.location_data_dict['building_type'])
 
     def test_location_save(self):
-        """
+        '''
         Test if a LocationDataProcessor object can be saved in the DB
         as a Location and related LocationData
-        """
+        '''
         # Check that no location exists in the database
-        Location.objects.all().delete()
         self.assertEqual(Location.objects.all().count(), 0)
-        # Save a location
-        location = LocationDataProcessor({
-            'building_code': '24000',
-            'name': 'Amstel 1',
-            'description': 'Stadhuis',
-            'active': True,
-            'street': 'Amstel',
-            'street_number': '1',
-            'postal_code': '1000 AA',
-            'city': 'Amsterdam',
-            'occupied': 'Ja',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Office',
-        })
-        location.save()
+        # Create and save a Location
+        LocationDataProcessor(self.location_data_dict).save()
 
         # Check if the location has been added to the database
         # Only one location should exist in the database
         self.assertEqual(Location.objects.all().count(), 1)
 
-        get_location = Location.objects.get(building_code='24000')
+        # Get the object
+        get_location = Location.objects.all()[0]
 
         # Check the attribute values for the Location() instance
-        self.assertEqual(get_location.building_code, 24000)
-        self.assertEqual(get_location.name, 'Amstel 1')
-        self.assertEqual(get_location.description, 'Stadhuis')
-        self.assertTrue(get_location.active)
-        self.assertEqual(get_location.street, 'Amstel')
-        self.assertEqual(get_location.street_number, 1)
-        self.assertEqual(get_location.postal_code, '1000 AA')
-        self.assertEqual(get_location.city, 'Amsterdam')
+        self.assertEqual(get_location.building_code, self.location_data_dict['building_code'])
+        self.assertEqual(get_location.name, self.location_data_dict['name'])
+        self.assertEqual(get_location.description, self.location_data_dict['description'])
+        self.assertEqual(get_location.active, self.location_data_dict['active'])
+        self.assertEqual(get_location.street, self.location_data_dict['street'])
+        self.assertEqual(get_location.street_number, self.location_data_dict['street_number'])
+        self.assertEqual(get_location.postal_code, self.location_data_dict['postal_code'])
+        self.assertEqual(get_location.city, self.location_data_dict['city'])
         # Check the LocationData() values
         location_data = get_location.locationdata_set.all()
         self.assertEqual(location_data[0].location_property, self.boolean_property)
-        self.assertEqual(location_data[0].value, 'Ja')
+        self.assertEqual(location_data[0].value, self.location_data_dict['occupied'])
         self.assertEqual(location_data[1].location_property, self.date_property)
-        self.assertEqual(location_data[1].value, '01-12-2023')
+        self.assertEqual(location_data[1].value, self.location_data_dict['build_year'])
         self.assertEqual(location_data[2].location_property, self.email_property)
-        self.assertEqual(location_data[2].value, 'mail@example.org')
+        self.assertEqual(location_data[2].value, self.location_data_dict['mail_address'])
         self.assertEqual(location_data[3].location_property, self.integer_property)
-        self.assertEqual(location_data[3].value, '11')
+        self.assertEqual(location_data[3].value, self.location_data_dict['number_of_floors'])
         self.assertEqual(location_data[4].location_property, self.string_property)
-        self.assertEqual(location_data[4].value, 'Yellow')
+        self.assertEqual(location_data[4].value, self.location_data_dict['building_color'])
         self.assertEqual(location_data[5].location_property, self.url_property)
-        self.assertEqual(location_data[5].value, 'https://example.org')
+        self.assertEqual(location_data[5].value, self.location_data_dict['web_address'])
         self.assertEqual(location_data[6].location_property, self.choice_property)
-        self.assertEqual(location_data[6].property_option, self.choice_option)
+        self.assertEqual(location_data[6].property_option.option, self.location_data_dict['building_type'])
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_choice')
-    def test_location_save_atomic(self, mock):
-        """
+    def test_location_save_atomic(self):
+        '''
         Test that neither a Location or LocationData will be added to the DB
-        if an error occurs during save()
-        """
-        location = LocationDataProcessor({
-            'building_code': '24000',
-            'name': 'Amstel 1',
-            'description': 'Stadhuis',
-            'active': True,
-            'street': 'Amstel',
-            'street_number': '1',
-            'postal_code': '1000 AA',
-            'city': 'Amsterdam',
-            'occupied': 'Ja',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Kantoor',
-        })
-        mock.return_value = 'Office'
-        # Mock the return value for validation of a boolean so no error is raised
+        if an error occurs during save().
+        '''
+        # Init location with non existing building_type option
+        location = LocationDataProcessor(self.location_data_dict)
+        location.building_type = 'Tomato'
+        
+        # When saving the object, an ObjectDoesNotExist should be raised because Tomato is not a valid choice value
         self.assertRaises(ObjectDoesNotExist, location.save)
-        self.assertEqual(Location.objects.all().count(), 0)        
+        # Verify that no object has been added to the database
+        self.assertEqual(Location.objects.all().count(), 0)
 
     def test_validation(self):
-        location = LocationDataProcessor({
-            'building_code': '24000',
-            'name': 'Amstel 1',
-            'description': 'Stadhuis',
-            'active': True,
-            'street': 'Amstel',
-            'street_number': '1',
-            'postal_code': '1000 AA',
-            'city': 'Amsterdam',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Office',
-        })
-        self.assertRaises(ValidationError, location.validate)
+        '''
+        Test the validation method
+        '''
+        # Init a location
+        location = LocationDataProcessor(self.location_data_dict)
 
-        location = LocationDataProcessor({
-            'building_code': '24000',
-            'name': 'Amstel 1',
-            'description': 'Stadhuis',
-            'active': True,
-            'street': 'Amstel',
-            'street_number': '1',
-            'postal_code': '1000 AA',
-            'city': 'Amsterdam',
-            'occupied': '',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Office',
-        })
-        self.assertRaises(ValidationError, location.validate)
+        # Set occupied to an empty string
+        location.occupied = ''
+        # Verify that a validation Error occurs because occupied is an empty string
+        with self.assertRaises(ValidationError) as validation_error:
+            location.validate()
+        # Verify the error message
+        self.assertEqual(
+            validation_error.exception.message,
+            f'Value required for {self.boolean_property.label}',
+        )
+
+        # Set occupied to None
+        location.occupied = None
+        # Verify that a validation Error occurs because occupied is None
+        with self.assertRaises(ValidationError) as validation_error:
+            location.validate()
+        # Verify the error message
+        self.assertEqual(
+            validation_error.exception.message,
+            f'Value required for {self.boolean_property.label}',
+        )
 
     def test_location_get(self):
-        location = LocationDataProcessor({
-            'building_code': '24000',
-            'name': 'Amstel 1',
-            'description': 'Stadhuis',
-            'active': True,
-            'street': 'Amstel',
-            'street_number': '1',
-            'postal_code': '1000 AA',
-            'city': 'Amsterdam',
-            'occupied': 'Ja',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Office',
-        })
-        location.save()
+        '''
+        Test retrieving a locaiont data object from the database
+        '''
+        # First create and save an object
+        LocationDataProcessor(self.location_data_dict).save()
 
-        get_location = LocationDataProcessor.get(building_code='24000')
+        # Get the object
+        get_location = LocationDataProcessor.get(
+            building_code=self.location_data_dict['building_code']
+        )
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(get_location, LocationDataProcessor)
-        self.assertEqual(get_location.building_code, 24000) # TODO: string -> int, is dat erg?
-        self.assertEqual(get_location.name, 'Amstel 1')
-        self.assertEqual(get_location.description, 'Stadhuis')
-        self.assertEqual(get_location.active, True)
-        self.assertEqual(get_location.street, 'Amstel')
-        self.assertEqual(get_location.street_number, 1)
-        self.assertEqual(get_location.postal_code, '1000 AA')
-        self.assertEqual(get_location.city, 'Amsterdam')
-        self.assertEqual(get_location.occupied, 'Ja')
-        self.assertEqual(get_location.build_year, '01-12-2023')
-        self.assertEqual(get_location.mail_address, 'mail@example.org')
-        self.assertEqual(get_location.number_of_floors, '11')
-        self.assertEqual(get_location.building_color, 'Yellow')
-        self.assertEqual(get_location.web_address, 'https://example.org')
-        self.assertEqual(get_location.building_type, 'Office')
+        self.assertEqual(get_location.building_code, self.location_data_dict['building_code'])
+        self.assertEqual(get_location.name, self.location_data_dict['name'])
+        self.assertEqual(get_location.description, self.location_data_dict['description'])
+        self.assertEqual(get_location.active, self.location_data_dict['active'])
+        self.assertEqual(get_location.street, self.location_data_dict['street'])
+        self.assertEqual(get_location.street_number, self.location_data_dict['street_number'])
+        self.assertEqual(get_location.postal_code, self.location_data_dict['postal_code'])
+        self.assertEqual(get_location.city, self.location_data_dict['city'])
+        self.assertEqual(get_location.occupied, self.location_data_dict['occupied'])
+        self.assertEqual(get_location.build_year, self.location_data_dict['build_year'])
+        self.assertEqual(get_location.mail_address, self.location_data_dict['mail_address'])
+        self.assertEqual(get_location.number_of_floors, self.location_data_dict['number_of_floors'])
+        self.assertEqual(get_location.building_color, self.location_data_dict['building_color'])
+        self.assertEqual(get_location.web_address, self.location_data_dict['web_address'])
+        self.assertEqual(get_location.building_type, self.location_data_dict['building_type'])
 
-    def test_dict_method(self):...
+    def test_dict_method(self):
+        '''
+        Test the function for returning a dictionary of the locations' attributes
+        '''
+        # First create and save an object
+        LocationDataProcessor(self.location_data_dict).save()
+
+        # Get dictionary of the LocationDataProcessor object
+        location_dict = LocationDataProcessor.get(self.location_data_dict['building_code']).dict()
+
+        # Verifiy the instance and the attribute values
+        self.assertIsInstance(location_dict, dict)
+        self.assertEqual(location_dict['building_code'], self.location_data_dict['building_code'])
+        self.assertEqual(location_dict['name'], self.location_data_dict['name'])
+        self.assertEqual(location_dict['description'], self.location_data_dict['description'])
+        self.assertEqual(location_dict['active'], self.location_data_dict['active'])
+        self.assertEqual(location_dict['street'], self.location_data_dict['street'])
+        self.assertEqual(location_dict['street_number'], self.location_data_dict['street_number'])
+        self.assertEqual(location_dict['postal_code'], self.location_data_dict['postal_code'])
+        self.assertEqual(location_dict['city'], self.location_data_dict['city'])
+        self.assertEqual(location_dict['occupied'], self.location_data_dict['occupied'])
+        self.assertEqual(location_dict['build_year'], self.location_data_dict['build_year'])
+        self.assertEqual(location_dict['mail_address'], self.location_data_dict['mail_address'])
+        self.assertEqual(location_dict['number_of_floors'], self.location_data_dict['number_of_floors'])
+        self.assertEqual(location_dict['building_color'], self.location_data_dict['building_color'])
+        self.assertEqual(location_dict['web_address'], self.location_data_dict['web_address'])
+        self.assertEqual(location_dict['building_type'], self.location_data_dict['building_type'])
