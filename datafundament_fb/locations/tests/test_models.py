@@ -6,6 +6,7 @@ from django.db import transaction
 from locations.models import compute_building_code, validate_postal_code, Location, LocationProperty, PropertyOption, LocationData
 from locations.validators import LocationDataValidator
 
+
 class TestModelFunctions(TestCase):
     """
     Test custom model functions
