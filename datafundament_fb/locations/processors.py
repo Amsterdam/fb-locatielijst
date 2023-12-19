@@ -67,7 +67,7 @@ class LocationDataProcessor():
 
         return object
 
-    def dict(self) -> dict:
+    def get_dict(self) -> dict:
         """
         Return a dictionary of all the 'real' properties of a location  
         """

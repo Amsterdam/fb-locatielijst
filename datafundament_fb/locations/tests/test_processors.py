@@ -251,7 +251,7 @@ class TestDataLocationProcessor(TestCase):
         LocationDataProcessor(self.location_data_dict).save()
 
         # Get dictionary of the LocationDataProcessor object
-        location_dict = LocationDataProcessor.get(self.location_data_dict['building_code']).dict()
+        location_dict = LocationDataProcessor.get(self.location_data_dict['building_code']).get_dict()
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(location_dict, dict)
