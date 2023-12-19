@@ -16,8 +16,7 @@ class LocationDataProcessor():
 
         # Get all model fields excluding related fields or auto id's
         self.location_model_fields = [field for field in Location._meta.get_fields(include_parents=False) if field.concrete and not (
-            field.is_relation or field.one_to_one or (field.many_to_one and field.related_model) or field.name == 'id')]
-        # [field.name for field in Location._meta.get_fields(include_parents=False) if field.concrete and not(field.is_relation or field.one_to_one or(field.many_to_one and field.related_model) or field.name == 'id')]
+            field.is_relation or field.name == 'id')]
         self.location_property_instances =  [obj for obj in LocationProperty.objects.all()]
 
         # Set attributes for properties from the Location model

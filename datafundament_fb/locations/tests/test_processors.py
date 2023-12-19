@@ -144,7 +144,7 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(Location.objects.all().count(), 1)
 
         # Get the object
-        get_location = Location.objects.all()[0]
+        get_location = Location.objects.get(building_code=self.location_data_dict['building_code'])
 
         # Check the attribute values for the Location() instance
         self.assertEqual(get_location.building_code, self.location_data_dict['building_code'])
@@ -223,9 +223,7 @@ class TestDataLocationProcessor(TestCase):
         LocationDataProcessor(self.location_data_dict).save()
 
         # Get the object
-        get_location = LocationDataProcessor.get(
-            building_code=self.location_data_dict['building_code']
-        )
+        get_location = LocationDataProcessor.get(building_code=self.location_data_dict['building_code'])
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(get_location, LocationDataProcessor)
