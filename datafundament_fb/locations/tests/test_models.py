@@ -6,6 +6,7 @@ from django.db import transaction
 from locations.models import compute_building_code, validate_postal_code, Location, LocationProperty, PropertyOption, LocationData
 from locations.validators import LocationDataValidator
 
+
 class TestModelFunctions(TestCase):
     """
     Test custom model functions
@@ -18,6 +19,8 @@ class TestModelFunctions(TestCase):
         self.location2 = Location(building_code='24000', name='GGD', description='Gemeentelijke Gezondheidsdienst',
                                   street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
                                   city='Amsterdam')
+        self.choice_property = LocationProperty.objects.create(
+            label='Choice', property_type='CHOICE')
 
     def test_compute_building_code(self):
         """
@@ -67,6 +70,18 @@ class TestModelFunctions(TestCase):
         self.location1.postal_code = '1234SS'
         self.assertRaises(ValidationError, self.location1.full_clean)
 
+    def test_required_field(self):
+        # Test when location_property is required and no value or option is passed
+        # Make the location property required
+        self.choice_property.required = True
+
+        # Set LocationData without value
+        self.location_data = LocationData(
+            location=self.location1,
+            location_property=self.choice_property,
+        )
+        self.assertRaises(ValidationError, self.location_data.clean)
+
 
 class TestLocationDataValidation(TestCase):
     """
@@ -107,9 +122,7 @@ class TestLocationDataValidation(TestCase):
             self.assertEqual(LocationDataValidator.valid_boolean(value), value)
 
         # Test for invalid boolean called 'maybe'
-        with self.assertRaises(ValidationError):
-            value = 'maybe'
-            LocationDataValidator.valid_boolean(value)
+        self.assertRaises(ValidationError, LocationDataValidator.valid_boolean, 'maybe')
         
     def test_date_validation(self):
         # Test valid date values
@@ -120,8 +133,7 @@ class TestLocationDataValidation(TestCase):
         # Test invalid date values
         values = ['12-31-2000', '29-02-2001', '31-12-20', '31-04-2000']
         for value in values:
-            with self.assertRaises(ValidationError):
-                LocationDataValidator.valid_date(value)
+            self.assertRaises(ValidationError, LocationDataValidator.valid_date, value)
 
     def test_email_validation(self):
         # Test valid email values
@@ -140,8 +152,7 @@ class TestLocationDataValidation(TestCase):
             'test@test@example.nl'
         ]
         for value in values:
-            with self.assertRaises(ValidationError):
-                LocationDataValidator.valid_email(value)
+            self.assertRaises(ValidationError, LocationDataValidator.valid_email, value)
 
     def test_int_validation(self):
         # Test valid integer values
@@ -152,8 +163,7 @@ class TestLocationDataValidation(TestCase):
         # Test invalid integer values
         values = ['0.5', '.5', ',5', '100.239,00']
         for value in values:
-            with self.assertRaises(ValidationError):
-                LocationDataValidator.valid_integer(value)
+            self.assertRaises(ValidationError, LocationDataValidator.valid_integer, value)
 
     def test_str_validation(self):
         # Test valid string value; this functions always returns the input, because the value it is already a string
@@ -181,8 +191,7 @@ class TestLocationDataValidation(TestCase):
             'http:// example.org',
         ]
         for value in values:
-            with self.assertRaises(ValidationError):
-                LocationDataValidator.valid_url(value)
+            self.assertRaises(ValidationError, LocationDataValidator.valid_url, value)
 
     def test_choice_validation(self):
         # Test valid choice value input
@@ -192,12 +201,12 @@ class TestLocationDataValidation(TestCase):
         )
 
         # Test invalid choice value input
-        with self.assertRaises(ValidationError):
-            value = 'Magenta'
-            LocationDataValidator.valid_choice(self.choice_property, value)
-        with self.assertRaises(ValidationError):
-            value = 'yellow'
-            LocationDataValidator.valid_choice(self.choice_property, value)
+        self.assertRaises(
+            ValidationError, LocationDataValidator.valid_choice, value='Magenta', location_property=self.choice_property
+        )
+        self.assertRaises(
+            ValidationError, LocationDataValidator.valid_choice, value='yellow', location_property=self.choice_property
+        )
 
 
 class TestLocationDataValidate(TestCase):

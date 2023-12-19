@@ -147,6 +147,10 @@ class LocationData(models.Model):
 
     def clean(self) -> None:
         # Ensure location property validation when submitted via a form
+        # Validate for empty properties
+        if self.location_property.required and not(self.value or self.property_option):
+            raise ValidationError(f'Value required for {self.location_property.label}')
+            
         # Skip for choice validation, because value should be empty
         if self.location_property.property_type != 'CHOICE': 
             LocationDataValidator().validate(

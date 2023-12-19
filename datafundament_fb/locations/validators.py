@@ -47,7 +47,7 @@ class LocationDataValidator():
         return value
 
     @staticmethod
-    def valid_url(value):
+    def valid_url(value) -> str:
         url = URLValidator()
         try:
             url(value)
@@ -69,8 +69,6 @@ class LocationDataValidator():
     @classmethod
     def validate(cls, location_property, value) -> str:
         # match the property_type to the proper validation method
-        if location_property.required and value == None:
-            raise ValidationError(f'Value required for {location_property.label}')
         if value != None:
             match location_property.property_type:
                 case 'BOOL':
