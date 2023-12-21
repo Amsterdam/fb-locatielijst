@@ -28,12 +28,12 @@ class TestDataLocationProcessor(TestCase):
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Office')
         self.location_data_dict = dict({
-            'building_code': 24000,
+            'building_code': '24000',
             'name': 'Amstel 1',
             'description': 'Stadhuis',
-            'active': True,
+            'active': 'Ja',
             'street': 'Amstel',
-            'street_number': 1,
+            'street_number': '1',
             'postal_code': '1000 AA',
             'city': 'Amsterdam',
             'occupied': 'Ja',
@@ -147,12 +147,12 @@ class TestDataLocationProcessor(TestCase):
         get_location = Location.objects.get(building_code=self.location_data_dict['building_code'])
 
         # Check the attribute values for the Location() instance
-        self.assertEqual(get_location.building_code, self.location_data_dict['building_code'])
+        self.assertEqual(get_location.building_code, int(self.location_data_dict['building_code']))
         self.assertEqual(get_location.name, self.location_data_dict['name'])
         self.assertEqual(get_location.description, self.location_data_dict['description'])
         self.assertEqual(get_location.active, self.location_data_dict['active'])
         self.assertEqual(get_location.street, self.location_data_dict['street'])
-        self.assertEqual(get_location.street_number, self.location_data_dict['street_number'])
+        self.assertEqual(get_location.street_number, int(self.location_data_dict['street_number']))
         self.assertEqual(get_location.postal_code, self.location_data_dict['postal_code'])
         self.assertEqual(get_location.city, self.location_data_dict['city'])
         # Check the LocationData() values
@@ -227,12 +227,12 @@ class TestDataLocationProcessor(TestCase):
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(get_location, LocationDataProcessor)
-        self.assertEqual(get_location.building_code, self.location_data_dict['building_code'])
+        self.assertEqual(get_location.building_code, int(self.location_data_dict['building_code']))
         self.assertEqual(get_location.name, self.location_data_dict['name'])
         self.assertEqual(get_location.description, self.location_data_dict['description'])
         self.assertEqual(get_location.active, self.location_data_dict['active'])
         self.assertEqual(get_location.street, self.location_data_dict['street'])
-        self.assertEqual(get_location.street_number, self.location_data_dict['street_number'])
+        self.assertEqual(get_location.street_number, int(self.location_data_dict['street_number']))
         self.assertEqual(get_location.postal_code, self.location_data_dict['postal_code'])
         self.assertEqual(get_location.city, self.location_data_dict['city'])
         self.assertEqual(get_location.occupied, self.location_data_dict['occupied'])
@@ -255,12 +255,12 @@ class TestDataLocationProcessor(TestCase):
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(location_dict, dict)
-        self.assertEqual(location_dict['building_code'], self.location_data_dict['building_code'])
+        self.assertEqual(location_dict['building_code'], int(self.location_data_dict['building_code']))
         self.assertEqual(location_dict['name'], self.location_data_dict['name'])
         self.assertEqual(location_dict['description'], self.location_data_dict['description'])
         self.assertEqual(location_dict['active'], self.location_data_dict['active'])
         self.assertEqual(location_dict['street'], self.location_data_dict['street'])
-        self.assertEqual(location_dict['street_number'], self.location_data_dict['street_number'])
+        self.assertEqual(location_dict['street_number'], int(self.location_data_dict['street_number']))
         self.assertEqual(location_dict['postal_code'], self.location_data_dict['postal_code'])
         self.assertEqual(location_dict['city'], self.location_data_dict['city'])
         self.assertEqual(location_dict['occupied'], self.location_data_dict['occupied'])

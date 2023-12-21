@@ -22,6 +22,11 @@ class Location(models.Model):
     '''
     Base class for the location with location typical information
     '''
+    ACTIVE_CHOICES = (
+        ('Ja', 'Ja'),
+        ('Nee', 'Nee')
+    )
+
     building_code = models.IntegerField(
         verbose_name='Pandcode', default=compute_building_code)  # possible race condition when a location is added simultaneously; not worried about it now
     short_name = models.CharField(
@@ -29,7 +34,8 @@ class Location(models.Model):
     name = models.CharField(verbose_name='Locatie', max_length=100,)
     description = models.CharField(
         verbose_name='Beschrijving', max_length=255)
-    active = models.BooleanField(verbose_name='Actief', default=True)
+    active = models.CharField(
+        verbose_name='Actief', default='Ja', choices=ACTIVE_CHOICES)
     last_modified = models.DateField(
         verbose_name='Laatste wijziging', auto_now=True)
     street = models.CharField(verbose_name='Straat', max_length=100)
