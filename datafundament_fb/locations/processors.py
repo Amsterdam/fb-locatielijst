@@ -107,7 +107,7 @@ class LocationDataProcessor():
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
             # Save the location model first before adding LocationData
-            self.location_model.clean()
+            self.location_model.full_clean()
             self.location_model.save()
 
             # Add all the LocationData to the Location model
