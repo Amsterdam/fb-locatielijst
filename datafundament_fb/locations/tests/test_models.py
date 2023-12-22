@@ -112,7 +112,6 @@ class TestModelFunctions(TestCase):
         self.assertRaises(ValidationError, self.location_property.full_clean)
         self.location_property.short_name = 'Shortname'
         self.assertRaises(ValidationError, self.location_property.full_clean)
-        breakpoint()
 
 
 class TestLocationDataValidation(TestCase):
