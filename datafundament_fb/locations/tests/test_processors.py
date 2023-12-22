@@ -12,7 +12,7 @@ class TestDataLocationProcessor(TestCase):
 
     def setUp(self) -> None:
         self.boolean_property = LocationProperty.objects.create(
-            short_name='occ', label='occupied', property_type='BOOL', required=True)
+            short_name='occupied', label='occupied', property_type='BOOL', required=True)
         self.date_property = LocationProperty.objects.create(
             short_name='build', label='build_year', property_type='DATE', required=True)
         self.email_property = LocationProperty.objects.create(
@@ -37,12 +37,12 @@ class TestDataLocationProcessor(TestCase):
             'postal_code': '1000 AA',
             'city': 'Amsterdam',
             'occupied': 'Ja',
-            'build_year': '01-12-2023',
-            'mail_address': 'mail@example.org',
-            'number_of_floors': '11',
-            'building_color': 'Yellow',
-            'web_address': 'https://example.org',
-            'building_type': 'Office',
+            'build': '01-12-2023',
+            'mail': 'mail@example.org',
+            'floors': '11',
+            'color': 'Yellow',
+            'url': 'https://example.org',
+            'type': 'Office',
         })
 
     def test_set_location_properties(self):
@@ -75,12 +75,12 @@ class TestDataLocationProcessor(TestCase):
         # Dynamic location properties defined for this test
         expected_location_properties = {
             'occupied',
-            'build_year',
-            'mail_address',
-            'number_of_floors',
-            'building_color',
-            'web_address',
-            'building_type',
+            'build',
+            'mail',
+            'floors',
+            'color',
+            'url',
+            'type',
         }
 
         # Combined list of both types of properties
@@ -91,7 +91,7 @@ class TestDataLocationProcessor(TestCase):
         # Location fields and properties filtered by _set_location_properties()
         processor = LocationDataProcessor()
         found_location_fields = set([field.name for field in processor.location_model_fields])
-        found_location_properties = set([instance.label for instance in processor.location_property_instances])
+        found_location_properties = set([instance.short_name for instance in processor.location_property_instances])
         found_properties_combined = set(processor.location_properties_list)
 
         # Location field sets should be equal
@@ -122,12 +122,12 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(location_processor.postal_code, self.location_data_dict['postal_code'])
         self.assertEqual(location_processor.city, self.location_data_dict['city'])
         self.assertEqual(location_processor.occupied, self.location_data_dict['occupied'])
-        self.assertEqual(location_processor.build_year, self.location_data_dict['build_year'])
-        self.assertEqual(location_processor.mail_address, self.location_data_dict['mail_address'])
-        self.assertEqual(location_processor.number_of_floors, self.location_data_dict['number_of_floors'])
-        self.assertEqual(location_processor.building_color, self.location_data_dict['building_color'])
-        self.assertEqual(location_processor.web_address, self.location_data_dict['web_address'])
-        self.assertEqual(location_processor.building_type, self.location_data_dict['building_type'])
+        self.assertEqual(location_processor.build, self.location_data_dict['build'])
+        self.assertEqual(location_processor.mail, self.location_data_dict['mail'])
+        self.assertEqual(location_processor.floors, self.location_data_dict['floors'])
+        self.assertEqual(location_processor.color, self.location_data_dict['color'])
+        self.assertEqual(location_processor.url, self.location_data_dict['url'])
+        self.assertEqual(location_processor.type, self.location_data_dict['type'])
 
     def test_location_save(self):
         '''
@@ -160,17 +160,17 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(location_data[0].location_property, self.boolean_property)
         self.assertEqual(location_data[0].value, self.location_data_dict['occupied'])
         self.assertEqual(location_data[1].location_property, self.date_property)
-        self.assertEqual(location_data[1].value, self.location_data_dict['build_year'])
+        self.assertEqual(location_data[1].value, self.location_data_dict['build'])
         self.assertEqual(location_data[2].location_property, self.email_property)
-        self.assertEqual(location_data[2].value, self.location_data_dict['mail_address'])
+        self.assertEqual(location_data[2].value, self.location_data_dict['mail'])
         self.assertEqual(location_data[3].location_property, self.integer_property)
-        self.assertEqual(location_data[3].value, self.location_data_dict['number_of_floors'])
+        self.assertEqual(location_data[3].value, self.location_data_dict['floors'])
         self.assertEqual(location_data[4].location_property, self.string_property)
-        self.assertEqual(location_data[4].value, self.location_data_dict['building_color'])
+        self.assertEqual(location_data[4].value, self.location_data_dict['color'])
         self.assertEqual(location_data[5].location_property, self.url_property)
-        self.assertEqual(location_data[5].value, self.location_data_dict['web_address'])
+        self.assertEqual(location_data[5].value, self.location_data_dict['url'])
         self.assertEqual(location_data[6].location_property, self.choice_property)
-        self.assertEqual(location_data[6].property_option.option, self.location_data_dict['building_type'])
+        self.assertEqual(location_data[6].property_option.option, self.location_data_dict['type'])
 
     def test_location_save_atomic(self):
         '''
@@ -179,7 +179,7 @@ class TestDataLocationProcessor(TestCase):
         '''
         # Init location with non existing building_type option
         location = LocationDataProcessor(self.location_data_dict)
-        location.building_type = 'Tomato'
+        location.type = 'Tomato'
         
         # When saving the object, an ObjectDoesNotExist should be raised because Tomato is not a valid choice value
         self.assertRaises(ObjectDoesNotExist, location.save)
@@ -236,12 +236,12 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(get_location.postal_code, self.location_data_dict['postal_code'])
         self.assertEqual(get_location.city, self.location_data_dict['city'])
         self.assertEqual(get_location.occupied, self.location_data_dict['occupied'])
-        self.assertEqual(get_location.build_year, self.location_data_dict['build_year'])
-        self.assertEqual(get_location.mail_address, self.location_data_dict['mail_address'])
-        self.assertEqual(get_location.number_of_floors, self.location_data_dict['number_of_floors'])
-        self.assertEqual(get_location.building_color, self.location_data_dict['building_color'])
-        self.assertEqual(get_location.web_address, self.location_data_dict['web_address'])
-        self.assertEqual(get_location.building_type, self.location_data_dict['building_type'])
+        self.assertEqual(get_location.build, self.location_data_dict['build'])
+        self.assertEqual(get_location.mail, self.location_data_dict['mail'])
+        self.assertEqual(get_location.floors, self.location_data_dict['floors'])
+        self.assertEqual(get_location.color, self.location_data_dict['color'])
+        self.assertEqual(get_location.url, self.location_data_dict['url'])
+        self.assertEqual(get_location.type, self.location_data_dict['type'])
 
     def test_dict_method(self):
         '''
@@ -264,9 +264,9 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(location_dict['postal_code'], self.location_data_dict['postal_code'])
         self.assertEqual(location_dict['city'], self.location_data_dict['city'])
         self.assertEqual(location_dict['occupied'], self.location_data_dict['occupied'])
-        self.assertEqual(location_dict['build_year'], self.location_data_dict['build_year'])
-        self.assertEqual(location_dict['mail_address'], self.location_data_dict['mail_address'])
-        self.assertEqual(location_dict['number_of_floors'], self.location_data_dict['number_of_floors'])
-        self.assertEqual(location_dict['building_color'], self.location_data_dict['building_color'])
-        self.assertEqual(location_dict['web_address'], self.location_data_dict['web_address'])
-        self.assertEqual(location_dict['building_type'], self.location_data_dict['building_type'])
+        self.assertEqual(location_dict['build'], self.location_data_dict['build'])
+        self.assertEqual(location_dict['mail'], self.location_data_dict['mail'])
+        self.assertEqual(location_dict['floors'], self.location_data_dict['floors'])
+        self.assertEqual(location_dict['color'], self.location_data_dict['color'])
+        self.assertEqual(location_dict['url'], self.location_data_dict['url'])
+        self.assertEqual(location_dict['type'], self.location_data_dict['type'])

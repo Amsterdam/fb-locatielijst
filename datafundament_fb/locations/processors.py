@@ -26,8 +26,8 @@ class LocationDataProcessor():
 
         # Set attributes from all the available LocationProperties
         for location_property in self.location_property_instances:
-            setattr(self, location_property.label, None)
-            self.location_properties_list.append(location_property.label)
+            setattr(self, location_property.short_name, None)
+            self.location_properties_list.append(location_property.short_name)
 
     def __init__(self, data: dict=None):
         """
@@ -63,7 +63,7 @@ class LocationDataProcessor():
                 value = location_data.property_option.option
             else:
                 value = location_data.value
-            setattr(object, location_data.location_property.label, value)
+            setattr(object, location_data.location_property.short_name, value)
 
         return object
 
@@ -85,7 +85,7 @@ class LocationDataProcessor():
         """
         for location_property in self.location_property_instances:
             # Location properties that are required should have a value
-            if location_property.required and not getattr(self, location_property.label):
+            if location_property.required and not getattr(self, location_property.short_name):
                 raise ValidationError(f'Value required for {location_property.label}')
 
     def save(self)-> Location:
@@ -112,7 +112,7 @@ class LocationDataProcessor():
 
             # Add all the LocationData to the Location model
             for location_property in self.location_property_instances:
-                value = getattr(self, location_property.label)
+                value = getattr(self, location_property.short_name)
                 if value:
                     location_data = LocationData(
                         location = self.location_model,
