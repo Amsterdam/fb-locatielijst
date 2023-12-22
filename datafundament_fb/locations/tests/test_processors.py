@@ -12,19 +12,19 @@ class TestDataLocationProcessor(TestCase):
 
     def setUp(self) -> None:
         self.boolean_property = LocationProperty.objects.create(
-            label='occupied', property_type='BOOL', required=True)
+            short_name='occ', label='occupied', property_type='BOOL', required=True)
         self.date_property = LocationProperty.objects.create(
-            label='build_year', property_type='DATE', required=True)
+            short_name='build', label='build_year', property_type='DATE', required=True)
         self.email_property = LocationProperty.objects.create(
-            label='mail_address', property_type='EMAIL', required=True)
+            short_name='mail', label='mail_address', property_type='EMAIL', required=True)
         self.integer_property = LocationProperty.objects.create(
-            label='number_of_floors', property_type='INT', required=True)
+            short_name='floors', label='number_of_floors', property_type='INT', required=True)
         self.string_property = LocationProperty.objects.create(
-            label='building_color', property_type='STR', required=True)
+            short_name='color', label='building_color', property_type='STR', required=True)
         self.url_property = LocationProperty.objects.create(
-            label='web_address', property_type='URL', required=True)
+            short_name='url', label='web_address', property_type='URL', required=True)
         self.choice_property = LocationProperty.objects.create(
-            label='building_type', property_type='CHOICE', required=True)
+            short_name='type', label='building_type', property_type='CHOICE', required=True)
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Office')
         self.location_data_dict = dict({

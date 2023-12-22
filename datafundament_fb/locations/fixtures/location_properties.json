@@ -4,6 +4,7 @@
     "pk": 1,
     "fields": {
         "order": null,
+        "short_name": "afstoten",
         "label": "Afstoten",
         "required": false,
         "multiple": false,
@@ -16,6 +17,7 @@
     "pk": 2,
     "fields": {
         "order": null,
+        "short_name": "ambtenaar",
         "label": "Ambtenaren huisvesting",
         "required": true,
         "multiple": false,
@@ -28,6 +30,7 @@
     "pk": 3,
     "fields": {
         "order": null,
+        "short_name": "soort",
         "label": "Soort locatie",
         "required": true,
         "multiple": false,
@@ -40,6 +43,7 @@
     "pk": 4,
     "fields": {
         "order": null,
+        "short_name": "gelieerd",
         "label": "Gelieerde partij",
         "required": false,
         "multiple": false,
@@ -52,6 +56,7 @@
     "pk": 5,
     "fields": {
         "order": null,
+        "short_name": "lt",
         "label": "Locatieteam",
         "required": true,
         "multiple": false,
@@ -64,6 +69,7 @@
     "pk": 6,
     "fields": {
         "order": null,
+        "short_name": "lt_mail",
         "label": "Mailadres Locatieteam",
         "required": false,
         "multiple": false,
@@ -76,6 +82,7 @@
     "pk": 7,
     "fields": {
         "order": null,
+        "short_name": "dvk_nr",
         "label": "Gewenste Cat. dienstverlenings kader",
         "required": true,
         "multiple": false,
@@ -88,6 +95,7 @@
     "pk": 8,
     "fields": {
         "order": null,
+        "short_name": "dvk_naam",
         "label": "Categorie Dienstverleningskader",
         "required": true,
         "multiple": false,
@@ -100,6 +108,7 @@
     "pk": 9,
     "fields": {
         "order": null,
+        "short_name": "budget_dir",
         "label": "Budget verantwoordelijke directie",
         "required": true,
         "multiple": false,
@@ -112,6 +121,7 @@
     "pk": 10,
     "fields": {
         "order": null,
+        "short_name": "routecode",
         "label": "Routecode indien geen budget FB",
         "required": false,
         "multiple": false,
@@ -124,6 +134,7 @@
     "pk": 11,
     "fields": {
         "order": null,
+        "short_name": "bagconf",
         "label": "Adres validatie",
         "required": true,
         "multiple": false,
@@ -136,6 +147,7 @@
     "pk": 12,
     "fields": {
         "order": null,
+        "short_name": "lm",
         "label": "Locatiemanager",
         "required": true,
         "multiple": false,
@@ -148,6 +160,7 @@
     "pk": 13,
     "fields": {
         "order": null,
+        "short_name": "contact",
         "label": "Contactpersoon vanuit Directies",
         "required": true,
         "multiple": false,
@@ -160,6 +173,7 @@
     "pk": 14,
     "fields": {
         "order": null,
+        "short_name": "bezit",
         "label": "Eigendom / Huur",
         "required": false,
         "multiple": false,
@@ -172,6 +186,7 @@
     "pk": 15,
     "fields": {
         "order": null,
+        "short_name": "energielbl",
         "label": "Energielabel",
         "required": false,
         "multiple": false,
@@ -184,6 +199,7 @@
     "pk": 16,
     "fields": {
         "order": null,
+        "short_name": "werkplek",
         "label": "Aantal werkplekken",
         "required": false,
         "multiple": false,
@@ -196,6 +212,7 @@
     "pk": 17,
     "fields": {
         "order": null,
+        "short_name": "tom",
         "label": "TOM",
         "required": false,
         "multiple": false,
@@ -208,6 +225,7 @@
     "pk": 18,
     "fields": {
         "order": null,
+        "short_name": "tsc",
         "label": "TSC",
         "required": false,
         "multiple": false,
@@ -220,6 +238,7 @@
     "pk": 19,
     "fields": {
         "order": null,
+        "short_name": "beveiligng",
         "label": "Adviseur beveiliging",
         "required": false,
         "multiple": false,
@@ -232,6 +251,7 @@
     "pk": 20,
     "fields": {
         "order": null,
+        "short_name": "veiligheid",
         "label": "Adviseur veiligheid",
         "required": false,
         "multiple": false,
@@ -244,6 +264,7 @@
     "pk": 21,
     "fields": {
         "order": null,
+        "short_name": "am_gv",
         "label": "Assetmanager/contact vastgoed",
         "required": false,
         "multiple": false,
@@ -256,6 +277,7 @@
     "pk": 22,
     "fields": {
         "order": null,
+        "short_name": "pas",
         "label": "1s1p",
         "required": false,
         "multiple": false,
@@ -268,6 +290,7 @@
     "pk": 23,
     "fields": {
         "order": null,
+        "short_name": "anet",
         "label": "A-net",
         "required": false,
         "multiple": false,
@@ -280,6 +303,7 @@
     "pk": 24,
     "fields": {
         "order": null,
+        "short_name": "vlekken",
         "label": "Vlekken",
         "required": false,
         "multiple": true,

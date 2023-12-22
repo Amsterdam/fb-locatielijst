@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Max, Q
 from django.core.exceptions import ValidationError
 from locations.validators import LocationDataValidator
+from django.utils.translation import gettext as _
 
 # Create your models here.
 
@@ -16,6 +17,16 @@ def validate_postal_code(value)-> str:
         return value
     else:
         raise ValidationError("This is not a valid postal code in the format 0000XX")
+
+def validate_short_name(value)-> str:
+    name_regex = '^[a-z]+[0-9a-z_]+$'
+    if re.match(name_regex, value):
+        return value
+    raise ValidationError(
+        _("Invalid value for: %(value)s"),
+        code="invalid",
+        params={"value": value},   
+    )
 
 
 class Location(models.Model):
@@ -85,6 +96,7 @@ class LocationProperty(models.Model):
         CHOICE = 'CHOICE', 'Keuzelijst'
 
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
+    short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
     label = models.CharField(max_length=100)
     required = models.BooleanField(
         verbose_name='Verplicht veld', default=False)
@@ -98,6 +110,10 @@ class LocationProperty(models.Model):
     class Meta:
         verbose_name = 'Locatie eigenschap'
         verbose_name_plural = 'Locatie eigenschappen'
+        constraints = [
+            models.UniqueConstraint(fields=['short_name'], name='unique_location_property_name'),
+            models.UniqueConstraint(fields=['label'], name='unique_location_property_label')
+        ]
 
     def __str__(self):
         required = ', verplicht' if self.required else ''
@@ -168,10 +184,15 @@ class ExternalService(models.Model):
     External data sources (APIs)
     '''
     name = models.CharField(verbose_name='Externe API', max_length=100)
+    short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
 
     class Meta:
         verbose_name = 'Externe koppeling'
         verbose_name_plural = 'Externe koppelingen'
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='unique_service_short_name'),
+            models.UniqueConstraint(fields=['short_name'], name='unique_service_name')
+        ]
 
     def __str__(self):
         return f'{self.name}'
