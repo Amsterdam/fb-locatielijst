@@ -107,6 +107,9 @@ class LocationDataProcessor():
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
                 value = getattr(self, location_property.short_name)
+
+                # TODO IETS DOEN MET BESTAANDE OF NIEUWE LOCATIEDATA_SET, ANDERS KRIJG JE DUBBELE LOCATIEDATA
+
                 if value:
                     location_data = LocationData(
                         location = self.location_instance,

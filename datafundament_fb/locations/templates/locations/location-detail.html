@@ -1,0 +1,32 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; {% translate 'Location' %}
+    &rsaquo; {{ location_data.naam }}
+</div>
+{% endblock %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+{% block content %}
+    <form action="." method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <div class="submit_row">
+            <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-detail' pandcode %}">
+        </div>
+    </form>
+</div>
+<br />
+{% endblock %}
