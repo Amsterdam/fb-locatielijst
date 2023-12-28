@@ -97,7 +97,7 @@ class LocationProperty(models.Model):
 
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
-    label = models.CharField(max_length=100)
+    label = models.CharField(max_length=100, verbose_name='Omschrijving')
     required = models.BooleanField(
         verbose_name='Verplicht veld', default=False)
     multiple = models.BooleanField(
