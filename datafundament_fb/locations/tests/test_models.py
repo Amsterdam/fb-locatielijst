@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.db import transaction
-from locations.models import compute_building_code, validate_postal_code, Location, LocationProperty, PropertyOption, LocationData
+from locations.models import compute_building_code, validate_postal_code, validate_short_name, Location, LocationProperty, PropertyOption, LocationData
 from locations.validators import LocationDataValidator
 
 
@@ -19,6 +19,8 @@ class TestModelFunctions(TestCase):
         self.location2 = Location(building_code='24000', name='GGD', description='Gemeentelijke Gezondheidsdienst',
                                   street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
                                   city='Amsterdam')
+        self.location_property = LocationProperty(
+            short_name='short_name', label="Short Name", property_type = 'STR')
         self.choice_property = LocationProperty.objects.create(
             label='Choice', property_type='CHOICE')
 
@@ -82,6 +84,35 @@ class TestModelFunctions(TestCase):
         )
         self.assertRaises(ValidationError, self.location_data.clean)
 
+    def test_short_name_validation(self):
+        """
+        Test validator for the short_name field
+        """
+        # Test the validator
+        self.location_property.short_name = 'short_name'
+        self.assertEqual(validate_short_name(self.location_property.short_name), self.location_property.short_name)
+        self.location_property.short_name = 'shortname'
+        self.assertEqual(validate_short_name(self.location_property.short_name), self.location_property.short_name)
+        self.location_property.short_name = 'shortname1'
+        self.assertEqual(validate_short_name(self.location_property.short_name), self.location_property.short_name)
+
+        # Test for validation errors
+        # Beginning with a number
+        self.location_property.short_name = '1_name'
+        self.assertRaises(ValidationError, self.location_property.full_clean)
+
+        # To long
+        self.location_property.short_name = 'to_long_name'
+        self.assertRaises(ValidationError, self.location_property.full_clean)
+
+        # Invalid characters
+        self.location_property.short_name = 'short-name'
+        self.assertRaises(ValidationError, self.location_property.full_clean)
+        self.location_property.short_name = 'short name'
+        self.assertRaises(ValidationError, self.location_property.full_clean)
+        self.location_property.short_name = 'Shortname'
+        self.assertRaises(ValidationError, self.location_property.full_clean)
+
 
 class TestLocationDataValidation(TestCase):
     """
@@ -96,19 +127,19 @@ class TestLocationDataValidation(TestCase):
                                   street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
                                   city='Amsterdam')
         self.boolean_property = LocationProperty.objects.create(
-            label='Boolean', property_type='BOOL')
+            short_name='bool', label='Boolean', property_type='BOOL')
         self.date_property = LocationProperty.objects.create(
-            label='Date', property_type='DATE')
+            short_name='date', label='Date', property_type='DATE')
         self.email_property = LocationProperty.objects.create(
-            label='Email', property_type='EMAIL')
+            short_name='mail', label='Email', property_type='EMAIL')
         self.integer_property = LocationProperty.objects.create(
-            label='Integer', property_type='INT')
+            short_name='int', label='Integer', property_type='INT')
         self.string_property = LocationProperty.objects.create(
-            label='String', property_type='STR')
+            short_name='str', label='String', property_type='STR')
         self.url_property = LocationProperty.objects.create(
-            label='Url', property_type='URL')
+            short_name='url', label='Url', property_type='URL')
         self.choice_property = LocationProperty.objects.create(
-            label='Choice', property_type='CHOICE')
+            short_name='choice', label='Choice', property_type='CHOICE')
         self.choice_option_1 = PropertyOption.objects.create(
             location_property=self.choice_property, option='Yellow')
         self.choice_option_2 = PropertyOption.objects.create(
@@ -222,19 +253,19 @@ class TestLocationDataValidate(TestCase):
                                                  street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
                                                  city='Amsterdam')
         self.boolean_property = LocationProperty.objects.create(
-            label='Boolean', property_type='BOOL')
+            short_name='bool', label='Boolean', property_type='BOOL')
         self.date_property = LocationProperty.objects.create(
-            label='Date', property_type='DATE')
+            short_name='date', label='Date', property_type='DATE')
         self.email_property = LocationProperty.objects.create(
-            label='Email', property_type='EMAIL')
+            short_name='mail', label='Email', property_type='EMAIL')
         self.integer_property = LocationProperty.objects.create(
-            label='Integer', property_type='INT')
+            short_name='int', label='Integer', property_type='INT')
         self.string_property = LocationProperty.objects.create(
-            label='String', property_type='STR')
+            short_name='str', label='String', property_type='STR')
         self.url_property = LocationProperty.objects.create(
-            label='Url', property_type='URL')
+            short_name='url', label='Url', property_type='URL')
         self.choice_property = LocationProperty.objects.create(
-            label='Choice', property_type='CHOICE')
+            short_name='choice', label='Choice', property_type='CHOICE')
         self.choice_option_1 = PropertyOption.objects.create(
             location_property=self.choice_property, option='Yellow')
         self.choice_option_2 = PropertyOption.objects.create(
