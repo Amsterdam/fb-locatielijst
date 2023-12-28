@@ -94,10 +94,12 @@ class LocationDataProcessor():
         """
         # Run validation
         self.validate()
+        new_instance =  False # TODO gebruiken voor bestaande of nieuwe locatie
 
         # If a Location model instance has not been set yet
         if not isinstance(self.location_model, Location):
             self.location_model = Location()
+            new_instance = True
 
         # Set the attributes for the Location model instance
         for field in self.location_model_fields:
@@ -113,6 +115,9 @@ class LocationDataProcessor():
             # Add all the LocationData to the Location model
             for location_property in self.location_property_instances:
                 value = getattr(self, location_property.short_name)
+
+                # TODO IETS DOEN MET BESTAANDE OF NIEUWE LOCATIEDATA_SET, ANDERS KRIJG JE DUBBELE LOCATIEDATA
+
                 if value:
                     location_data = LocationData(
                         location = self.location_model,

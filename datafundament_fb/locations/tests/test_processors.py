@@ -18,7 +18,7 @@ class TestDataLocationProcessor(TestCase):
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='mail_address', property_type='EMAIL', required=True)
         self.integer_property = LocationProperty.objects.create(
-            short_name='floors', label='number_of_floors', property_type='INT', required=True)
+            short_name='floors', label='Number_of_floors', property_type='INT', required=True)
         self.string_property = LocationProperty.objects.create(
             short_name='color', label='building_color', property_type='STR', required=True)
         self.url_property = LocationProperty.objects.create(

@@ -1,0 +1,30 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Locations</h1>
+<div>
+    <!-- Iterate over object_list -->
+    <p>
+        {% for object in object_list %}
+        <!-- Display Objects -->
+        <a href="{% url 'location-detail' object.building_code %}">{{object.building_code}} - {{ object.name }}</a> | {{ object.description }}
+    </p>
+    <!-- If object_list is empty  -->
+    {% empty %}
+    No objects yet.
+    {% endfor %}
+</div>
+<br />
+
+{% endblock %}
