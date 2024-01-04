@@ -26,6 +26,40 @@ class LocationDetailView(View):
         return render(request=request, template_name=self.template, context=context)
 
 
+class LocationCreateView(View):
+    form = LocationDetailForm
+    template = 'locations/location-create.html'
+    
+    def get(self, request, *args, **kwargs):
+        form = self.form()
+        context = {'form': form}
+        return render(request=request, template_name=self.template, context=context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form(request.POST)
+        # ALS ID IS GEGEVEN DAN IS HET EEN BESTAANDE LOCATIE???
+        
+        if form.is_valid():
+            location_data = LocationDataProcessor(form.cleaned_data)
+            location_data.save()
+            messages.success(request, 'De locatie is opgeslagen')
+            return HttpResponseRedirect(reverse('location-detail', args=[self.kwargs['id']]))
+
+        context = {'form': form}
+        return render(request, template_name=self.template, context=context)
+
+
+class LocationUpdateView(View):
+    form = LocationDetailForm
+    template = 'locations/location-update.html'
+
+    def get(self, request, *args, **kwargs):
+        initial_data = LocationDataProcessor.get(pandcode=self.kwargs['id']).get_dict()
+        form = self.form(initial=initial_data)
+        context = {'form': form, 'pandcode': self.kwargs['id'], 'location_data': initial_data}
+        return render(request=request, template_name=self.template, context=context)
+
+
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
         # ALS ID IS GEGEVEN DAN IS HET EEN BESTAANDE LOCATIE???
@@ -49,27 +83,3 @@ class LocationDetailView(View):
 
         context = {'form': form, 'pandcode': pandcode}
         return render(request, template_name=self.template, context=context)
-
-def location_view_edit(request, id):
-    if request.method == 'GET':
-        context = {
-            'location_data': LocationDataProcessor.get(pandcode=id).get_dict()
-        }
-        
-        return render(request, template_name='locations/location_edit.html', context=context)
-
-    if request.method == 'POST':
-        form_data = dict(request.POST)
-        location = LocationDataProcessor.get(pandcode=id)
-        location.name = form_data['name'][0]
-        setattr(location, 'Adres validatie', form_data['Adres validatie'][0])
-        location.save()
-
-        messages.success(request, 'De locatie is opgeslagen')
-        return HttpResponseRedirect(reverse('location-detail', args=[id]))
-
-
-class LocationCreateView():...
-
-
-class LocationUpdateView():...

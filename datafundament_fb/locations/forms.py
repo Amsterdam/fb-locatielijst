@@ -10,7 +10,15 @@ class LocationDetailForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        location_properties = [obj for obj in LocationProperty.objects.all()]
+        if kwargs.get('initial'):
+            add_fields_to_top = {
+                'building_code' : forms.IntegerField(label='Pandcode', disabled=True),
+                'last_modified' : forms.DateField(label='Laatste wijziging', disabled=True)
+            }
+            add_fields_to_top.update(self.fields)
+            self.fields = add_fields_to_top
+
+        location_properties = [obj for obj in LocationProperty.objects.all().order_by('order', 'short_name')]
         for location_property in location_properties:
             match location_property.property_type:
                 case 'BOOL':
@@ -18,19 +26,23 @@ class LocationDetailForm(forms.Form):
                         label=location_property.label,
                         required=location_property.required,
                         choices=(('Ja', 'Ja'),('Nee','Nee')),
-                        validators=[LocationDataValidator.valid_boolean]
+                        validators=[LocationDataValidator.valid_boolean],
+                        help_text=location_property.description,
                     )
                 case 'DATE':
                     self.fields[location_property.short_name] = forms.CharField(
                         label=location_property.label,
                         required=location_property.required,
-                        validators=[LocationDataValidator.valid_date]
+                        validators=[LocationDataValidator.valid_date],
+                        help_text=location_property.description,
                     )
                 case 'EMAIL':
                     self.fields[location_property.short_name] = forms.CharField(
                         label=location_property.label,
                         required=location_property.required,
-                        validators=[LocationDataValidator.valid_email])
+                        validators=[LocationDataValidator.valid_email],
+                        help_text=location_property.description,
+                    )
                 case 'INT':
                     self.fields[location_property.short_name] = forms.CharField(
                         label=location_property.label,
@@ -50,12 +62,15 @@ class LocationDetailForm(forms.Form):
                     self.fields[location_property.short_name] = forms.CharField(
                         label=location_property.label,
                         required=location_property.required,
-                        validators=[LocationDataValidator.valid_string])
+                        validators=[LocationDataValidator.valid_string],
+                        help_text=location_property.description,
+                    )
                 case 'URL':
                     self.fields[location_property.short_name] = forms.CharField(
                         label=location_property.label,
                         required=location_property.required,
-                        validators=[LocationDataValidator.valid_url]
+                        validators=[LocationDataValidator.valid_url],
+                        help_text=location_property.description,
                     )
                 case 'CHOICE':
                     if location_property.propertyoption_set.values_list('option', flat=True):

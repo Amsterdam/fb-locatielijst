@@ -8,7 +8,7 @@
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
     &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
-    &rsaquo; {{ location_data.name }}
+    &rsaquo; <a href="{% url 'location-detail' building_code %}">{{ location_data.name }}</a>
 </div>
 {% endblock %}
 
@@ -20,13 +20,13 @@
 </ul>
 {% endif %}
 {% block content %}
-    {% for field in form  %}
-        <div>
-            {{ field.errors }}
-            {{ field.label_tag }} {{ field.value }}
+    <form action="." method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <div class="submit_row">
+            <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-create' %}">
         </div>
-    {% endfor %}
-    <a href="{% url 'location-update' building_code %}">Edit</a>
+    </form>
 </div>
 <br />
 {% endblock %}

@@ -1,4 +1,5 @@
 from typing import Self
+from datetime import datetime
 from django.db import transaction
 from django.forms import ValidationError
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
@@ -100,6 +101,9 @@ class LocationDataProcessor():
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
+            # TODO juist plaats voor last_modified datum (auto_now uitzetten op model?)
+            # self.location_model.last_modified = datetime.now()
+
             # Save the location model first before adding LocationData
             self.location_instance.full_clean()
             self.location_instance.save()
@@ -107,8 +111,6 @@ class LocationDataProcessor():
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
                 value = getattr(self, location_property.short_name)
-
-                # TODO IETS DOEN MET BESTAANDE OF NIEUWE LOCATIEDATA_SET, ANDERS KRIJG JE DUBBELE LOCATIEDATA
 
                 if value:
                     location_data = LocationData(
@@ -122,7 +124,18 @@ class LocationDataProcessor():
                         location_data.value = value
                     
                     location_data.clean()
-                    location_data.save()
+                    #location_data.save()
+                    # TODO update_or_create gemaakt, maar misschien een beetje clunky nog
+                    defaults = {}
+                    if location_property.property_type == 'CHOICE':
+                        defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
+                    else: 
+                        defaults['value'] = value
+                    obj, created = LocationData.objects.update_or_create(
+                        location = self.location_model,
+                        location_property = location_property,
+                        defaults = defaults
+                    )
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'
