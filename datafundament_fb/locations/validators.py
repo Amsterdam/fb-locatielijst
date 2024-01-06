@@ -41,7 +41,21 @@ class LocationDataValidator():
             return value
         else:
             raise ValidationError(f"{value} is not a valid number")
-        
+
+    # TODO test schrijven
+    @staticmethod
+    def valid_memo(value)-> str:
+        return value
+
+    # TODO test schrijven/verplaatsen
+    @staticmethod
+    def valid_postal_code(value)-> str:
+        postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
+        if re.match(postal_code_regex, value):
+            return value
+        else:
+            raise ValidationError("This is not a valid postal code in the format 0000XX")
+
     @staticmethod
     def valid_string(value)-> str:
         return value
@@ -79,6 +93,10 @@ class LocationDataValidator():
                     return cls.valid_email(value)
                 case 'INT':
                     return cls.valid_integer(value)
+                case 'MEMO':
+                    return cls.valid_memo(value)
+                case 'POST':
+                    return cls.valid_postal_code(value)
                 case 'STR':
                     return cls.valid_string(value)
                 case 'URL':

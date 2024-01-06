@@ -1,67 +1,14 @@
 [
 {
     "model": "locations.locationproperty",
-    "pk": 1,
+    "pk": 5,
     "fields": {
         "order": null,
         "short_name": "afstoten",
         "label": "Afstoten",
         "required": false,
         "multiple": false,
-        "description": null,
         "property_type": "DATE"
-    }
-},
-{
-    "model": "locations.locationproperty",
-    "pk": 2,
-    "fields": {
-        "order": null,
-        "short_name": "ambtenaar",
-        "label": "Ambtenaren huisvesting",
-        "required": true,
-        "multiple": false,
-        "description": null,
-        "property_type": "BOOL"
-    }
-},
-{
-    "model": "locations.locationproperty",
-    "pk": 3,
-    "fields": {
-        "order": null,
-        "short_name": "soort",
-        "label": "Soort locatie",
-        "required": true,
-        "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
-    }
-},
-{
-    "model": "locations.locationproperty",
-    "pk": 4,
-    "fields": {
-        "order": null,
-        "short_name": "gelieerd",
-        "label": "Gelieerde partij",
-        "required": false,
-        "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
-    }
-},
-{
-    "model": "locations.locationproperty",
-    "pk": 5,
-    "fields": {
-        "order": null,
-        "short_name": "lt",
-        "label": "Locatieteam",
-        "required": true,
-        "multiple": false,
-        "description": null,
-        "property_type": "STR"
     }
 },
 {
@@ -69,12 +16,11 @@
     "pk": 6,
     "fields": {
         "order": null,
-        "short_name": "lt_mail",
-        "label": "Mailadres Locatieteam",
-        "required": false,
+        "short_name": "ambtenaar",
+        "label": "Ambtenaren huisvesting",
+        "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "STR"
+        "property_type": "BOOL"
     }
 },
 {
@@ -82,12 +28,11 @@
     "pk": 7,
     "fields": {
         "order": null,
-        "short_name": "dvk_nr",
-        "label": "Gewenste Cat. dienstverlenings kader",
+        "short_name": "soort",
+        "label": "Soort locatie",
         "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "INT"
+        "property_type": "CHOICE"
     }
 },
 {
@@ -95,11 +40,10 @@
     "pk": 8,
     "fields": {
         "order": null,
-        "short_name": "dvk_naam",
-        "label": "Categorie Dienstverleningskader",
-        "required": true,
+        "short_name": "gelieerd",
+        "label": "Gelieerde partij",
+        "required": false,
         "multiple": false,
-        "description": null,
         "property_type": "CHOICE"
     }
 },
@@ -108,12 +52,11 @@
     "pk": 9,
     "fields": {
         "order": null,
-        "short_name": "budget_dir",
-        "label": "Budget verantwoordelijke directie",
+        "short_name": "lt",
+        "label": "Locatieteam",
         "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
+        "property_type": "STR"
     }
 },
 {
@@ -121,12 +64,11 @@
     "pk": 10,
     "fields": {
         "order": null,
-        "short_name": "routecode",
-        "label": "Routecode indien geen budget FB",
+        "short_name": "lt_mail",
+        "label": "Mailadres Locatieteam",
         "required": false,
         "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
+        "property_type": "STR"
     }
 },
 {
@@ -134,12 +76,11 @@
     "pk": 11,
     "fields": {
         "order": null,
-        "short_name": "bagconf",
-        "label": "Adres validatie",
+        "short_name": "dvk_nr",
+        "label": "Gewenste Cat. dienstverlenings kader",
         "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
+        "property_type": "INT"
     }
 },
 {
@@ -147,12 +88,11 @@
     "pk": 12,
     "fields": {
         "order": null,
-        "short_name": "lm",
-        "label": "Locatiemanager",
+        "short_name": "dvk_naam",
+        "label": "Categorie Dienstverleningskader",
         "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "STR"
+        "property_type": "CHOICE"
     }
 },
 {
@@ -160,12 +100,11 @@
     "pk": 13,
     "fields": {
         "order": null,
-        "short_name": "contact",
-        "label": "Contactpersoon vanuit Directies",
+        "short_name": "budget_dir",
+        "label": "Budget verantwoordelijke directie",
         "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "STR"
+        "property_type": "CHOICE"
     }
 },
 {
@@ -173,11 +112,10 @@
     "pk": 14,
     "fields": {
         "order": null,
-        "short_name": "bezit",
-        "label": "Eigendom / Huur",
+        "short_name": "routecode",
+        "label": "Routecode indien geen budget FB",
         "required": false,
         "multiple": false,
-        "description": null,
         "property_type": "CHOICE"
     }
 },
@@ -186,11 +124,202 @@
     "pk": 15,
     "fields": {
         "order": null,
+        "short_name": "bagconf",
+        "label": "Adres validatie",
+        "required": false,
+        "multiple": false,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 22,
+    "fields": {
+        "order": null,
+        "short_name": "lm",
+        "label": "Locatiemanager",
+        "required": true,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 23,
+    "fields": {
+        "order": null,
+        "short_name": "contact",
+        "label": "Contactpersoon vanuit Directies",
+        "required": true,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 24,
+    "fields": {
+        "order": null,
+        "short_name": "bezit",
+        "label": "Eigendom / Huur",
+        "required": false,
+        "multiple": false,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 27,
+    "fields": {
+        "order": null,
         "short_name": "energielbl",
         "label": "Energielabel",
         "required": false,
         "multiple": false,
-        "description": null,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 28,
+    "fields": {
+        "order": null,
+        "short_name": "werkplek",
+        "label": "Aantal werkplekken",
+        "required": false,
+        "multiple": false,
+        "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 29,
+    "fields": {
+        "order": null,
+        "short_name": "tom",
+        "label": "TOM",
+        "required": false,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 30,
+    "fields": {
+        "order": null,
+        "short_name": "tsc",
+        "label": "TSC",
+        "required": false,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 31,
+    "fields": {
+        "order": null,
+        "short_name": "beveiligng",
+        "label": "Adviseur beveiliging",
+        "required": false,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 32,
+    "fields": {
+        "order": null,
+        "short_name": "veiligheid",
+        "label": "Adviseur veiligheid",
+        "required": false,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 33,
+    "fields": {
+        "order": null,
+        "short_name": "am_gv",
+        "label": "Assetmanager/contact vastgoed",
+        "required": false,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 39,
+    "fields": {
+        "order": null,
+        "short_name": "pas",
+        "label": "1s1p",
+        "required": false,
+        "multiple": false,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 40,
+    "fields": {
+        "order": null,
+        "short_name": "anet",
+        "label": "A-net",
+        "required": false,
+        "multiple": false,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 41,
+    "fields": {
+        "order": null,
+        "short_name": "vlekken",
+        "label": "Vlekken",
+        "required": false,
+        "multiple": true,
+        "property_type": "CHOICE"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 1,
+    "fields": {
+        "order": null,
+        "short_name": "afkorting",
+        "label": "Afkorting",
+        "required": false,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 3,
+    "fields": {
+        "order": null,
+        "short_name": "beschrving",
+        "label": "Beschrijving",
+        "required": true,
+        "multiple": false,
+        "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 4,
+    "fields": {
+        "order": null,
+        "short_name": "actief",
+        "label": "Actief",
+        "required": true,
+        "multiple": false,
         "property_type": "STR"
     }
 },
@@ -199,24 +328,10 @@
     "pk": 16,
     "fields": {
         "order": null,
-        "short_name": "werkplek",
-        "label": "Aantal werkplekken",
-        "required": false,
+        "short_name": "straat",
+        "label": "Straat",
+        "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "INT"
-    }
-},
-{
-    "model": "locations.locationproperty",
-    "pk": 17,
-    "fields": {
-        "order": null,
-        "short_name": "tom",
-        "label": "TOM",
-        "required": false,
-        "multiple": false,
-        "description": null,
         "property_type": "STR"
     }
 },
@@ -225,12 +340,11 @@
     "pk": 18,
     "fields": {
         "order": null,
-        "short_name": "tsc",
-        "label": "TSC",
-        "required": false,
+        "short_name": "straat_nr",
+        "label": "Straatnummer",
+        "required": true,
         "multiple": false,
-        "description": null,
-        "property_type": "STR"
+        "property_type": "INT"
     }
 },
 {
@@ -238,11 +352,10 @@
     "pk": 19,
     "fields": {
         "order": null,
-        "short_name": "beveiligng",
-        "label": "Adviseur beveiliging",
+        "short_name": "num_letter",
+        "label": "Straatnummer letter",
         "required": false,
         "multiple": false,
-        "description": null,
         "property_type": "STR"
     }
 },
@@ -251,12 +364,23 @@
     "pk": 20,
     "fields": {
         "order": null,
-        "short_name": "veiligheid",
-        "label": "Adviseur veiligheid",
+        "short_name": "num_ext",
+        "label": "Straatnummer extensie",
         "required": false,
         "multiple": false,
-        "description": null,
         "property_type": "STR"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 17,
+    "fields": {
+        "order": null,
+        "short_name": "postcode",
+        "label": "Postcode",
+        "required": true,
+        "multiple": false,
+        "property_type": "POST"
     }
 },
 {
@@ -264,51 +388,95 @@
     "pk": 21,
     "fields": {
         "order": null,
-        "short_name": "am_gv",
-        "label": "Assetmanager/contact vastgoed",
-        "required": false,
+        "short_name": "plaats",
+        "label": "Plaats",
+        "required": true,
         "multiple": false,
-        "description": null,
         "property_type": "STR"
     }
 },
 {
     "model": "locations.locationproperty",
-    "pk": 22,
+    "pk": 25,
     "fields": {
         "order": null,
-        "short_name": "pas",
-        "label": "1s1p",
+        "short_name": "bouwjaar",
+        "label": "Bouwjaar",
         "required": false,
         "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
+        "property_type": "INT"
     }
 },
 {
     "model": "locations.locationproperty",
-    "pk": 23,
+    "pk": 26,
     "fields": {
         "order": null,
-        "short_name": "anet",
-        "label": "A-net",
+        "short_name": "vvo",
+        "label": "Vloeroppervlak",
         "required": false,
         "multiple": false,
-        "description": null,
-        "property_type": "CHOICE"
+        "property_type": "INT"
     }
 },
 {
     "model": "locations.locationproperty",
-    "pk": 24,
+    "pk": 38,
     "fields": {
         "order": null,
-        "short_name": "vlekken",
-        "label": "Vlekken",
+        "short_name": "notitie",
+        "label": "Notitie",
         "required": false,
-        "multiple": true,
-        "description": null,
-        "property_type": "CHOICE"
+        "multiple": false,
+        "property_type": "MEMO"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 34,
+    "fields": {
+        "order": null,
+        "short_name": "longitude",
+        "label": "Longitude",
+        "required": false,
+        "multiple": false,
+        "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 35,
+    "fields": {
+        "order": null,
+        "short_name": "latitude",
+        "label": "Latitude",
+        "required": false,
+        "multiple": false,
+        "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 36,
+    "fields": {
+        "order": null,
+        "short_name": "rd_x",
+        "label": "RD-X",
+        "required": false,
+        "multiple": false,
+        "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 37,
+    "fields": {
+        "order": null,
+        "short_name": "rd_y",
+        "label": "RD-Y",
+        "required": false,
+        "multiple": false,
+        "property_type": "INT"
     }
 }
 ]

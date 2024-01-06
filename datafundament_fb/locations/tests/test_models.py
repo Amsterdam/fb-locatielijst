@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.db import transaction
-from locations.models import compute_building_code, validate_postal_code, validate_short_name, Location, LocationProperty, PropertyOption, LocationData
+from locations.models import compute_pandcode, validate_short_name, Location, LocationProperty, PropertyOption, LocationData
 from locations.validators import LocationDataValidator
 
 
@@ -13,76 +13,28 @@ class TestModelFunctions(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location(building_code='25000', name='Stopera', description='Stadhuis',
-                                  street='Amstel1', street_number=1, postal_code='1000 AA',
-                                  city='Amsterdam')
-        self.location2 = Location(building_code='24000', name='GGD', description='Gemeentelijke Gezondheidsdienst',
-                                  street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
-                                  city='Amsterdam')
+        self.location1 = Location(pandcode='25000', naam='Stopera')
+        self.location2 = Location(pandcode='24000', naam='GGD')
         self.location_property = LocationProperty(
             short_name='short_name', label="Short Name", property_type = 'STR')
         self.choice_property = LocationProperty.objects.create(
             label='Choice', property_type='CHOICE')
 
-    def test_compute_building_code(self):
+    def test_compute_pandcode(self):
         """
         Test auto compute of the building code in Location based on the current highest number
         """
 
         # Test when there is no Location object yet in the db
         self.assertEqual(Location.objects.all().count(), 0)
-        self.assertEqual(compute_building_code(), 1)
+        self.assertEqual(compute_pandcode(), 1)
 
         # Test when there are existing location objects
         self.location1.save()
         self.location2.save()
-        location_with_highest_building_code = Location.objects.all().order_by('-building_code').first()
-        next_building_code = location_with_highest_building_code.building_code + 1
-        self.assertEqual(compute_building_code(), next_building_code)
-
-    def test_postal_code_validation(self):
-        """
-        Test  postal code validation
-        """
-
-        # Test the validator
-        self.location1.postal_code = '1234AA'
-        self.assertEqual(validate_postal_code(self.location1.postal_code), self.location1.postal_code)
-        self.location1.postal_code = '1234 AA'
-        self.assertEqual(validate_postal_code(self.location1.postal_code), self.location1.postal_code)
-
-        # Test for validation errors
-        # Only one letter
-        self.location1.postal_code = '1234A'
-        self.assertRaises(ValidationError, self.location1.full_clean)
-
-        # Only 3 numbers
-        self.location1.postal_code = '123 AA'
-        self.assertRaises(ValidationError, self.location1.full_clean)
-
-        # Letters in lower case
-        self.location1.postal_code = '1234aa'
-        self.assertRaises(ValidationError, self.location1.full_clean)
-
-        # Leading with a zero
-        self.location1.postal_code = '0234 AA'
-        self.assertRaises(ValidationError, self.location1.full_clean)
-
-        # Prohibited combination of letters (SA, SD, SS)
-        self.location1.postal_code = '1234SS'
-        self.assertRaises(ValidationError, self.location1.full_clean)
-
-    def test_required_field(self):
-        # Test when location_property is required and no value or option is passed
-        # Make the location property required
-        self.choice_property.required = True
-
-        # Set LocationData without value
-        self.location_data = LocationData(
-            location=self.location1,
-            location_property=self.choice_property,
-        )
-        self.assertRaises(ValidationError, self.location_data.clean)
+        location_with_highest_pandcode = Location.objects.all().order_by('-pandcode').first()
+        next_pandcode = location_with_highest_pandcode.pandcode + 1
+        self.assertEqual(compute_pandcode(), next_pandcode)
 
     def test_short_name_validation(self):
         """
@@ -120,31 +72,7 @@ class TestLocationDataValidation(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location.objects.create(building_code='25000', name='Stopera', description='Stadhuis',
-                                  street='Amstel1', street_number=1, postal_code='1000 AA',
-                                  city='Amsterdam')
-        self.location2 = Location.objects.create(building_code='24000', name='GGD', description='Gemeentelijke Gezondheidsdienst',
-                                  street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
-                                  city='Amsterdam')
-        self.boolean_property = LocationProperty.objects.create(
-            short_name='bool', label='Boolean', property_type='BOOL')
-        self.date_property = LocationProperty.objects.create(
-            short_name='date', label='Date', property_type='DATE')
-        self.email_property = LocationProperty.objects.create(
-            short_name='mail', label='Email', property_type='EMAIL')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='int', label='Integer', property_type='INT')
-        self.string_property = LocationProperty.objects.create(
-            short_name='str', label='String', property_type='STR')
-        self.url_property = LocationProperty.objects.create(
-            short_name='url', label='Url', property_type='URL')
-        self.choice_property = LocationProperty.objects.create(
-            short_name='choice', label='Choice', property_type='CHOICE')
-        self.choice_option_1 = PropertyOption.objects.create(
-            location_property=self.choice_property, option='Yellow')
-        self.choice_option_2 = PropertyOption.objects.create(
-            location_property=self.choice_property, option='Orange')
-        self.location_data = LocationData(location=self.location1)
+        return super().setUp()
 
     def test_boolean_validation(self):
         # Test valid boolean value
@@ -196,6 +124,22 @@ class TestLocationDataValidation(TestCase):
         for value in values:
             self.assertRaises(ValidationError, LocationDataValidator.valid_integer, value)
 
+    def test_memo_validation(self):
+        # Test valid string value; this functions always returns the input, because the value it is already a string
+        value = 'string'
+        self.assertEqual(LocationDataValidator.valid_string(value), value)
+
+    def test_postal_code_validation(self):
+        # Test valid postal codes
+        values = ['1234AA', '1234 AA']
+        for value in values:
+            self.assertEqual(LocationDataValidator.valid_postal_code(value), value)
+
+        # Test for invalid postal codes
+        values = ['1234A', '123 AA', '1234aa', '0234 AA', '1234SS']
+        for value in values:
+            self.assertRaises(ValidationError, LocationDataValidator.valid_postal_code, value)
+
     def test_str_validation(self):
         # Test valid string value; this functions always returns the input, because the value it is already a string
         value = 'string'
@@ -225,18 +169,25 @@ class TestLocationDataValidation(TestCase):
             self.assertRaises(ValidationError, LocationDataValidator.valid_url, value)
 
     def test_choice_validation(self):
+        choice_property = LocationProperty.objects.create(
+            short_name='choice', label='Choice', property_type='CHOICE')
+        PropertyOption.objects.create(
+            location_property=choice_property, option='Yellow')
+        PropertyOption.objects.create(
+            location_property=choice_property, option='Orange')
+
         # Test valid choice value input
         value = 'Yellow'
         self.assertEqual(LocationDataValidator.valid_choice(
-            self.choice_property, value), value
+            choice_property, value), value
         )
 
         # Test invalid choice value input
         self.assertRaises(
-            ValidationError, LocationDataValidator.valid_choice, value='Magenta', location_property=self.choice_property
+            ValidationError, LocationDataValidator.valid_choice, value='Magenta', location_property=choice_property
         )
         self.assertRaises(
-            ValidationError, LocationDataValidator.valid_choice, value='yellow', location_property=self.choice_property
+            ValidationError, LocationDataValidator.valid_choice, value='yellow', location_property=choice_property
         )
 
 
@@ -246,12 +197,8 @@ class TestLocationDataValidate(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location.objects.create(building_code='25000', name='Stopera', description='Stadhuis',
-                                                 street='Amstel1', street_number=1, postal_code='1000 AA',
-                                                 city='Amsterdam')
-        self.location2 = Location.objects.create(building_code='24000', name='GGD', description='Gemeentelijke Gezondheidsdienst',
-                                                 street='Nieuw Achtergracht', street_number=100, postal_code='1018 BB',
-                                                 city='Amsterdam')
+        self.location1 = Location.objects.create(pandcode='25000', naam='Stopera')
+        self.location2 = Location.objects.create(pandcode='24000', naam='GGD')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
         self.date_property = LocationProperty.objects.create(
@@ -260,6 +207,10 @@ class TestLocationDataValidate(TestCase):
             short_name='mail', label='Email', property_type='EMAIL')
         self.integer_property = LocationProperty.objects.create(
             short_name='int', label='Integer', property_type='INT')
+        self.memo_property = LocationProperty.objects.create(
+            short_name='memo', label='Memo', property_type='MEMO')
+        self.postal_code_property = LocationProperty.objects.create(
+            short_name='post', label='Postal code', property_type='POST')
         self.string_property = LocationProperty.objects.create(
             short_name='str', label='String', property_type='STR')
         self.url_property = LocationProperty.objects.create(
@@ -296,6 +247,22 @@ class TestLocationDataValidate(TestCase):
             location_property=self.integer_property, value=value)
         self.assertTrue(mock.called)
 
+    @mock.patch('locations.validators.LocationDataValidator.valid_memo')
+    def test_clean_memo(self, mock):
+        # Test if valid_integer is called
+        value = 'string'
+        LocationDataValidator.validate(
+            location_property=self.memo_property, value=value)
+        self.assertTrue(mock.called)
+
+    @mock.patch('locations.validators.LocationDataValidator.valid_postal_code')
+    def test_clean_postal_code(self, mock):
+        # Test if valid string is called
+        value = '1234 AA'
+        LocationDataValidator.validate(
+            location_property=self.postal_code_property, value=value)
+        self.assertTrue(mock.called)
+
     @mock.patch('locations.validators.LocationDataValidator.valid_string')
     def test_clean_string(self, mock):
         # Test if valid string is called
@@ -327,17 +294,29 @@ class TestLocationDataModel(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location = Location.objects.create(building_code='25000', name='Stopera', description='Stadhuis',
-                                                 street='Amstel1', street_number=1, postal_code='1000 AA',
-                                                 city='Amsterdam')
+        self.location = Location.objects.create(pandcode='25000', naam='Stopera')
+        self.string_property = LocationProperty.objects.create(
+            short_name='str', label='String', property_type='STR', unique=True)
         self.choice_property = LocationProperty.objects.create(
             label='Choice', property_type='CHOICE')
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Yellow')
         self.location_data = LocationData(location=self.location)
     
-    def test_model_constraint(self):
-        # Test when either field is filled, not both TODO there is not validation on choice field + option, or other field + value
+    def test_required_field(self):
+        # Test when location_property is required and no value or option is passed
+        # Make the location property required
+        self.choice_property.required = True
+
+        # Set LocationData without value
+        self.location_data = LocationData(
+            location=self.location,
+            location_property=self.choice_property,
+        )
+        self.assertRaises(ValidationError, self.location_data.clean)
+
+    def test_for_empty_value_constraint(self):
+        # Test when either field is filled, not both
         self.location_data.location_property = self.choice_property
         self.location_data.property_option = self.choice_option
         self.assertEqual(self.location_data.clean(), None)
@@ -357,3 +336,49 @@ class TestLocationDataModel(TestCase):
         self.location_data.value = None
         with transaction.atomic():
             self.assertRaises(IntegrityError, self.location_data.save)
+
+    def test_for_unique_constraint(self):
+        # Test when unique is enabled
+        # Save a value to the database
+        self.location_data.location_property = self.string_property
+        self.location_data.value = 'Yellow'
+        self.location_data.save()
+
+        location_data = LocationData(
+            location=self.location,
+            location_property = self.string_property,
+            value = 'Yellow'
+        )
+        # Raise a validation error
+        with self.assertRaises(ValidationError) as validation_error:
+            location_data.clean()
+
+        # Test the validation error
+        self.assertEqual(validation_error.exception.code, 'unique')
+        self.assertEqual(
+            validation_error.exception.message,
+            f'Property %(property)s already exists for location %(location)s',
+        )
+
+    def test_for_single_constraint(self):
+        # Test that a property can only exist once for a location; except when multiple is enabled for a property
+        self.location_data.location_property = self.string_property
+        self.location_data.value = 'Yellow'
+        self.location_data.save()
+
+        location_data = LocationData(
+            location=self.location,
+            location_property = self.string_property,
+            value = 'Organe'
+        )
+
+        # Raise a validation error
+        with self.assertRaises(ValidationError) as validation_error:
+            location_data.clean()
+
+        # Test the validation error
+        self.assertEqual(validation_error.exception.code, 'unique')
+        self.assertEqual(
+            validation_error.exception.message,
+            f'Property %(property)s already exists for location %(location)s',
+        )

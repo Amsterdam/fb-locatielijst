@@ -2,21 +2,14 @@ import re
 from django.db import models
 from django.db.models import Max, Q
 from django.core.exceptions import ValidationError
-from locations.validators import LocationDataValidator
 from django.utils.translation import gettext as _
+from locations.validators import LocationDataValidator
 
 # Create your models here.
 
 # Auto generate a new building_code based on the current highest in the database
-def compute_building_code() -> int:
-    return (Location.objects.aggregate(Max('building_code'))['building_code__max'] or 0) + 1
-
-def validate_postal_code(value)-> str:
-    postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
-    if re.match(postal_code_regex, value):
-        return value
-    else:
-        raise ValidationError("This is not a valid postal code in the format 0000XX")
+def compute_pandcode() -> int:
+    return (Location.objects.aggregate(Max('pandcode'))['pandcode__max'] or 0) + 1
 
 def validate_short_name(value)-> str:
     name_regex = '^[a-z]+[0-9a-z_]+$'
@@ -31,52 +24,23 @@ def validate_short_name(value)-> str:
 
 class Location(models.Model):
     '''
-    Base class for the location with location typical information
+    Base class for the location
     '''
-    ACTIVE_CHOICES = (
-        ('Ja', 'Ja'),
-        ('Nee', 'Nee')
-    )
-
-    building_code = models.IntegerField(
-        verbose_name='Pandcode', default=compute_building_code)  # possible race condition when a location is added simultaneously; not worried about it now
-    short_name = models.CharField(
-        verbose_name='Afkorting', max_length=12, null=True, blank=True)
-    name = models.CharField(verbose_name='Locatie', max_length=100,)
-    description = models.CharField(
-        verbose_name='Beschrijving', max_length=255)
-    active = models.CharField(
-        verbose_name='Actief', default='Ja', choices=ACTIVE_CHOICES)
-    last_modified = models.DateField(
+    pandcode = models.IntegerField(
+        default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
+    naam = models.CharField(
+        verbose_name='Locatie', max_length=100)
+    mut_datum = models.DateField(
         verbose_name='Laatste wijziging', auto_now=True)
-    street = models.CharField(verbose_name='Straat', max_length=100)
-    street_number = models.IntegerField(verbose_name='Straatnummer')
-    street_number_letter = models.CharField(
-        verbose_name='Huisletter', max_length=10, null=True, blank=True)
-    street_number_extension = models.CharField(
-        verbose_name='Nummer toevoeging', max_length=10, null=True, blank=True)
-    postal_code = models.CharField(verbose_name='Postcode', max_length=7, validators=[validate_postal_code])
-    city = models.CharField(verbose_name='Plaats', max_length=100)
-    construction_year = models.IntegerField(
-        verbose_name='Bouwjaar', null=True, blank=True)
-    floor_area = models.IntegerField(
-        verbose_name='Vloeroppervlak', null=True, blank=True)
-    longitude = models.FloatField(null=True, blank=True)
-    latitude = models.FloatField(null=True, blank=True)
-    rd_x = models.FloatField(null=True, blank=True)
-    rd_y = models.FloatField(null=True, blank=True)
-    note = models.TextField(verbose_name='Notitie', null=True, blank=True)
-
+    
     def __str__(self):
-        return f'{self.building_code}, {self.name}'
+        return f'{self.pandcode}, {self.naam}'
 
     class Meta:
         verbose_name = 'Locatie'
         constraints = [
-            models.UniqueConstraint(
-                fields=['building_code'], name='unique_building_code'),
-            models.UniqueConstraint(
-                fields=['name'], name='unique_location_name')
+            models.UniqueConstraint(fields=['pandcode'], name='pandcode'),
+            models.UniqueConstraint(fields=['naam'], name='unique_location_name')
         ]
 
 
@@ -90,7 +54,8 @@ class LocationProperty(models.Model):
         DATE = 'DATE', 'Datum'
         EMAIL = 'EMAIL', 'E-mail'
         INT = 'INT', 'Numeriek'
-        STR = 'STR', 'Tekst'
+        MEMO = 'MEMO', 'Memo'
+        POST = 'POST', 'Postcode'
         URL = 'URL', 'Url'
         # Indicates related property option for a choice list
         CHOICE = 'CHOICE', 'Keuzelijst'
@@ -102,8 +67,9 @@ class LocationProperty(models.Model):
         verbose_name='Verplicht veld', default=False)
     multiple = models.BooleanField(
         verbose_name='Meervoudige invoer', default=False)
-    description = models.CharField(
-        verbose_name='Omschrijving', null=True, blank=True, max_length=255)
+    unique = models.BooleanField(
+        verbose_name='Waarde moet uniek zijn', default=False
+    )
     property_type = models.CharField(
         verbose_name='Gegevens type', choices=LocationPropertyType.choices, max_length=10)
 
@@ -149,7 +115,8 @@ class LocationData(models.Model):
         LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     property_option = models.ForeignKey(
         PropertyOption, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Optie')
-    value = models.CharField(verbose_name='Waarde', max_length=255, null=True, blank=True)
+    value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
+    last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True)
 
     class Meta:
         verbose_name = 'Locatie gegeven'
@@ -168,12 +135,40 @@ class LocationData(models.Model):
         return f'{self.location}, {self.location_property}, {self.property_option}, {self.value}'
 
     def clean(self) -> None:
+        # Validate for single instance
+        if not self.location_property.multiple:
+            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+                raise ValidationError(
+                    _("Property %(property)s already exists for location %(location)s"),
+                    code='unique',
+                    params={
+                        'property': self.location_property.label,
+                        'location': self.location.pandcode
+                    },
+                )
+
+        # Validate uniqueness for properties' value
+        if self.location_property.unique:
+            if LocationData.objects.filter(location_property=self.location_property,value=self.value).exists():
+                raise ValidationError(
+                    _("Value %(value)s already exists for property %(property)s"),
+                    code='unique',
+                    params={
+                        'value': self.value,
+                        'property': self.location_property.label
+                    },
+                )
+
         # Ensure location property validation when submitted via a form
         # Validate for empty properties
         if self.location_property.required and not(self.value or self.property_option):
-            raise ValidationError(f'Value required for {self.location_property.label}')
-            
-        # Skip for choice validation, because value should be empty
+            raise ValidationError(
+                _("Value required for %(property)s"),
+                code='required',
+                params={'property': self.location_property.label}
+            )
+
+         # Skip for choice validation, because value should be empty
         if self.location_property.property_type != 'CHOICE': 
             LocationDataValidator().validate(
                 location_property=self.location_property, value=self.value)
