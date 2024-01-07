@@ -14,6 +14,9 @@
 {% block content %}
 <h1>Locations</h1>
 <div>
+    <a href="{% url 'location-create' %}">New</a>
+</div>
+<div>
     <!-- Iterate over object_list -->
     <p>
         {% for object in object_list %}

@@ -8,7 +8,7 @@
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
     &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
-    &rsaquo; <a href="{% url 'location-detail' building_code %}">{{ location_data.name }}</a>
+    &rsaquo; <a href="{% url 'location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
 </div>
 {% endblock %}
 
@@ -22,9 +22,13 @@
 {% block content %}
     <form action="." method="POST">
         {% csrf_token %}
+        <div>
+            Pandcode: {{ location_data.pandcode }}<br>
+            Mutatie datum: {{ location_data.mut_datum }}
+        </div>
         {{ form }}
         <div class="submit_row">
-            <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-create' %}">
+            <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}">
         </div>
     </form>
 </div>

@@ -29,8 +29,8 @@ class Location(models.Model):
     pandcode = models.IntegerField(
         default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
     naam = models.CharField(
-        verbose_name='Locatie', max_length=100)
-    mut_datum = models.DateField(
+        verbose_name='Naam', max_length=100)
+    mut_datum = models.DateTimeField(
         verbose_name='Laatste wijziging', auto_now=True)
     
     def __str__(self):
@@ -42,7 +42,6 @@ class Location(models.Model):
             models.UniqueConstraint(fields=['pandcode'], name='pandcode'),
             models.UniqueConstraint(fields=['naam'], name='unique_location_name')
         ]
-
 
 class LocationProperty(models.Model):
     '''
@@ -136,16 +135,17 @@ class LocationData(models.Model):
 
     def clean(self) -> None:
         # Validate for single instance
-        if not self.location_property.multiple:
-            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
-                raise ValidationError(
-                    _("Property %(property)s already exists for location %(location)s"),
-                    code='unique',
-                    params={
-                        'property': self.location_property.label,
-                        'location': self.location.pandcode
-                    },
-                )
+        # TODO werkt niet omdat deze validatie al plaatsvindt voordat de update van een property plaatsvind
+        # if not self.location_property.multiple:
+        #     if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+        #         raise ValidationError(
+        #             _("Property %(property)s already exists for location %(location)s"),
+        #             code='unique',
+        #             params={
+        #                 'property': self.location_property.label,
+        #                 'location': self.location.pandcode
+        #             },
+        #         )
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:

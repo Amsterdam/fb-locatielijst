@@ -22,6 +22,9 @@
 {% block content %}
     <form action="." method="POST">
         {% csrf_token %}
+        <div>
+            Pandcode: Wordt gevuld na het opslaan<br>
+        </div>
         {{ form }}
         <div class="submit_row">
             <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-create' %}">

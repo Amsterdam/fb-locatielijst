@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 # Create your views here.
 class LocationListView(ListView):
     model = Location
+    template_name = 'locations/location-list.html'
     
     def get(self, request, *args, **kwargs):
         return super(LocationListView, self).get(request, *args, **kwargs)
@@ -43,7 +44,7 @@ class LocationCreateView(View):
             location_data = LocationDataProcessor(form.cleaned_data)
             location_data.save()
             messages.success(request, 'De locatie is opgeslagen')
-            return HttpResponseRedirect(reverse('location-detail', args=[self.kwargs['id']]))
+            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
 
         context = {'form': form}
         return render(request, template_name=self.template, context=context)
@@ -56,7 +57,7 @@ class LocationUpdateView(View):
     def get(self, request, *args, **kwargs):
         initial_data = LocationDataProcessor.get(pandcode=self.kwargs['id']).get_dict()
         form = self.form(initial=initial_data)
-        context = {'form': form, 'pandcode': self.kwargs['id'], 'location_data': initial_data}
+        context = {'form': form, 'location_data': initial_data}
         return render(request=request, template_name=self.template, context=context)
 
 
@@ -71,9 +72,8 @@ class LocationUpdateView(View):
             # OF FILTEREN OP NIEUW IN REQUEST BODY OID?
             if Location.objects.filter(pandcode=pandcode).exists():
                 location_data = LocationDataProcessor.get(pandcode=pandcode)
-                for field in location_data.location_properties:
-                    if getattr(location_data, field) != form.cleaned_data[field]:
-                        setattr(location_data, field, form.cleaned_data[field])
+                for field in form.cleaned_data:
+                    setattr(location_data, field, form.cleaned_data[field])
             else:
                 location_data = LocationDataProcessor(form.cleaned_data)
             

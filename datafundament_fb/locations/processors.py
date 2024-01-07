@@ -1,7 +1,7 @@
 from typing import Self
-from datetime import datetime
 from django.db import transaction
 from django.forms import ValidationError
+from django.utils import timezone
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationDataProcessor():
@@ -51,8 +51,8 @@ class LocationDataProcessor():
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
         setattr(object, 'naam', getattr(object.location_instance, 'naam'))
-        # TODO naar string verwerken
-        setattr(object, 'mut_datum', getattr(object.location_instance, 'mut_datum').strftime('%d-%m-%Y'))
+        mut_datum = timezone.localtime(getattr(object.location_instance, 'mut_datum')).strftime('%d-%m-%Y %H:%M')
+        setattr(object, 'mut_datum', mut_datum)
         
         for location_data in object.location_instance.locationdata_set.all():
             if location_data.location_property.property_type == 'CHOICE':
@@ -86,27 +86,30 @@ class LocationDataProcessor():
         """
         # Run validation
         self.validate()
-
+        
+        # update or new
+        update = False
+        
         # If a Location model instance has not been set yet
         if not isinstance(self.location_instance, Location):
             if Location.objects.filter(pandcode=self.pandcode).exists():
+                update = True
                 self.location_instance = Location.objects.get(pandcode=self.pandcode)
             else:
                 self.location_instance = Location()
 
         # Set the attributes for the Location model instance
-        setattr(self.location_instance, 'pandcode', getattr(self, 'pandcode'))
         setattr(self.location_instance, 'naam', getattr(self, 'naam'))
 
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
-            # TODO juist plaats voor last_modified datum (auto_now uitzetten op model?)
-            # self.location_model.last_modified = datetime.now()
-
             # Save the location model first before adding LocationData
+            
+            # TODO, can ook get_or_create gebruiken, maar dan gaat het fout met full_clean?
+            
             self.location_instance.full_clean()
-            self.location_instance.save()
+            self.location_instance.save()          
 
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
@@ -126,16 +129,25 @@ class LocationDataProcessor():
                     location_data.clean()
                     #location_data.save()
                     # TODO update_or_create gemaakt, maar misschien een beetje clunky nog
+                    # TODO en validatie gaat nu fout omdat bij een update het nog niet bekent is of het object geupdate of nieuw is
                     defaults = {}
                     if location_property.property_type == 'CHOICE':
                         defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
                     else: 
                         defaults['value'] = value
                     obj, created = LocationData.objects.update_or_create(
-                        location = self.location_model,
+                        location = self.location_instance,
                         location_property = location_property,
                         defaults = defaults
                     )
+
+                    # Update datum mutatie?
+                    self.location_instance.save()
+
+        # TODO update pandcode wanneer het een nieuwe locatie betreft
+        if not update:
+            self.pandcode = self.location_instance.pandcode
+
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'
