@@ -22,14 +22,14 @@
 {% block content %}
         <div>
             Pandcode: {{ location_data.pandcode }}<br>
-            Mutatie datum: {{ location_data.mut_datum }}
+            Laatst gewijzigd: {{ gewijzigd }}
         </div>
-    {% for field in form  %}
+    {% for field in form %}
         <div>
         {{ field.errors }}
         {{ field.label_tag }} {{ field.value }}
         </div>
     {% endfor %}
-    <a href="{% url 'location-update' pandcode %}">Edit</a>
+    <a href="{% url 'location-update' location_data.pandcode %}">Edit</a>
 <br />
 {% endblock %}

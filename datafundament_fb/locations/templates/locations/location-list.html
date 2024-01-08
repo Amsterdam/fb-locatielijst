@@ -21,7 +21,7 @@
     <p>
         {% for object in object_list %}
         <!-- Display Objects -->
-        <a href="{% url 'location-detail' object.pandcode %}">{{object.pandcode}} - {{ object.naam }}</a>
+        <a href="{% url 'location-detail' object.pandcode %}">{{object.pandcode}} - {{ object.name }}</a>
     </p>
     <!-- If object_list is empty  -->
     {% empty %}

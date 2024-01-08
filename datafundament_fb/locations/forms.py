@@ -1,7 +1,7 @@
 from django import forms
-from locations.models import Location
-from locations.validators import LocationDataValidator
+from django.utils.safestring import mark_safe
 from locations.models import LocationProperty
+from locations.validators import LocationDataValidator
 
 def set_location_property_fields()-> dict:
     fields = dict()
@@ -20,39 +20,48 @@ def set_location_property_fields()-> dict:
                     label=location_property.label,
                     required=location_property.required,
                     validators=[LocationDataValidator.valid_date],
+                    widget=forms.DateInput
                 )
             case 'EMAIL':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
                     validators=[LocationDataValidator.valid_email],
+                    widget=forms.EmailInput
                 )
             case 'INT':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_integer])
+                    validators=[LocationDataValidator.valid_integer],
+                    widget=forms.NumberInput
+                )
             case 'MEMO':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_memo])
+                    validators=[LocationDataValidator.valid_memo],
+                    widget=forms.Textarea)
             case 'POST':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_postal_code])
+                    validators=[LocationDataValidator.valid_postal_code],
+                    widget=forms.TextInput
+                )
             case 'STR':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
                     validators=[LocationDataValidator.valid_string],
+                    widget=forms.TextInput
                 )
             case 'URL':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
                     validators=[LocationDataValidator.valid_url],
+                    widget=forms.URLInput
                 )
             case 'CHOICE':
                 if location_property.propertyoption_set.values_list('option', flat=True):
@@ -68,20 +77,20 @@ def set_location_property_fields()-> dict:
 
     return fields
 
+
 class LocationDetailForm(forms.Form):
-    # pandcode = forms.IntegerField() # TODO hoe kan dit read-only zijn? Zie bijv: https://www.google.com/search?client=firefox-b-d&q=django+request.POST+disabled+field+is+empty
+    # pandcode = forms.IntegerField(label='Pandcode) # TODO hoe kan dit read-only zijn? Zie bijv: https://www.google.com/search?client=firefox-b-d&q=django+request.POST+disabled+field+is+empty
     naam = forms.CharField(label='Naam')
-    #mut_datum = forms.DateField(label='Laatste wijziging', disabled=True)
+    #last_modified = forms.DateField(label='Laatste wijziging', disabled=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # if kwargs.get('initial'):
         #     add_fields_to_top = {
         #         'pandcode' : forms.IntegerField(label='Pandcode', disabled=True),
-        #         'mut_datum' : forms.DateField(label='Laatste wijziging', disabled=True)
+        #         'last_modified' : forms.DateField(label='Laatste wijziging', disabled=True)
         #     }
         #     add_fields_to_top.update(self.fields)
         #     self.fields = add_fields_to_top        
         
         self.fields.update(set_location_property_fields())
-    

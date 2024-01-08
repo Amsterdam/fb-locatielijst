@@ -18,7 +18,7 @@
         "order": null,
         "short_name": "ambtenaar",
         "label": "Ambtenaren huisvesting",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "BOOL"
     }
@@ -30,7 +30,7 @@
         "order": null,
         "short_name": "soort",
         "label": "Soort locatie",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "CHOICE"
     }
@@ -54,7 +54,7 @@
         "order": null,
         "short_name": "lt",
         "label": "Locatieteam",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "STR"
     }
@@ -68,7 +68,7 @@
         "label": "Mailadres Locatieteam",
         "required": false,
         "multiple": false,
-        "property_type": "STR"
+        "property_type": "EMAIL"
     }
 },
 {
@@ -78,7 +78,7 @@
         "order": null,
         "short_name": "dvk_nr",
         "label": "Gewenste Cat. dienstverlenings kader",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "INT"
     }
@@ -90,7 +90,7 @@
         "order": null,
         "short_name": "dvk_naam",
         "label": "Categorie Dienstverleningskader",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "CHOICE"
     }
@@ -102,7 +102,7 @@
         "order": null,
         "short_name": "budget_dir",
         "label": "Budget verantwoordelijke directie",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "CHOICE"
     }
@@ -138,7 +138,7 @@
         "order": null,
         "short_name": "lm",
         "label": "Locatiemanager",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "STR"
     }
@@ -150,7 +150,7 @@
         "order": null,
         "short_name": "contact",
         "label": "Contactpersoon vanuit Directies",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "STR"
     }
@@ -306,8 +306,9 @@
         "order": null,
         "short_name": "beschrving",
         "label": "Beschrijving",
-        "required": true,
+        "required": false,
         "multiple": false,
+        "unique": true,
         "property_type": "STR"
     }
 },
@@ -318,9 +319,9 @@
         "order": null,
         "short_name": "actief",
         "label": "Actief",
-        "required": true,
+        "required": false,
         "multiple": false,
-        "property_type": "STR"
+        "property_type": "BOOL"
     }
 },
 {
@@ -330,7 +331,7 @@
         "order": null,
         "short_name": "straat",
         "label": "Straat",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "STR"
     }
@@ -342,7 +343,7 @@
         "order": null,
         "short_name": "straat_nr",
         "label": "Straatnummer",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "INT"
     }
@@ -378,7 +379,7 @@
         "order": null,
         "short_name": "postcode",
         "label": "Postcode",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "POST"
     }
@@ -390,7 +391,7 @@
         "order": null,
         "short_name": "plaats",
         "label": "Plaats",
-        "required": true,
+        "required": false,
         "multiple": false,
         "property_type": "STR"
     }
@@ -477,6 +478,18 @@
         "required": false,
         "multiple": false,
         "property_type": "INT"
+    }
+},
+{
+    "model": "locations.locationproperty",
+    "pk": 42,
+    "fields": {
+        "order": null,
+        "short_name": "mut_datum",
+        "label": "Mutatie datum",
+        "required": false,
+        "multiple": false,
+        "property_type": "DATE"
     }
 }
 ]

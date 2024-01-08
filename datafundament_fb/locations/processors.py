@@ -2,19 +2,19 @@ from typing import Self
 from django.db import transaction
 from django.forms import ValidationError
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationDataProcessor():
     location_instance = None
-    pandcode = None
-    mut_datum = None
 
     def _set_location_properties(self)-> None:
         """
         Get location data fields from the Location model and LocationProperties 
         """
         # List to hold all location data items, starting with fields from Location
-        self.location_properties = list(['pandcode', 'naam', 'mut_datum'])
+        # TODO gewijzigd verwijderd uit de lijst, dit veld moet namelijk enkel automatisch worden gezet, hierdoor mist deze wel in dit object
+        self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
         self.location_property_instances =  [obj for obj in LocationProperty.objects.all()]
@@ -50,9 +50,9 @@ class LocationDataProcessor():
         object.location_instance = Location.objects.get(pandcode=pandcode)
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
-        setattr(object, 'naam', getattr(object.location_instance, 'naam'))
-        mut_datum = timezone.localtime(getattr(object.location_instance, 'mut_datum')).strftime('%d-%m-%Y %H:%M')
-        setattr(object, 'mut_datum', mut_datum)
+        setattr(object, 'naam', getattr(object.location_instance, 'name'))
+        last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
+        setattr(object, 'gewijzigd', last_modified)
         
         for location_data in object.location_instance.locationdata_set.all():
             if location_data.location_property.property_type == 'CHOICE':
@@ -86,22 +86,23 @@ class LocationDataProcessor():
         """
         # Run validation
         self.validate()
-        
-        # update or new
-        update = False
-        
+     
         # If a Location model instance has not been set yet
         if not isinstance(self.location_instance, Location):
             if Location.objects.filter(pandcode=self.pandcode).exists():
-                update = True
                 self.location_instance = Location.objects.get(pandcode=self.pandcode)
+                # Update the attributes for the Location model instance
+                setattr(self.location_instance, 'name', getattr(self, 'naam'))
             else:
-                self.location_instance = Location()
+                # When importing locations, pandcode exists
+                if getattr(self, 'pandcode'):
+                    self.location_instance = Location(pandcode=self.pandcode, name=self.naam)
+                else:
+                    self.location_instance = Location(name=self.naam)
+                    # Update this instance with the pandcode
+                    self.pandcode = self.location_instance.pandcode
 
-        # Set the attributes for the Location model instance
-        setattr(self.location_instance, 'naam', getattr(self, 'naam'))
-
-        # Atomic is used to prevent incomplete locations being added;
+         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
             # Save the location model first before adding LocationData
@@ -122,8 +123,16 @@ class LocationDataProcessor():
                     )
                     # In case of a choice list, set the property_option attribute
                     if location_property.property_type == 'CHOICE':
-                        location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
-                    else: 
+                        # TODO als een optie niet bestaat, dan moet dit afgevangen worden... dit is eigenlijk daarvoor niet de plaats
+                        # OPTIE: voeg de optie meteen toe als deze niet bestaat
+                        if PropertyOption.objects.filter(location_property=location_property, option=value).exists():
+                            location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
+                        else:
+                            option = PropertyOption(location_property=location_property, option=value)
+                            option.full_clean()
+                            option.save()
+                            location_data.property_option = option
+                    else:
                         location_data.value = value
                     
                     location_data.clean()
@@ -145,8 +154,6 @@ class LocationDataProcessor():
                     self.location_instance.save()
 
         # TODO update pandcode wanneer het een nieuwe locatie betreft
-        if not update:
-            self.pandcode = self.location_instance.pandcode
 
 
     def __repr__(self):
