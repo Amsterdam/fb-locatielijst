@@ -1,4 +1,4 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/admin_base.html' %}
 {% load i18n admin_urls static admin_modify %}
 
 {% block extrastyle %}{{ block.super }}
@@ -7,27 +7,36 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
+    &rsaquo; {% translate 'Locations' %}
 </div>
 {% endblock %}
 
 {% block content %}
-<h1>Locations</h1>
-<div>
-    <a href="{% url 'location-create' %}">New</a>
-</div>
-<div>
-    <!-- Iterate over object_list -->
-    <p>
-        {% for object in object_list %}
-        <!-- Display Objects -->
-        <a href="{% url 'location-detail' object.pandcode %}">{{object.pandcode}} - {{ object.name }}</a>
-    </p>
-    <!-- If object_list is empty  -->
-    {% empty %}
-    No objects yet.
-    {% endfor %}
-</div>
-<br />
+<h1>{% translate 'Locations' %}</h1>
 
+<div class="page-content">
+    <div class="page-left">
+        <ul class="data-list">
+            {% for object in object_list %}
+            <li>
+                <a href="{% url 'location-detail' object.pandcode %}">
+                    <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                            <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
+                        </svg>
+                    </span>
+                    {{object.pandcode}} - {{ object.name }}
+                </a>
+            </li>
+            {% empty %}
+            <li>Geen locaties gevonden</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="page-right">
+        <div class="btn-container">
+            <a href="{% url 'location-create' %}" class="btn btn-secundair">Aanmaken</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

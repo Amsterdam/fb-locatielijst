@@ -1,0 +1,20 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_modify %}
+{% load static %}
+
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/ggd_base.css' %}">
+<link rel="stylesheet" href="{% static 'css/ggd_buttons.css' %}">
+<link rel="stylesheet" href="{% static 'css/ggd_header.css' %}">
+<link rel="stylesheet" href="{% static 'css/ggd_pages.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-logo"><img src="{% static 'images/logo-gemeente-amsterdam.svg' %}" alt="Logo Gemeente Amsterdam" /></div>
+<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Datafundament Facilitair Bureau') }}</a></div>
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}

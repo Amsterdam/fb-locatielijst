@@ -67,7 +67,7 @@ def set_location_property_fields()-> dict:
                 if location_property.propertyoption_set.values_list('option', flat=True):
                     choice_list = [(option, option) for option in location_property.propertyoption_set.values_list('option', flat=True)]
                 else:
-                    choice_list = [('', 'Keuzelijst is leeg')] # TODO HOE OM TE GAAN MET LEGE CHOICE VELDEN, OF MOGEN DIE NIET BESTAAN?
+                    choice_list = [('', '')] # TODO HOE OM TE GAAN MET LEGE CHOICE VELDEN, OF MOGEN DIE NIET BESTAAN?
                 fields[location_property.short_name] = forms.ChoiceField(
                     choices=choice_list,
                     label=location_property.label,

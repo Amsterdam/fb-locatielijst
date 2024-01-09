@@ -1,8 +1,5 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/admin_base.html' %}
 {% load i18n admin_urls static admin_modify %}
-
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -16,20 +13,31 @@
 <ul class="messages">
     {% for message in messages %}
     <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
+    {% endfor %}
 </ul>
 {% endif %}
+
 {% block content %}
-        <div>
-            Pandcode: {{ location_data.pandcode }}<br>
-            Laatst gewijzigd: {{ gewijzigd }}
-        </div>
+<h1>{{ location_data.pandcode }} - {{ location_data.naam }}</h1>
+<small>
+    Locatie gewijzigd op {{ gewijzigd }}
+</small>
+
+<dl class="data-view">
+    <div class="data-view-row">
+        <dt class="data-label">Pandcode</dt>
+        <dd class="data-value">{{ location_data.pandcode }}</dd>
+    </div>
     {% for field in form %}
-        <div>
-        {{ field.errors }}
-        {{ field.label_tag }} {{ field.value }}
-        </div>
+    <div class="data-view-row">
+        <dt class="data-label">{{ field.label }}</dt>
+        <dd class="data-value">{% if field.value %}{{ field.value }}{% endif %}</dd>
+    </div>
     {% endfor %}
-    <a href="{% url 'location-update' location_data.pandcode %}">Edit</a>
-<br />
+</dl>
+
+<div class="btn-container">
+    <a href="{% url 'location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
+    <a href="{% url 'location-list' %}" class="btn btn-secundair">Annuleren</a>
+</div>
 {% endblock %}

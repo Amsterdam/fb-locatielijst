@@ -1,0 +1,41 @@
+
+#header {
+  --accent: var(--header-branding-color);
+}
+
+#branding {
+  flex-grow: 1;
+}
+
+#site-logo {
+  height: 32px;
+  width: 210px;
+}
+
+#site-logo IMG {
+  height: 100%;
+}
+
+#site-name {
+  font-family: "amsterdam sans", arial, sans-serif;
+  font-style: normal;
+  font-weight: 800;
+  flex-grow: 1;
+}
+
+#site-name a {
+  text-decoration: none;
+}
+
+.theme-toggle svg.theme-icon-when-auto,
+.theme-toggle svg.theme-icon-when-dark,
+.theme-toggle svg.theme-icon-when-light {
+  fill: var(--header-link-color);
+  color: var(--header-bg);
+}
+
+/*******************************************/
+
+div.breadcrumbs {
+  background: var(--color-blue);
+}

@@ -1,8 +1,5 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/admin_base.html' %}
 {% load i18n admin_urls static admin_modify %}
-
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -16,20 +13,35 @@
 <ul class="messages">
     {% for message in messages %}
     <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
+    {% endfor %}
 </ul>
 {% endif %}
+
 {% block content %}
-    <form action="." method="POST">
+<h1>{{ location_data.pandcode }} - {{ location_data.naam }}</h1>
+
+<form action="." method="POST">
+    <div class="data-view">
         {% csrf_token %}
-        <div>
-            Pandcode: {{ location_data.pandcode }}<br>
+        <div class="data-view-row">
+            <div class="data-label">Pandcode</div>
+            <div class="data-value">{{ location_data.pandcode }}</div>
         </div>
-        {{ form }}
-        <div class="submit_row">
-            <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}">
+        {% for field in form %}
+        <div class="data-view-row">
+            <div class="data-label"><label for="{{ field.auto_id }}">{{ field.label }}</label></div>
+            <div class="data-value">
+                {{ field }}
+                {{ field.errors }}
+            </div>
         </div>
-    </form>
-</div>
-<br />
+        {% endfor %}
+    </div>
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}">Opslaan</button>
+        <!-- <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}"> -->
+        <a href="{% url 'location-detail' location_data.pandcode %}" class="btn btn-secundair">Annuleren</a>
+    </div>
+</form>
+
 {% endblock %}
