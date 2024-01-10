@@ -63,6 +63,8 @@ html[data-theme="light"] {
   --color-dark-blue: #00387a;
   --color-grey: #b4b4b4;
   --color-white: #ffffff;
+  --color-black: #000000;
+  --font-family-primary: "amsterdam sans", "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html[data-theme="dark"] {

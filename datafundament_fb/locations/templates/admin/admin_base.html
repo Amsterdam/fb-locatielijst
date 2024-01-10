@@ -4,6 +4,7 @@
 
 
 {% block extrastyle %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
 <link rel="stylesheet" href="{% static 'css/ggd_base.css' %}">
 <link rel="stylesheet" href="{% static 'css/ggd_buttons.css' %}">
@@ -14,7 +15,24 @@
 {% block branding %}
 <div id="site-logo"><img src="{% static 'images/logo-gemeente-amsterdam.svg' %}" alt="Logo Gemeente Amsterdam" /></div>
 <div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Datafundament Facilitair Bureau') }}</a></div>
-{% if user.is_anonymous %}
-  {% include "admin/color_theme_toggle.html" %}
-{% endif %}
 {% endblock %}
+
+{% block nav-global %}
+{% include "admin/color_theme_toggle.html" %}
+<nav>
+  <ul>
+    {% if user.is_anonymous %}
+    <li><a href="{% url 'admin:index' %}">Inloggen</a></li>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <li><a href="{% url 'location-beheer' %}">Beheer</a></li>
+    <li><form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+      {% csrf_token %}
+      <button type="submit">{% translate 'Log out' %}</button>
+    </form></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}

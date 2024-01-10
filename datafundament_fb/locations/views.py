@@ -76,3 +76,10 @@ class LocationUpdateView(View):
         else:
             context = {'form': form, 'location_data': location_data.get_dict()}
             return render(request, template_name=self.template, context=context)
+        
+
+class LocationBeheerView(View):
+    template = 'locations/location-beheer.html'
+    
+    def get(self, request, *args, **kwargs):
+        return render(request, template_name=self.template)

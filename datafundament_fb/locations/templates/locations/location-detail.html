@@ -37,7 +37,9 @@
 </dl>
 
 <div class="btn-container">
+    {% if user.is_authenticated %}
     <a href="{% url 'location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
-    <a href="{% url 'location-list' %}" class="btn btn-secundair">Annuleren</a>
+    {% endif %}
+    <a href="{% url 'location-list' %}" class="btn btn-secundair">Terug</a>
 </div>
 {% endblock %}
