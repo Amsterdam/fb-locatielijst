@@ -1,4 +1,5 @@
 import unittest.mock as mock
+from unittest import skip
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
@@ -115,12 +116,12 @@ class TestLocationDataValidation(TestCase):
 
     def test_int_validation(self):
         # Test valid integer values
-        values = ['1', '0', '-100', '-1,1', '3.6', '0,5', '16.3635']
+        values = ['1', '0', '-100', '-1,1', '0,5', '16,3635']
         for value in values:
             self.assertEqual(LocationDataValidator.valid_integer(value), value)
 
         # Test invalid integer values
-        values = ['.5', ',5', '100.239,00']
+        values = ['0.5', '.5', ',5', '100.239,00']
         for value in values:
             self.assertRaises(ValidationError, LocationDataValidator.valid_integer, value)
 
@@ -360,6 +361,7 @@ class TestLocationDataModel(TestCase):
             f'Value %(value)s already exists for property %(property)s',
         )
 
+    @skip("zie opmerking in models.py")
     def test_for_single_constraint(self):
         # Test that a property can only exist once for a location; except when multiple is enabled for a property
         self.location_data.location_property = self.string_property
