@@ -18,5 +18,6 @@ from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
+    path('locations/', include('locations.urls'), name='location-urls'),
     path('admin/', admin.site.urls),
 ]

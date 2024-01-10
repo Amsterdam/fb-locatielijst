@@ -13,8 +13,8 @@ class TestModelFunctions(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location(pandcode='25000', naam='Stopera')
-        self.location2 = Location(pandcode='24000', naam='GGD')
+        self.location1 = Location(pandcode='25000', name='Stopera')
+        self.location2 = Location(pandcode='24000', name='GGD')
         self.location_property = LocationProperty(
             short_name='short_name', label="Short Name", property_type = 'STR')
         self.choice_property = LocationProperty.objects.create(
@@ -197,8 +197,8 @@ class TestLocationDataValidate(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location.objects.create(pandcode='25000', naam='Stopera')
-        self.location2 = Location.objects.create(pandcode='24000', naam='GGD')
+        self.location1 = Location.objects.create(pandcode='25000', name='Stopera')
+        self.location2 = Location.objects.create(pandcode='24000', name='GGD')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
         self.date_property = LocationProperty.objects.create(
@@ -294,7 +294,7 @@ class TestLocationDataModel(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location = Location.objects.create(pandcode='25000', naam='Stopera')
+        self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.string_property = LocationProperty.objects.create(
             short_name='str', label='String', property_type='STR', unique=True)
         self.choice_property = LocationProperty.objects.create(

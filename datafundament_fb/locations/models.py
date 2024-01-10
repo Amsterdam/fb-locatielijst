@@ -7,7 +7,7 @@ from locations.validators import LocationDataValidator
 
 # Create your models here.
 
-# Auto generate a new building_code based on the current highest in the database
+# Auto generate a new pandcode based on the current highest in the database
 def compute_pandcode() -> int:
     return (Location.objects.aggregate(Max('pandcode'))['pandcode__max'] or 0) + 1
 
@@ -26,21 +26,18 @@ class Location(models.Model):
     '''
     Base class for the location
     '''
-    pandcode = models.IntegerField(
-        default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
-    naam = models.CharField(
-        verbose_name='Locatie', max_length=100)
-    mut_datum = models.DateField(
-        verbose_name='Laatste wijziging', auto_now=True)
+    pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
+    name = models.CharField(verbose_name='Naam', max_length=100)
+    last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
     
     def __str__(self):
-        return f'{self.pandcode}, {self.naam}'
+        return f'{self.pandcode}, {self.name}'
 
     class Meta:
         verbose_name = 'Locatie'
         constraints = [
-            models.UniqueConstraint(fields=['pandcode'], name='pandcode'),
-            models.UniqueConstraint(fields=['naam'], name='unique_location_name')
+            models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
+            models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
 
 
@@ -56,6 +53,7 @@ class LocationProperty(models.Model):
         INT = 'INT', 'Numeriek'
         MEMO = 'MEMO', 'Memo'
         POST = 'POST', 'Postcode'
+        STR = 'STR', 'Tekst'
         URL = 'URL', 'Url'
         # Indicates related property option for a choice list
         CHOICE = 'CHOICE', 'Keuzelijst'
@@ -135,17 +133,18 @@ class LocationData(models.Model):
         return f'{self.location}, {self.location_property}, {self.property_option}, {self.value}'
 
     def clean(self) -> None:
+        # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
         # Validate for single instance
-        if not self.location_property.multiple:
-            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
-                raise ValidationError(
-                    _("Property %(property)s already exists for location %(location)s"),
-                    code='unique',
-                    params={
-                        'property': self.location_property.label,
-                        'location': self.location.pandcode
-                    },
-                )
+        # if not self.location_property.multiple:
+        #     if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+        #         raise ValidationError(
+        #             _("Property %(property)s already exists for location %(location)s"),
+        #             code='unique',
+        #             params={
+        #                 'property': self.location_property.label,
+        #                 'location': self.location.pandcode
+        #             },
+        #         )
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:

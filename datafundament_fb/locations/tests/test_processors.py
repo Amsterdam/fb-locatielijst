@@ -55,7 +55,6 @@ class TestDataLocationProcessor(TestCase):
         expected_location_properties = {
             'pandcode',
             'naam',
-            'mut_datum',
             'occupied',
             'build',
             'mail',
@@ -118,7 +117,7 @@ class TestDataLocationProcessor(TestCase):
 
         # Check the attribute values for the Location() instance
         self.assertEqual(get_location.pandcode, int(self.location_data_dict['pandcode']))
-        self.assertEqual(get_location.naam, self.location_data_dict['naam'])
+        self.assertEqual(get_location.name, self.location_data_dict['name'])
 
         # Check the LocationData() values
         location_data = get_location.locationdata_set.all()
