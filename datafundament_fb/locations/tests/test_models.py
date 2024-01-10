@@ -296,6 +296,7 @@ class TestLocationDataModel(TestCase):
 
     def setUp(self) -> None:
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
+        self.location2 = Location.objects.create(pandcode='25001', name='GGD')
         self.string_property = LocationProperty.objects.create(
             short_name='str', label='String', property_type='STR', unique=True)
         self.choice_property = LocationProperty.objects.create(
@@ -345,8 +346,9 @@ class TestLocationDataModel(TestCase):
         self.location_data.value = 'Yellow'
         self.location_data.save()
 
+        # Add location_data to second location with an existing value
         location_data = LocationData(
-            location=self.location,
+            location=self.location2,
             location_property = self.string_property,
             value = 'Yellow'
         )
