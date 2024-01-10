@@ -64,6 +64,7 @@ class LocationProperty(models.Model):
     required = models.BooleanField(verbose_name='Verplicht veld', default=False)
     multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
     unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
+    public = models.BooleanField(verbose_name='Zichtbaar voor gebruikers', default=False)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
 
     class Meta:

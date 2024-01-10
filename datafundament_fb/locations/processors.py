@@ -8,7 +8,7 @@ from locations.models import Location, LocationProperty, PropertyOption, Locatio
 class LocationDataProcessor():
     location_instance = None
 
-    def _set_location_properties(self)-> None:
+    def set_location_properties(self, private: bool=False)-> None:
         """
         Get location data fields from the Location model and LocationProperties 
         """
@@ -16,20 +16,27 @@ class LocationDataProcessor():
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
-        self.location_property_instances =  [obj for obj in LocationProperty.objects.all()]
+        # List is filtered for private accessibility
+        if private:
+            self.location_property_instances =  [obj for obj in LocationProperty.objects.all()]
+        else:
+            self.location_property_instances =  [obj for obj in LocationProperty.objects.filter(public=True)]
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Set attributes from all the available location properties
         for property in self.location_properties:
             setattr(self, property, None)
 
-    def __init__(self, data: dict=None):
+    def __init__(self, data: dict=None, private: bool=False):
         """
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
+        attr: Private
+          Properties are filtered on whether they are publicly or privately visible.
+        Default is false; only the public properties will be set
         """
         # Set the location data fields for this instance
-        self._set_location_properties()
+        self.set_location_properties(private)
 
         # Set values
         if data:
@@ -38,11 +45,11 @@ class LocationDataProcessor():
                     setattr(self, key, value)
 
     @classmethod
-    def get(cls, pandcode)-> Self: 
+    def get(cls, pandcode: int, private: bool=False)-> Self: 
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls()
+        object = cls(private=private)
         object.location_instance = Location.objects.get(pandcode=pandcode)
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
@@ -51,11 +58,12 @@ class LocationDataProcessor():
         setattr(object, 'gewijzigd', last_modified)
         
         for location_data in object.location_instance.locationdata_set.all():
-            if location_data.location_property.property_type == 'CHOICE':
-                value = location_data.property_option.option
-            else:
-                value = location_data.value
-            setattr(object, location_data.location_property.short_name, value)
+            if location_data.location_property.short_name in object.location_properties:
+                if location_data.location_property.property_type == 'CHOICE':
+                    value = location_data.property_option.option
+                else:
+                    value = location_data.value
+                setattr(object, location_data.location_property.short_name, value)
 
         return object
 

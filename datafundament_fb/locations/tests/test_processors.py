@@ -13,9 +13,9 @@ class TestDataLocationProcessor(TestCase):
 
     def setUp(self) -> None:
         self.boolean_property = LocationProperty.objects.create(
-            short_name='occupied', label='occupied', property_type='BOOL', required=True)
+            short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True)
         self.date_property = LocationProperty.objects.create(
-            short_name='build', label='build_year', property_type='DATE', required=True)
+            short_name='build', label='build_year', property_type='DATE', required=True, public=True)
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='mail_address', property_type='EMAIL', required=True)
         self.integer_property = LocationProperty.objects.create(
@@ -46,10 +46,37 @@ class TestDataLocationProcessor(TestCase):
             'type': 'Office',
         })
 
-    def test_set_location_properties(self):
+    def test_set_location_properties_public(self):
         '''
         Verify if all the expected location fields and properties are filtered
-        correctly and present as attribute
+        correctly and present as attribute. Only publicly visible properties should be included.
+        '''
+
+        # Dynamic location properties defined for this test
+        expected_location_properties = {
+            'pandcode',
+            'naam',
+            'occupied',
+            'build',
+        }
+
+        # Location fields and properties filtered by _set_location_properties(); added with fields from location
+        # Included properties are public
+        processor = LocationDataProcessor()
+        location_properties = processor.location_properties
+        found_location_properties = set(location_properties)
+
+        # Location property sets should be equal
+        self.assertEqual(expected_location_properties, found_location_properties)
+
+        # All expected fields should have an attribute in the LocationProcessorData object
+        for field in expected_location_properties:
+            self.assertTrue(hasattr(processor, field), field)
+
+    def test_set_location_properties_private(self):
+        '''
+        Verify if all the expected location fields and properties are filtered
+        correctly and present as attribute. All properties (private and public) should be included.
         '''
 
         # Dynamic location properties defined for this test
@@ -68,7 +95,8 @@ class TestDataLocationProcessor(TestCase):
         }
 
         # Location fields and properties filtered by _set_location_properties(); added with fields from location
-        processor = LocationDataProcessor()
+        # Included properties are private and public
+        processor = LocationDataProcessor(private=True)
         location_properties = processor.location_properties
         found_location_properties = set(location_properties)
 
@@ -84,7 +112,7 @@ class TestDataLocationProcessor(TestCase):
         Test if an instancve of LocationDataProcessor is created
         and if the attributes have the correct value
         '''
-        location_processor = LocationDataProcessor(self.location_data_dict)
+        location_processor = LocationDataProcessor(private=True, data=self.location_data_dict)
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(location_processor, LocationDataProcessor)
@@ -107,7 +135,7 @@ class TestDataLocationProcessor(TestCase):
         # Check that no location exists in the database
         self.assertEqual(Location.objects.all().count(), 0)
         # Create and save a Location
-        LocationDataProcessor(self.location_data_dict).save()
+        LocationDataProcessor(private=True, data=self.location_data_dict).save()
 
         # Check if the location has been added to the database
         # Only one location should exist in the database
@@ -148,7 +176,7 @@ class TestDataLocationProcessor(TestCase):
         if an error occurs during save().
         '''
         # Init location with non existing type option
-        location = LocationDataProcessor(self.location_data_dict)
+        location = LocationDataProcessor(private=True, data=self.location_data_dict)
         location.type = 'Tomato'
         
         # When saving the object, an ObjectDoesNotExist should be raised because Tomato is not a valid choice value
@@ -161,7 +189,7 @@ class TestDataLocationProcessor(TestCase):
         Test the validation method
         '''
         # Init a location
-        location = LocationDataProcessor(self.location_data_dict)
+        location = LocationDataProcessor(private=True, data=self.location_data_dict)
 
         # Set occupied to an empty string
         location.occupied = ''
@@ -190,10 +218,10 @@ class TestDataLocationProcessor(TestCase):
         Test retrieving a locaiont data object from the database
         '''
         # First create and save an object
-        LocationDataProcessor(self.location_data_dict).save()
+        LocationDataProcessor(private=True, data=self.location_data_dict).save()
 
         # Get the object
-        get_location = LocationDataProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        get_location = LocationDataProcessor.get(pandcode=self.location_data_dict['pandcode'], private=True)
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(get_location, LocationDataProcessor)
@@ -216,10 +244,10 @@ class TestDataLocationProcessor(TestCase):
         Test the function for returning a dictionary of the locations' attributes
         '''
         # First create and save an object
-        LocationDataProcessor(self.location_data_dict).save()
+        LocationDataProcessor(private=True, data=self.location_data_dict).save()
 
         # Get dictionary of the LocationDataProcessor object
-        location_dict = LocationDataProcessor.get(self.location_data_dict['pandcode']).get_dict()
+        location_dict = LocationDataProcessor.get(self.location_data_dict['pandcode'], private=True).get_dict()
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(location_dict, dict)
