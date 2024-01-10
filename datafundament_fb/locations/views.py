@@ -36,12 +36,12 @@ class LocationImportView(View):
             column_not_in_properties = False
             headers = csv_dict.fieldnames
 
-            for property in location_properties:
-                if property not in headers:
+            for location_property in location_properties:
+                if location_property not in headers:
                     messages.add_message(
                         request,
                         messages.WARNING,
-                        'De volgende eigenshaip mist in het import bestand: {column}'.format(column=property)
+                        "Locatie eigenschap '{location_property}' mist in het import bestand en is niet verwerkt".format(location_property=location_property)
                     )
             
             for column in headers:
@@ -49,7 +49,7 @@ class LocationImportView(View):
                     messages.add_message(
                         request,
                         messages.WARNING,
-                        'De volgende kolom in het import bestand bestaat niet als eigenschap: {column}'.format(column=column)
+                        "Kolom '{column}' in het import bestand bestaat niet als eigenschap en is overgeslagen".format(column=column)
                     )
 
             for row in csv_dict:
