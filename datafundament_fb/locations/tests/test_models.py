@@ -13,8 +13,8 @@ class TestModelFunctions(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location(pandcode='25000', naam='Stopera')
-        self.location2 = Location(pandcode='24000', naam='GGD')
+        self.location1 = Location(pandcode='25000', name='Stopera')
+        self.location2 = Location(pandcode='24000', name='GGD')
         self.location_property = LocationProperty(
             short_name='short_name', label="Short Name", property_type = 'STR')
         self.choice_property = LocationProperty.objects.create(
@@ -115,12 +115,12 @@ class TestLocationDataValidation(TestCase):
 
     def test_int_validation(self):
         # Test valid integer values
-        values = ['1', '0', '-100', '-1,1', '0,5', '16,3635']
+        values = ['1', '0', '-100', '-1,1', '3.6', '0,5', '16.3635']
         for value in values:
             self.assertEqual(LocationDataValidator.valid_integer(value), value)
 
         # Test invalid integer values
-        values = ['0.5', '.5', ',5', '100.239,00']
+        values = ['.5', ',5', '100.239,00']
         for value in values:
             self.assertRaises(ValidationError, LocationDataValidator.valid_integer, value)
 
@@ -197,8 +197,8 @@ class TestLocationDataValidate(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location1 = Location.objects.create(pandcode='25000', naam='Stopera')
-        self.location2 = Location.objects.create(pandcode='24000', naam='GGD')
+        self.location1 = Location.objects.create(pandcode='25000', name='Stopera')
+        self.location2 = Location.objects.create(pandcode='24000', name='GGD')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
         self.date_property = LocationProperty.objects.create(
@@ -294,7 +294,7 @@ class TestLocationDataModel(TestCase):
     """
 
     def setUp(self) -> None:
-        self.location = Location.objects.create(pandcode='25000', naam='Stopera')
+        self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.string_property = LocationProperty.objects.create(
             short_name='str', label='String', property_type='STR', unique=True)
         self.choice_property = LocationProperty.objects.create(
@@ -357,7 +357,7 @@ class TestLocationDataModel(TestCase):
         self.assertEqual(validation_error.exception.code, 'unique')
         self.assertEqual(
             validation_error.exception.message,
-            f'Property %(property)s already exists for location %(location)s',
+            f'Value %(value)s already exists for property %(property)s',
         )
 
     def test_for_single_constraint(self):
@@ -369,7 +369,7 @@ class TestLocationDataModel(TestCase):
         location_data = LocationData(
             location=self.location,
             location_property = self.string_property,
-            value = 'Organe'
+            value = 'Orange'
         )
 
         # Raise a validation error

@@ -34,11 +34,11 @@ class TestDataLocationProcessor(TestCase):
         self.location_data_dict = dict({
             'pandcode': '24000',
             'naam': 'Stopera',
-            'note': 'Notitie',
-            'postcode': '1000 AA',
             'occupied': 'Ja',
             'build': '01-12-2023',
             'mail': 'mail@example.org',
+            'note': 'Notitie',
+            'postcode': '1000 AA',
             'floors': '11',
             'color': 'Yellow',
             'url': 'https://example.org',
@@ -55,7 +55,6 @@ class TestDataLocationProcessor(TestCase):
         expected_location_properties = {
             'pandcode',
             'naam',
-            'mut_datum',
             'occupied',
             'build',
             'mail',
@@ -118,7 +117,7 @@ class TestDataLocationProcessor(TestCase):
 
         # Check the attribute values for the Location() instance
         self.assertEqual(get_location.pandcode, int(self.location_data_dict['pandcode']))
-        self.assertEqual(get_location.naam, self.location_data_dict['naam'])
+        self.assertEqual(get_location.name, self.location_data_dict['naam'])
 
         # Check the LocationData() values
         location_data = get_location.locationdata_set.all()
@@ -141,6 +140,7 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(location_data[8].location_property, self.choice_property)
         self.assertEqual(location_data[8].property_option.option, self.location_data_dict['type'])
 
+    # TODO omdat er nu in de processor niet bestaande property options worden toegevoegd werkt deze test niet meer; vraag is of dit gewenst is?
     def test_location_save_atomic(self):
         '''
         Test that neither a Location or LocationData will be added to the DB
@@ -207,6 +207,8 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(get_location.color, self.location_data_dict['color'])
         self.assertEqual(get_location.url, self.location_data_dict['url'])
         self.assertEqual(get_location.type, self.location_data_dict['type'])
+        # Verify is attribute 'gewijzigd' is filled
+        self.assertIsNotNone(get_location.gewijzigd)
 
     def test_dict_method(self):
         '''
@@ -231,3 +233,5 @@ class TestDataLocationProcessor(TestCase):
         self.assertEqual(location_dict['color'], self.location_data_dict['color'])
         self.assertEqual(location_dict['url'], self.location_data_dict['url'])
         self.assertEqual(location_dict['type'], self.location_data_dict['type'])
+        # Verify is attribute 'gewijzigd' is filled
+        self.assertIsNotNone(location_dict['gewijzigd'])

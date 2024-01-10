@@ -7,7 +7,7 @@ from locations.validators import LocationDataValidator
 
 # Create your models here.
 
-# Auto generate a new building_code based on the current highest in the database
+# Auto generate a new pandcode based on the current highest in the database
 def compute_pandcode() -> int:
     return (Location.objects.aggregate(Max('pandcode'))['pandcode__max'] or 0) + 1
 
@@ -26,21 +26,18 @@ class Location(models.Model):
     '''
     Base class for the location
     '''
-    pandcode = models.IntegerField(
-        default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
-    naam = models.CharField(
-        verbose_name='Locatie', max_length=100)
-    mut_datum = models.DateField(
-        verbose_name='Laatste wijziging', auto_now=True)
+    pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
+    name = models.CharField(verbose_name='Naam', max_length=100)
+    last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
     
     def __str__(self):
-        return f'{self.pandcode}, {self.naam}'
+        return f'{self.pandcode}, {self.name}'
 
     class Meta:
         verbose_name = 'Locatie'
         constraints = [
-            models.UniqueConstraint(fields=['pandcode'], name='pandcode'),
-            models.UniqueConstraint(fields=['naam'], name='unique_location_name')
+            models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
+            models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
 
 
@@ -56,22 +53,18 @@ class LocationProperty(models.Model):
         INT = 'INT', 'Numeriek'
         MEMO = 'MEMO', 'Memo'
         POST = 'POST', 'Postcode'
+        STR = 'STR', 'Tekst'
         URL = 'URL', 'Url'
         # Indicates related property option for a choice list
         CHOICE = 'CHOICE', 'Keuzelijst'
 
-    order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
     label = models.CharField(max_length=100, verbose_name='Omschrijving')
-    required = models.BooleanField(
-        verbose_name='Verplicht veld', default=False)
-    multiple = models.BooleanField(
-        verbose_name='Meervoudige invoer', default=False)
-    unique = models.BooleanField(
-        verbose_name='Waarde moet uniek zijn', default=False
-    )
-    property_type = models.CharField(
-        verbose_name='Gegevens type', choices=LocationPropertyType.choices, max_length=10)
+    property_type = models.CharField(verbose_name='Gegevens type', choices=LocationPropertyType.choices, max_length=10)
+    required = models.BooleanField(verbose_name='Verplicht veld', default=False)
+    multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
+    unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
+    order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie eigenschap'
@@ -84,15 +77,15 @@ class LocationProperty(models.Model):
     def __str__(self):
         required = ', verplicht' if self.required else ''
         multiple = ', meervoudig' if self.multiple else ''
-        return f'{self.label} ({self.property_type}){required}{multiple}'
+        unique = ', unique' if self.unique else ''
+        return f'{self.label} ({self.property_type}){required}{multiple}{unique}'
 
 
 class PropertyOption(models.Model):
     '''
     Choice list for (some) custom entries 
     '''
-    location_property = models.ForeignKey(
-        LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
+    location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     option = models.CharField(verbose_name='Optie', max_length=100)
 
     class Meta:
@@ -102,19 +95,16 @@ class PropertyOption(models.Model):
             fields=['location_property', 'option'], name='unique_property_option')]
 
     def __str__(self):
-        return f'{self.location_property}, {self.option}'
+        return f'{self.location_property.label}: {self.option}'
 
 
 class LocationData(models.Model):
     '''
     Holds each custom data entry for each location
     '''
-    location = models.ForeignKey(
-        Location, on_delete=models.CASCADE, verbose_name='Locatie')
-    location_property = models.ForeignKey(
-        LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
-    property_option = models.ForeignKey(
-        PropertyOption, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Optie')
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
+    location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
+    property_option = models.ForeignKey(PropertyOption, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Optie')
     value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
     last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True)
 
@@ -136,16 +126,17 @@ class LocationData(models.Model):
 
     def clean(self) -> None:
         # Validate for single instance
-        if not self.location_property.multiple:
-            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
-                raise ValidationError(
-                    _("Property %(property)s already exists for location %(location)s"),
-                    code='unique',
-                    params={
-                        'property': self.location_property.label,
-                        'location': self.location.pandcode
-                    },
-                )
+        # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
+        # if not self.location_property.multiple:
+        #     if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+        #         raise ValidationError(
+        #             _("Property %(property)s already exists for location %(location)s"),
+        #             code='unique',
+        #             params={
+        #                 'property': self.location_property.label,
+        #                 'location': self.location.pandcode
+        #             },
+        #         )
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:
@@ -197,12 +188,9 @@ class LocationExternalService(models.Model):
     '''
     Join table between external services and the location (pandcode) and the external code for the location (externe pandcode)
     '''
-    location = models.ForeignKey(
-        Location, on_delete=models.CASCADE, verbose_name='Locatie')
-    external_service = models.ForeignKey(
-        ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
-    external_location_code = models.CharField(
-        verbose_name='Externe locatie code', max_length=100)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
+    external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
+    external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100)
 
     class Meta:
         verbose_name = 'Locatie koppeling'
