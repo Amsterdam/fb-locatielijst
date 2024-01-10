@@ -63,8 +63,8 @@ shell:
 dev: 						        ## Run the development app (and run extra migrations first)
 	$(run) --service-ports dev
 
-test:                               ## Execute tests
-	$(manage) test $(ARGS)
+test:                               ## Execute tests. Use TEST= to define which specific test
+	$(manage) test $(TEST)
 
 clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
@@ -78,9 +78,8 @@ superuser:                          ## Create a superuser (user with admin right
 janitor:							## Run the janitor
 	$(manage) janitor $(ARGS)
 
-FIXTURE = dump
-dumpdata:
-	$(run) dev bash -c './manage.py dumpdata -a --format=json $(APP) > /app/fixtures/$(FIXTURE).json'
+dumpdata:							## Make a json dump of the db. Use APPS= to define which apps
+	$(run) dev bash -c './manage.py dumpdata -a --indent 2 --format=json $(APPS) > dump.json'
 
 loaddata:
 	$(run) dev bash -c './manage.py loaddata locations location_properties property_options location_data'
