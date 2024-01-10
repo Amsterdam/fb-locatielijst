@@ -80,10 +80,10 @@ janitor:							## Run the janitor
 
 FIXTURE = dump
 dumpdata:
-	$(run) dev bash -c './manage.py dumpdata -a --format=yaml $(APP) > /app/fixtures/$(FIXTURE).yaml'
+	$(run) dev bash -c './manage.py dumpdata -a --format=json $(APP) > /app/fixtures/$(FIXTURE).json'
 
 loaddata:
-	$(run) dev bash -c './manage.py loaddata /app/fixtures/$(FIXTURE).yaml'
+	$(run) dev bash -c './manage.py loaddata locations location_properties property_options location_data'
 
 trivy: 								## Detect image vulnerabilities
 	$(dc) build --no-cache app
