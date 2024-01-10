@@ -140,7 +140,7 @@ class LocationData(models.Model):
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:
-            if LocationData.objects.filter(location_property=self.location_property,value=self.value).exists():
+            if LocationData.objects.filter(location_property=self.location_property,value=self.value).exclude(location=self.location).exists():
                 raise ValidationError(
                     _("Value %(value)s already exists for property %(property)s"),
                     code='unique',
