@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
-class LocationDataProcessor():
+class LocationProcessor():
     location_instance = None
 
     def _set_location_properties(self)-> None:

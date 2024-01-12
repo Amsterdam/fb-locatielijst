@@ -5,7 +5,7 @@
     "fields": {
         "pandcode": 24001,
         "name": "Amstel 1",
-        "last_modified": "2023-11-29T23:00:00Z"
+        "last_modified": "2023-11-29T00:00:00.000Z"
     }
 },
 {
@@ -14,7 +14,7 @@
     "fields": {
         "pandcode": 24002,
         "name": "Waterlooplein 22",
-        "last_modified": "2023-11-29T23:00:00Z"
+        "last_modified": "2023-11-29T00:00:00.000Z"
     }
 },
 {
@@ -23,7 +23,7 @@
     "fields": {
         "pandcode": 24003,
         "name": "Herengracht 502",
-        "last_modified": "2023-11-29T23:00:00Z"
+        "last_modified": "2023-11-29T00:00:00.000Z"
     }
 },
 {
@@ -32,7 +32,7 @@
     "fields": {
         "pandcode": 24005,
         "name": "Van Der Madeweg 26",
-        "last_modified": "2023-11-29T23:00:00Z"
+        "last_modified": "2023-11-29T00:00:00.000Z"
     }
 }
 ]
