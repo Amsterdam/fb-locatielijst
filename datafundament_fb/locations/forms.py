@@ -5,11 +5,16 @@ from locations.validators import LocationDataValidator
 
 def set_location_property_fields()-> dict:
     fields = dict()
+    
+    # Get all location properties instances
     location_properties = [obj for obj in LocationProperty.objects.all().order_by('order', 'short_name')]
+    
     for location_property in location_properties:
+
+        # Matching the property_type to set the correct form type
         match location_property.property_type:
             case 'BOOL':
-                fields[location_property.short_name] = forms.TypedChoiceField(
+                fields[location_property.short_name] = forms.ChoiceField(
                     label=location_property.label,
                     required=location_property.required,
                     choices=(('Ja', 'Ja'),('Nee','Nee')),
@@ -72,25 +77,23 @@ def set_location_property_fields()-> dict:
                     choices=choice_list,
                     label=location_property.label,
                     required=location_property.required,
-                    # TODO VALIDATIE NODIG?
                 )
-
+            case _:
+                # If there is no match an exception will be raised
+                raise ValueError(f"No form field defined for '{location_property.property_type}'")
+    
     return fields
 
 
-class LocationDetailForm(forms.Form):
-    # pandcode = forms.IntegerField(label='Pandcode) # TODO hoe kan dit read-only zijn? Zie bijv: https://www.google.com/search?client=firefox-b-d&q=django+request.POST+disabled+field+is+empty
+class LocationDataForm(forms.Form):
+    """
+    Render the form fields for all location properties from both Location and LocationProperties model
+    """
+    # Model fields pandcode and last_modified from the Location model are added in the View
     naam = forms.CharField(label='Naam')
-    #last_modified = forms.DateField(label='Laatste wijziging', disabled=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # if kwargs.get('initial'):
-        #     add_fields_to_top = {
-        #         'pandcode' : forms.IntegerField(label='Pandcode', disabled=True),
-        #         'last_modified' : forms.DateField(label='Laatste wijziging', disabled=True)
-        #     }
-        #     add_fields_to_top.update(self.fields)
-        #     self.fields = add_fields_to_top        
-        
+
+        # Add the location property fields to this form
         self.fields.update(set_location_property_fields())

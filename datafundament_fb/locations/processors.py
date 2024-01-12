@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
-class LocationDataProcessor():
+class LocationProcessor():
     location_instance = None
 
     def _set_location_properties(self)-> None:
@@ -13,7 +13,6 @@ class LocationDataProcessor():
         Get location data fields from the Location model and LocationProperties 
         """
         # List to hold all location data items, starting with fields from Location
-        # TODO gewijzigd verwijderd uit de lijst, dit veld moet namelijk enkel automatisch worden gezet, hierdoor mist deze wel in dit object
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
@@ -37,9 +36,6 @@ class LocationDataProcessor():
             for key,value in data.items():
                 if key in self.location_properties:
                     setattr(self, key, value)
-                else:
-                    raise ValidationError(f'{key} is een niet bestaande locatie eigenschap')
-                    
 
     @classmethod
     def get(cls, pandcode)-> Self: 
@@ -68,7 +64,10 @@ class LocationDataProcessor():
         Return a dictionary of all the 'real' properties of a location  
         """
         dictionary = {attr: getattr(self, attr) for attr in self.location_properties}
-      
+        # Add last_modified date to the dictionary
+        if getattr(self, 'gewijzigd'):
+            dictionary['gewijzigd'] = self.gewijzigd
+
         return dictionary
 
     def validate(self):
@@ -106,11 +105,9 @@ class LocationDataProcessor():
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
             # Save the location model first before adding LocationData
-            
-            # TODO, can ook get_or_create gebruiken, maar dan gaat het fout met full_clean?
-            
+            # TODO, kan ook get_or_create gebruiken, maar dan gaat het fout met full_clean?
             self.location_instance.full_clean()
-            self.location_instance.save()          
+            self.location_instance.save()
 
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
@@ -132,13 +129,13 @@ class LocationDataProcessor():
                             option.full_clean()
                             option.save()
                             location_data.property_option = option
-                    else:
+                    else: 
                         location_data.value = value
                     
                     location_data.clean()
                     #location_data.save()
                     # TODO update_or_create gemaakt, maar misschien een beetje clunky nog
-                    # TODO en validatie gaat nu fout omdat bij een update het nog niet bekent is of het object geupdate of nieuw is
+                    # TODO en single validatie gaat nu fout omdat bij een update het nog niet bekent is of het object geupdate of nieuw is
                     defaults = {}
                     if location_property.property_type == 'CHOICE':
                         defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
@@ -152,9 +149,6 @@ class LocationDataProcessor():
 
                     # Update datum mutatie?
                     self.location_instance.save()
-
-        # TODO update pandcode wanneer het een nieuwe locatie betreft
-
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'

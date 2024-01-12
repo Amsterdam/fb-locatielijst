@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.urls import reverse
-from locations.forms import LocationDetailForm
+from locations.forms import LocationDataForm
 from locations.models import Location
 from locations.processors import LocationDataProcessor
 
@@ -18,19 +18,18 @@ class LocationListView(ListView):
     
 
 class LocationDetailView(View):  
-    form = LocationDetailForm
+    form = LocationDataForm
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
         location_data = LocationDataProcessor.get(pandcode=self.kwargs['id'])
-        initial_data = location_data.get_dict()
-        form = self.form(initial=initial_data)
-        context = {'form': form, 'location_data': initial_data, 'gewijzigd': location_data.gewijzigd}
+        form = self.form(initial=location_data.get_dict())
+        context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
 
 class LocationCreateView(View):
-    form = LocationDetailForm
+    form = LocationDataForm
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
@@ -40,25 +39,26 @@ class LocationCreateView(View):
 
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
-        
+
         if form.is_valid():
             location_data = LocationDataProcessor(form.cleaned_data)
             location_data.save()
-            messages.success(request, 'De locatie is opgeslagen')
-            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
 
-        context = {'form': form}
-        return render(request, template_name=self.template, context=context)
+            messages.success(request, 'De locatie is toegevoegd')
+            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
+        else:
+            context = {'form': form}
+            return render(request, template_name=self.template, context=context)
 
 
 class LocationUpdateView(View):
-    form = LocationDetailForm
+    form = LocationDataForm
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        initial_data = LocationDataProcessor.get(pandcode=self.kwargs['id']).get_dict()
-        form = self.form(initial=initial_data)
-        context = {'form': form, 'location_data': initial_data, 'pandcode': self.kwargs['id']}
+        location_data = LocationDataProcessor.get(pandcode=self.kwargs['id'])
+        form = self.form(initial=location_data.get_dict())
+        context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
 
@@ -69,14 +69,14 @@ class LocationUpdateView(View):
         if form.is_valid():
             for field in form.cleaned_data:
                     setattr(location_data, field, form.cleaned_data[field])
-            
             location_data.save()
+
             messages.success(request, 'De locatie is opgeslagen')
-            return HttpResponseRedirect(reverse('location-detail', args=[self.kwargs['id']]))
+            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
         else:
             context = {'form': form, 'location_data': location_data.get_dict()}
             return render(request, template_name=self.template, context=context)
-        
+
 
 class LocationBeheerView(View):
     template = 'locations/location-beheer.html'
