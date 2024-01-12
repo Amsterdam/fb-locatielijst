@@ -75,10 +75,7 @@ class LocationProperty(models.Model):
         ]
 
     def __str__(self):
-        required = ', verplicht' if self.required else ''
-        multiple = ', meervoudig' if self.multiple else ''
-        unique = ', unique' if self.unique else ''
-        return f'{self.label} ({self.property_type}){required}{multiple}{unique}'
+        return f'{self.label}'
 
 
 class PropertyOption(models.Model):
