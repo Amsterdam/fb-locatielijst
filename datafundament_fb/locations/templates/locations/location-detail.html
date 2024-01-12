@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
     &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
     &rsaquo; {{ location_data.naam }}
 </div>
@@ -20,7 +20,7 @@
 {% block content %}
 <h1>{{ location_data.pandcode }} - {{ location_data.naam }}</h1>
 <small>
-    Locatie gewijzigd op {{ gewijzigd }}
+    Locatie gewijzigd op {{ location_data.gewijzigd }}
 </small>
 
 <dl class="data-view">
