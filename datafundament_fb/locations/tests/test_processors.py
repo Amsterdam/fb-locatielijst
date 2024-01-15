@@ -6,7 +6,7 @@ from locations.models import Location, LocationProperty, PropertyOption
 from locations.processors import LocationProcessor
 
 
-class TestDataLocationProcessor(TestCase):
+class TestLocationProcessor(TestCase):
     '''
     Test processing of location property data
     '''
