@@ -6,7 +6,7 @@ from locations.models import Location, LocationProperty, PropertyOption
 from locations.processors import LocationProcessor
 
 
-class TestDataLocationProcessor(TestCase):
+class TestLocationProcessor(TestCase):
     '''
     Test processing of location property data
     '''
@@ -158,15 +158,15 @@ class TestDataLocationProcessor(TestCase):
 
     def test_location_save_with_empty_value(self):
         # Test whether an precious filled value will be emptied
-        LocationDataProcessor(self.location_data_dict).save()
+        LocationProcessor(self.location_data_dict).save()
 
         # Get the location and delete a property value
-        location = LocationDataProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
         location.url = None
         location.save()
 
         # Verify that the location properties have no value in the db
-        location = LocationDataProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
         self.assertEqual(location.url, None)
 
     def test_validation(self):
