@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
-    location_instance = None
+    location_instance = Location()
 
     def _set_location_properties(self)-> None:
         """
@@ -85,21 +85,21 @@ class LocationProcessor():
         """
         # Run validation
         self.validate()
-     
+
+        # TODO: compute_pandcode verplaatsen naar save() van model en hieronder enkel controleren op aanwezigheid pandcode: dat is namelijk dan een update
         # If a Location model instance has not been set yet
-        if not isinstance(self.location_instance, Location):
-            if Location.objects.filter(pandcode=self.pandcode).exists():
-                self.location_instance = Location.objects.get(pandcode=self.pandcode)
-                # Update the attributes for the Location model instance
-                setattr(self.location_instance, 'name', getattr(self, 'naam'))
+        if Location.objects.filter(pandcode=self.pandcode).exists():
+            self.location_instance = Location.objects.get(pandcode=self.pandcode)
+            # Update the attributes for the Location model instance
+            setattr(self.location_instance, 'name', getattr(self, 'naam'))
+        else:
+            # When importing locations, pandcode exists
+            if getattr(self, 'pandcode'):
+                self.location_instance = Location(pandcode=self.pandcode, name=self.naam)
             else:
-                # When importing locations, pandcode exists
-                if getattr(self, 'pandcode'):
-                    self.location_instance = Location(pandcode=self.pandcode, name=self.naam)
-                else:
-                    self.location_instance = Location(name=self.naam)
-                    # Update this instance with the pandcode
-                    self.pandcode = self.location_instance.pandcode
+                self.location_instance = Location(name=self.naam)
+                # Update this instance with the pandcode
+                self.pandcode = self.location_instance.pandcode
 
          # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
@@ -109,13 +109,16 @@ class LocationProcessor():
 
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
-                value = getattr(self, location_property.short_name)
+                if getattr(self, location_property.short_name):
+                    value = getattr(self, location_property.short_name)
+                else:
+                    value = None
                 location_data = LocationData(
                     location = self.location_instance,
                     location_property = location_property,
                 )
                 # In case of a choice list, set the property_option attribute
-                if location_property.property_type == 'CHOICE':
+                if location_property.property_type == 'CHOICE' and value:
                     # TODO als een optie niet bestaat, dan moet dit afgevangen worden... dit is eigenlijk daarvoor niet de plaats
                     # OPTIE: voeg de optie meteen toe als deze niet bestaat
                     if PropertyOption.objects.filter(location_property=location_property, option=value).exists():
@@ -127,10 +130,10 @@ class LocationProcessor():
                         location_data.property_option = option
                 else: 
                     location_data.value = value
-                
+            
                 location_data.clean()
                 defaults = {}
-                if location_property.property_type == 'CHOICE':
+                if location_property.property_type == 'CHOICE' and value:
                     defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
                 else: 
                     defaults['value'] = value

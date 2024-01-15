@@ -9,7 +9,7 @@ from django.views import View
 from django.urls import reverse
 from locations.forms import LocationImportForm
 from locations.models import Location
-from locations.processors import LocationDataProcessor
+from locations.processors import LocationProcessor
 
 # Create your views here.
 class LocationImportView(View):
@@ -27,53 +27,38 @@ class LocationImportView(View):
 
         if form.is_valid():
             csv_file = form.cleaned_data.get('csv_file')
-            csv_reader = csv_file.read().decode('utf-8-sig').splitlines()
-            csv_dict = csv.DictReader(csv_reader)
+            if csv_file.name.endswith('.csv'):
+                csv_reader = csv_file.read().decode('utf-8-sig').splitlines()
+                csv_dict = csv.DictReader(csv_reader)
 
-            # verify column header names against location_data properties
-            location_properties = LocationDataProcessor().location_properties
-            column_not_in_csv = False
-            column_not_in_properties = False
-            headers = csv_dict.fieldnames
+                # Report columns that will be processed during import
+                location_properties = set(LocationProcessor().location_properties)
+                headers = set(csv_dict.fieldnames)
 
-            for location_property in location_properties:
-                if location_property not in headers:
-                    messages.add_message(
-                        request,
-                        messages.WARNING,
-                        "Locatie eigenschap '{location_property}' mist in het import bestand en is niet verwerkt".format(location_property=location_property)
-                    )
-            
-            for column in headers:
-                if column not in location_properties:
-                    messages.add_message(
-                        request,
-                        messages.WARNING,
-                        "Kolom '{column}' in het import bestand bestaat niet als eigenschap en is overgeslagen".format(column=column)
-                    )
+                used_columns = list(headers & location_properties)
+                message = f"Kolommen {used_columns} worden verwerkt"
+                messages.add_message(request, messages.INFO, message)
 
-            for row in csv_dict:
-                try:
-                    if Location.objects.filter(pandcode=row['pandcode']).exists():
-                        message = 'Locatie {name} is ge-update'.format(name=row['naam'])
-                    else:
-                        message = 'Locatie {name} is geïmporteerd'.format(name=row['naam'])
-                    
-                    location = LocationDataProcessor(row)
-                    location.save()
-                    messages.add_message(
-                        request,
-                        messages.INFO, message
-                    )
-                except ValidationError as err:
-                    messages.add_message(
-                        request,
-                        messages.ERROR, 'Fout bij het importeren voor locatie {name}: {message}'.format(
-                            name=row['naam'],
-                            message=err.messages
-                        )
-                    )       
+                # Process the rows from the import file
+                for row in csv_dict:
+                    # Initiatie a location processor with the row data
+                    location = LocationProcessor(row)
+                    try:
+                        # Save the locationprocessor instance                        
+                        location.save()
+
+                        # Return message for success
+                        message = f"Locatie {row['naam']} is geïmporteerd/ge-update"
+                        messages.add_message(request, messages.SUCCESS, message)
+
+                    except ValidationError as err:
+                        message = f"Fout bij het importeren voor locatie {row['naam']}: {err.message}"
+                        messages.add_message(request, messages.ERROR, message)
+            else:
+                message = f"{csv_file.name} is geen gelding CSV bestand"
+                messages.add_message(request, messages.ERROR, message)
         else:
-            messages.add_message(request, messages.ERROR, 'Something went wrong validating your input: {errors}.'.format(errors = form.errors))
+            message = f"Something went wrong validating your input: {form.errors}"
+            messages.add_message(request, messages.ERROR, message)
         
         return HttpResponseRedirect(reverse('location-import'))
