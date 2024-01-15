@@ -108,10 +108,9 @@ class LocationData(models.Model):
         verbose_name = 'Locatie gegeven'
         verbose_name_plural = 'Locatie gegevens'
         constraints = [
-            # Constraint so that either property_option or value is filled
+            # Constraint so that either property_option or value is filled, or empty
             models.CheckConstraint(
-                check=Q(property_option__isnull=False, value__isnull=True) | Q(
-                    property_option__isnull=True, value__isnull=False),
+                check=~Q(property_option__isnull=False, value__isnull=False),
                 name='either_field_filled',
                 violation_error_message=f'Either option or value must be filled.',
             ),

@@ -104,51 +104,42 @@ class LocationProcessor():
          # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
-            # Save the location model first before adding LocationData
-            # TODO, kan ook get_or_create gebruiken, maar dan gaat het fout met full_clean?
             self.location_instance.full_clean()
             self.location_instance.save()
 
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
                 value = getattr(self, location_property.short_name)
-
-                if value:
-                    location_data = LocationData(
-                        location = self.location_instance,
-                        location_property = location_property,
-                    )
-                    # In case of a choice list, set the property_option attribute
-                    if location_property.property_type == 'CHOICE':
-                        # TODO als een optie niet bestaat, dan moet dit afgevangen worden... dit is eigenlijk daarvoor niet de plaats
-                        # OPTIE: voeg de optie meteen toe als deze niet bestaat
-                        if PropertyOption.objects.filter(location_property=location_property, option=value).exists():
-                            location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
-                        else:
-                            option = PropertyOption(location_property=location_property, option=value)
-                            option.full_clean()
-                            option.save()
-                            location_data.property_option = option
-                    else: 
-                        location_data.value = value
-                    
-                    location_data.clean()
-                    #location_data.save()
-                    # TODO update_or_create gemaakt, maar misschien een beetje clunky nog
-                    # TODO en single validatie gaat nu fout omdat bij een update het nog niet bekent is of het object geupdate of nieuw is
-                    defaults = {}
-                    if location_property.property_type == 'CHOICE':
-                        defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
-                    else: 
-                        defaults['value'] = value
-                    obj, created = LocationData.objects.update_or_create(
-                        location = self.location_instance,
-                        location_property = location_property,
-                        defaults = defaults
-                    )
-
-                    # Update datum mutatie?
-                    self.location_instance.save()
+                location_data = LocationData(
+                    location = self.location_instance,
+                    location_property = location_property,
+                )
+                # In case of a choice list, set the property_option attribute
+                if location_property.property_type == 'CHOICE':
+                    # TODO als een optie niet bestaat, dan moet dit afgevangen worden... dit is eigenlijk daarvoor niet de plaats
+                    # OPTIE: voeg de optie meteen toe als deze niet bestaat
+                    if PropertyOption.objects.filter(location_property=location_property, option=value).exists():
+                        location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
+                    else:
+                        option = PropertyOption(location_property=location_property, option=value)
+                        option.full_clean()
+                        option.save()
+                        location_data.property_option = option
+                else: 
+                    location_data.value = value
+                
+                location_data.clean()
+                defaults = {}
+                if location_property.property_type == 'CHOICE':
+                    defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
+                else: 
+                    defaults['value'] = value
+                obj, created = LocationData.objects.update_or_create(
+                    location = self.location_instance,
+                    location_property = location_property,
+                    defaults = defaults
+                )
+                self.location_instance.save()
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'
