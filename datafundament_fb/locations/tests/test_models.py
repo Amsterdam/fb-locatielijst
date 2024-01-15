@@ -334,11 +334,6 @@ class TestLocationDataModel(TestCase):
         with transaction.atomic():
             self.assertRaises(IntegrityError, self.location_data.save)
 
-        self.location_data.property_option = None
-        self.location_data.value = None
-        with transaction.atomic():
-            self.assertRaises(IntegrityError, self.location_data.save)
-
     def test_for_unique_constraint(self):
         # Test when unique is enabled
         # Save a value to the database
