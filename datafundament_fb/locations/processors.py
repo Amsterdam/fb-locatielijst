@@ -3,6 +3,7 @@ from django.db import transaction
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from locations.validators import LocationDataValidator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
@@ -75,9 +76,8 @@ class LocationProcessor():
         Validate class specific properties
         """
         for location_property in self.location_property_instances:
-            # Location properties that are required should have a value
-            if location_property.required and not getattr(self, location_property.short_name):
-                raise ValidationError(f'Value required for {location_property.label}')
+            # Validate the value of every location property
+            LocationDataValidator.validate(location_property, getattr(self, location_property.short_name))
 
     def save(self)-> Location:
         """
@@ -105,7 +105,6 @@ class LocationProcessor():
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
             # Save the location model first before adding LocationData
-            # TODO, kan ook get_or_create gebruiken, maar dan gaat het fout met full_clean?
             self.location_instance.full_clean()
             self.location_instance.save()
 
@@ -119,22 +118,14 @@ class LocationProcessor():
                     )
                     # In case of a choice list, set the property_option attribute
                     if location_property.property_type == 'CHOICE':
-                        # TODO als een optie niet bestaat, dan moet dit afgevangen worden... dit is eigenlijk daarvoor niet de plaats
-                        # OPTIE: voeg de optie meteen toe als deze niet bestaat
-                        if PropertyOption.objects.filter(location_property=location_property, option=value).exists():
-                            location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
-                        else:
-                            option = PropertyOption(location_property=location_property, option=value)
-                            option.full_clean()
-                            option.save()
-                            location_data.property_option = option
+                        location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
                     else: 
                         location_data.value = value
-                    
-                    location_data.clean()
-                    #location_data.save()
-                    # TODO update_or_create gemaakt, maar misschien een beetje clunky nog
-                    # TODO en single validatie gaat nu fout omdat bij een update het nog niet bekent is of het object geupdate of nieuw is
+
+                    # Clean the data                    
+                    location_data.full_clean()
+
+                    # Create or update the instance
                     defaults = {}
                     if location_property.property_type == 'CHOICE':
                         defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
@@ -146,7 +137,7 @@ class LocationProcessor():
                         defaults = defaults
                     )
 
-                    # Update datum mutatie?
+                    # Update timestamp for last_modified attribute
                     self.location_instance.save()
 
     def __repr__(self):

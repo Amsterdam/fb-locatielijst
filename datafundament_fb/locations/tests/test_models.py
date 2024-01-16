@@ -1,5 +1,4 @@
 import unittest.mock as mock
-from unittest import skip
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
@@ -72,9 +71,6 @@ class TestLocationDataValidation(TestCase):
     Test for the validation of location property values 
     """
 
-    def setUp(self) -> None:
-        return super().setUp()
-
     def test_boolean_validation(self):
         # Test valid boolean value
         values = ['Ja', 'Nee']
@@ -128,7 +124,7 @@ class TestLocationDataValidation(TestCase):
     def test_memo_validation(self):
         # Test valid string value; this functions always returns the input, because the value it is already a string
         value = 'string'
-        self.assertEqual(LocationDataValidator.valid_string(value), value)
+        self.assertEqual(LocationDataValidator.valid_memo(value), value)
 
     def test_postal_code_validation(self):
         # Test valid postal codes
@@ -363,20 +359,20 @@ class TestLocationDataModel(TestCase):
             f'Value %(value)s already exists for property %(property)s',
         )
 
-    @skip("zie opmerking in models.py")
     def test_for_single_constraint(self):
         # Test that a property can only exist once for a location; except when multiple is enabled for a property
         self.location_data.location_property = self.string_property
         self.location_data.value = 'Yellow'
         self.location_data.save()
 
+        # Create a new LocationData
         location_data = LocationData(
             location=self.location,
             location_property = self.string_property,
             value = 'Orange'
         )
 
-        # Raise a validation error
+        # Raise a validation error with full_clean()
         with self.assertRaises(ValidationError) as validation_error:
             location_data.clean()
 
@@ -386,3 +382,23 @@ class TestLocationDataModel(TestCase):
             validation_error.exception.message,
             f'Property %(property)s already exists for location %(location)s',
         )
+
+        # Test when multiple is enabled for a property
+        self.string_property.multiple = True
+        self.string_property.save()
+        
+        # Create a new LocationData
+        location_data = LocationData.objects.create(
+            location=self.location,
+            location_property = self.string_property,
+            value = 'Orange'
+        )
+
+        # Verify that the same property is added to the location twice
+        location_data = Location.objects.get(pandcode=self.location.pandcode).locationdata_set.all()
+        self.assertEqual(len(location_data), 2)
+        self.assertEqual(location_data[0].value, 'Yellow')
+        self.assertEqual(location_data[1].value, 'Orange')
+        for item in Location.objects.get(pandcode=self.location.pandcode).locationdata_set.all():
+            self.assertEqual(item.location, self.location)
+            self.assertEqual(item.location_property, self.string_property)
