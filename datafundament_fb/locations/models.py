@@ -125,17 +125,16 @@ class LocationData(models.Model):
 
     def clean(self) -> None:
         # Validate for single instance
-        # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
-        # if not self.location_property.multiple:
-        #     if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
-        #         raise ValidationError(
-        #             _("Property %(property)s already exists for location %(location)s"),
-        #             code='unique',
-        #             params={
-        #                 'property': self.location_property.label,
-        #                 'location': self.location.pandcode
-        #             },
-        #         )
+        if not self.location_property.multiple and not self.pk:
+            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+                raise ValidationError(
+                    _("Property %(property)s already exists for location %(location)s"),
+                    code='unique',
+                    params={
+                        'property': self.location_property.label,
+                        'location': self.location.pandcode
+                    },
+                )
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:
