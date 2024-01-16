@@ -3,7 +3,7 @@
     "model": "locations.propertyoption",
     "pk": 1,
     "fields": {
-        "location_property": 3,
+        "location_property": 7,
         "option": "Stadhuis"
     }
 },
@@ -11,7 +11,7 @@
     "model": "locations.propertyoption",
     "pk": 2,
     "fields": {
-        "location_property": 3,
+        "location_property": 7,
         "option": "Overig"
     }
 },
@@ -19,7 +19,7 @@
     "model": "locations.propertyoption",
     "pk": 3,
     "fields": {
-        "location_property": 3,
+        "location_property": 7,
         "option": "Ambtswoning"
     }
 },
@@ -27,7 +27,7 @@
     "model": "locations.propertyoption",
     "pk": 4,
     "fields": {
-        "location_property": 3,
+        "location_property": 7,
         "option": "Kantoor"
     }
 },
@@ -35,7 +35,7 @@
     "model": "locations.propertyoption",
     "pk": 5,
     "fields": {
-        "location_property": 8,
+        "location_property": 12,
         "option": "Basis"
     }
 },
@@ -43,7 +43,7 @@
     "model": "locations.propertyoption",
     "pk": 6,
     "fields": {
-        "location_property": 8,
+        "location_property": 12,
         "option": "onderdeel van Amstel 1"
     }
 },
@@ -51,7 +51,7 @@
     "model": "locations.propertyoption",
     "pk": 7,
     "fields": {
-        "location_property": 8,
+        "location_property": 12,
         "option": "Contract"
     }
 },
@@ -59,7 +59,7 @@
     "model": "locations.propertyoption",
     "pk": 8,
     "fields": {
-        "location_property": 9,
+        "location_property": 13,
         "option": "Facilitair Bureau"
     }
 },
@@ -67,7 +67,7 @@
     "model": "locations.propertyoption",
     "pk": 9,
     "fields": {
-        "location_property": 9,
+        "location_property": 13,
         "option": "Werk"
     }
 },
@@ -75,7 +75,7 @@
     "model": "locations.propertyoption",
     "pk": 10,
     "fields": {
-        "location_property": 14,
+        "location_property": 24,
         "option": "Eigendom"
     }
 },
@@ -83,7 +83,7 @@
     "model": "locations.propertyoption",
     "pk": 11,
     "fields": {
-        "location_property": 14,
+        "location_property": 24,
         "option": "Gehuurd"
     }
 },
@@ -91,7 +91,7 @@
     "model": "locations.propertyoption",
     "pk": 12,
     "fields": {
-        "location_property": 22,
+        "location_property": 39,
         "option": "AEOS"
     }
 },
@@ -99,7 +99,7 @@
     "model": "locations.propertyoption",
     "pk": 13,
     "fields": {
-        "location_property": 22,
+        "location_property": 39,
         "option": "CardAccess"
     }
 },
@@ -107,7 +107,7 @@
     "model": "locations.propertyoption",
     "pk": 14,
     "fields": {
-        "location_property": 11,
+        "location_property": 15,
         "option": "Ja"
     }
 },
@@ -115,7 +115,7 @@
     "model": "locations.propertyoption",
     "pk": 15,
     "fields": {
-        "location_property": 11,
+        "location_property": 15,
         "option": "Nee"
     }
 }
