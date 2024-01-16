@@ -1,6 +1,5 @@
 import unittest.mock as mock
-from unittest import skip
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from locations.models import Location, LocationProperty, PropertyOption
 from locations.processors import LocationProcessor
@@ -169,20 +168,43 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_data[8].location_property, self.choice_property)
         self.assertEqual(location_data[8].property_option.option, self.location_data_dict['type'])
 
-    @skip("zie opmerking in processors.py bij save()")
-    def test_location_save_atomic(self):
+    @mock.patch('locations.validators.LocationDataValidator.valid_url')
+    def test_location_save_atomic(self, mock):
         '''
         Test that neither a Location or LocationData will be added to the DB
         if an error occurs during save().
+        '''
+        # Init location with an invalid attribute type 
+        location = LocationProcessor(self.location_data_dict)
+
+        # Mock the validation() so an error is raised
+        mock.side_effect = (ValueError)
+        
+        # When saving the object, an ObjectDoesNotExist should be raised because Tomato is not a valid choice value
+        with self.assertRaises(ValueError) as validation_error:
+            location.save()
+
+        # Verify that no object has been added to the database
+        self.assertEqual(Location.objects.all().count(), 0)
+
+
+    def test_invalid_choice_value(self):
+        '''
+        Test that an invalid choice value for a Location Property() during save results in a validation error.
         '''
         # Init location with non existing type option
         location = LocationProcessor(private=True, data=self.location_data_dict)
         location.type = 'Tomato'
         
-        # When saving the object, an ObjectDoesNotExist should be raised because Tomato is not a valid choice value
-        self.assertRaises(ObjectDoesNotExist, location.save)
-        # Verify that no object has been added to the database
-        self.assertEqual(Location.objects.all().count(), 0)
+        # When saving the object, a ValidationError should be raised because Tomato is not a valid choice value
+        with self.assertRaises(ValidationError) as validation_error:
+            location.save()
+
+        # Verify the error message
+        self.assertEqual(
+            validation_error.exception.message,
+            f"'Tomato' is not a valid choice for {self.choice_property.label}"
+        )
 
     def test_location_save_with_empty_value(self):
         # Test whether an precious filled value will be emptied
@@ -212,18 +234,7 @@ class TestLocationProcessor(TestCase):
         # Verify the error message
         self.assertEqual(
             validation_error.exception.message,
-            f'Value required for {self.boolean_property.label}',
-        )
-
-        # Set occupied to None
-        location.occupied = None
-        # Verify that a validation Error occurs because occupied is None
-        with self.assertRaises(ValidationError) as validation_error:
-            location.validate()
-        # Verify the error message
-        self.assertEqual(
-            validation_error.exception.message,
-            f'Value required for {self.boolean_property.label}',
+            f"'' is not a valid boolean",
         )
 
     def test_location_get(self):

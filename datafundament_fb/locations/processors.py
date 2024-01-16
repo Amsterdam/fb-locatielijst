@@ -3,6 +3,7 @@ from django.db import transaction
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from locations.validators import LocationDataValidator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
@@ -83,9 +84,8 @@ class LocationProcessor():
         Validate class specific properties
         """
         for location_property in self.location_property_instances:
-            # Location properties that are required should have a value
-            if location_property.required and not getattr(self, location_property.short_name):
-                raise ValidationError(f'Value required for {location_property.label}')
+            # Validate the value of every location property
+            LocationDataValidator.validate(location_property, getattr(self, location_property.short_name))
 
     def save(self)-> Location:
         """
@@ -112,42 +112,33 @@ class LocationProcessor():
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
+            # Save the location model first before adding LocationData
             self.location_instance.full_clean()
             self.location_instance.save()
 
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
+                # Check if the location_data already exists; otherwise create new instance
+                if self.location_instance.locationdata_set.filter(location=self.location_instance, location_property=location_property).exists():
+                    location_data = self.location_instance.locationdata_set.get(location=self.location_instance, location_property=location_property)
+                else:
+                    location_data = LocationData(location = self.location_instance, location_property = location_property)
+
                 value = getattr(self, location_property.short_name)
-                location_data = LocationData(
-                    location = self.location_instance,
-                    location_property = location_property,
-                )
                 # In case of a choice list, set the property_option attribute
                 if location_property.property_type == 'CHOICE':
-                    # TODO als een optie niet bestaat, dan moet dit afgevangen worden... dit is eigenlijk daarvoor niet de plaats
-                    # OPTIE: voeg de optie meteen toe als deze niet bestaat
-                    if PropertyOption.objects.filter(location_property=location_property, option=value).exists():
-                        location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
-                    else:
-                        option = PropertyOption(location_property=location_property, option=value)
-                        option.full_clean()
-                        option.save()
-                        location_data.property_option = option
+                    location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
                 else: 
                     location_data.value = value
-                
-                location_data.clean()
-                defaults = {}
-                if location_property.property_type == 'CHOICE':
-                    defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
-                else: 
-                    defaults['value'] = value
-                obj, created = LocationData.objects.update_or_create(
-                    location = self.location_instance,
-                    location_property = location_property,
-                    defaults = defaults
-                )
-                self.location_instance.save()
+
+                # Clean the data                    
+                location_data.full_clean()
+
+                # Save the instance
+                location_data.save()
+
+                # Update timestamp for last_modified attribute
+                self.location_instance.save()   
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'
