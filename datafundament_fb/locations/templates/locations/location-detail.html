@@ -3,9 +3,9 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
-    &rsaquo; {{ location_data.naam }}
+    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <span>&rsaquo;</span>
+    {{ location_data.naam }}
 </div>
 {% endblock %}
 
@@ -18,7 +18,7 @@
 {% endif %}
 
 {% block content %}
-<h1>{{ location_data.pandcode }} - {{ location_data.naam }}</h1>
+<h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
 <small>
     Locatie gewijzigd op {{ gewijzigd }}
 </small>

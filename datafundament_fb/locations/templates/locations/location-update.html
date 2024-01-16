@@ -3,9 +3,11 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
-    &rsaquo; <a href="{% url 'location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
+    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
+    <span>&rsaquo;</span>
+    Wijzigen
 </div>
 {% endblock %}
 
@@ -18,7 +20,7 @@
 {% endif %}
 
 {% block content %}
-<h1>{{ location_data.pandcode }} - {{ location_data.naam }}</h1>
+<h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
 
 <form action="." method="POST">
     <div class="data-view">
@@ -39,7 +41,6 @@
     </div>
     <div class="btn-container">
         <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}">Opslaan</button>
-        <!-- <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}"> -->
         <a href="{% url 'location-detail' location_data.pandcode %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>

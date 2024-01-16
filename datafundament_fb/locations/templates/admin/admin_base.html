@@ -13,12 +13,18 @@
 {% endblock %}
 
 {% block branding %}
-<div id="site-logo"><img src="{% static 'images/logo-gemeente-amsterdam.svg' %}" alt="Logo Gemeente Amsterdam" /></div>
-<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Datafundament Facilitair Bureau') }}</a></div>
+<h1>
+  <a href="/">
+    <div id="site-logo">
+      <img src="{% static 'images/logo-gemeente-amsterdam.svg' %}" class="site-logo-large" alt="Logo Gemeente Amsterdam" />
+      <img src="{% static 'images/logo-gemeente-amsterdam-small.svg' %}" class="site-logo-small" alt="Logo Gemeente Amsterdam" />
+    </div>
+    <div id="site-name">{{ site_header|default:_('Datafundament Facilitair Bureau') }}</div>
+  </a>
+</h1>
 {% endblock %}
 
 {% block nav-global %}
-{% include "admin/color_theme_toggle.html" %}
 <nav>
   <ul>
     {% if user.is_anonymous %}
@@ -28,7 +34,7 @@
     <li><a href="{% url 'location-beheer' %}">Beheer</a></li>
     <li><form id="logout-form" method="post" action="{% url 'admin:logout' %}">
       {% csrf_token %}
-      <button type="submit">{% translate 'Log out' %}</button>
+      <button type="submit">Uitloggen</button>
     </form></li>
     {% endif %}
   </ul>

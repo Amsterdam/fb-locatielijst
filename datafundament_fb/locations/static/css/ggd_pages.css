@@ -1,4 +1,8 @@
 
+body #content {
+  padding: 1.125rem 2rem;
+}
+
 .page-content {
   display: flex;
   flex-direction: row;
@@ -6,9 +10,11 @@
 
 .page-left {
   flex: 1 1 65%;
+  margin-bottom: 1rem;
 }
 .page-right {
   flex: 1 1 35%;
+  margin-bottom: 1rem;
 }
 
 
@@ -86,7 +92,7 @@ input, textarea, select, .form-row p, form .button {
 }
 
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 839px) {
 
   .page-content {
     flex-direction: column-reverse;

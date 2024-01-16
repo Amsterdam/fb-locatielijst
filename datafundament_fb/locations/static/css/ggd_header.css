@@ -1,30 +1,44 @@
 
-#header {
+body #header {
   --accent: var(--header-branding-color);
+  padding: 1.125rem 2rem;
+  display: flex;
+  flex-direction: row;
 }
 
 #branding {
   flex-grow: 1;
 }
 
+#branding h1 {
+  margin: 0;
+}
+
+#branding h1 a {
+  display: flex;
+  text-decoration: none;
+}
+
 #site-logo {
-  height: 32px;
-  width: 210px;
+  display: flex;
+  height: 39px;
+  width: 160px;
 }
 
 #site-logo IMG {
   height: 100%;
 }
 
+#site-logo .site-logo-large { display: block; }
+#site-logo .site-logo-small { display: none; }
+
 #site-name {
   font-family: "amsterdam sans", arial, sans-serif;
   font-style: normal;
   font-weight: 800;
   flex-grow: 1;
-}
-
-#site-name a {
-  text-decoration: none;
+  font-size: clamp(1.5rem, 1.5rem + 1 * (100vw - 20rem) / 100, 2.5rem);
+  line-height: clamp(2rem, 2rem + 1 * (100vw - 20rem) / 100, 3rem);
 }
 
 .theme-toggle svg.theme-icon-when-auto,
@@ -33,6 +47,18 @@
   fill: var(--header-link-color);
   color: var(--header-bg);
 }
+
+@media screen and (max-width: 839px) {
+
+  #site-logo {
+    width: 30px;
+  }
+
+  #site-logo .site-logo-large { display: none; }
+  #site-logo .site-logo-small { display: block; }
+    
+}
+
 
 /*******************************************/
 
@@ -65,6 +91,7 @@
   font-size: 1rem;
   letter-spacing: normal;
   text-transform: none;
+  line-height: 24px;
 }
 
 #header nav ul li a:hover, #header nav ul li a:focus,
@@ -78,5 +105,21 @@
 /*******************************************/
 
 div.breadcrumbs {
-  background: var(--color-blue);
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+div.breadcrumbs a {
+  color: var(--color-blue);
+  text-decoration: none;
+}
+
+div.breadcrumbs a:hover,
+div.breadcrumbs a:focus {
+  text-decoration: underline;
+  color: var(--color-dark-blue);
+}
+
+div.breadcrumbs span {
+  margin: 0 0.5rem;
 }

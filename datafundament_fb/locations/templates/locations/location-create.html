@@ -3,9 +3,9 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
-    &rsaquo; {% translate 'New' %}
+    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <span>&rsaquo;</span>
+    Locatie toevoegen
 </div>
 {% endblock %}
 
@@ -18,7 +18,7 @@
 {% endif %}
 
 {% block content %}
-<h1>Nieuwe locatie</h1>
+<h2>Nieuwe locatie</h2>
 <form action="." method="POST">
     <div class="data-view">
         {% csrf_token %}
@@ -37,7 +37,6 @@
         {% endfor %}
         <div class="btn-container">
             <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'location-create' %}">Aanmaken</button>
-            <!-- <input class="default" type="submit" name="_save" value="Save" formaction="{% url 'location-create' %}"> -->
             <a href="{% url 'location-list' %}" class="btn btn-secundair">Annuleren</a>
         </div>
     </div>
