@@ -31,7 +31,7 @@ class TestLocationImportForm(TestCase):
             location_property=self.choice_property, option='Orange')
         self.csv_content  = [
             'pandcode,naam,bool,date,mail,int,memo,post,str,url,choice',
-            '25001,Amstel 1,Ja,31-12-2023,mail@example.org,99,Memo tekst,1234AB,Tekst,https://example.org,Yellow'
+            '25001,Amstel 1,Ja,31-12-2023,mail@example.org,99,Memo tekst,1234AB,Tekst,https://example.org,Orange'
         ]
 
     def test_import_csv_get(self):
@@ -56,7 +56,6 @@ class TestLocationImportForm(TestCase):
 
         # Verify response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
-
         self.assertEqual(messages[0].tags, 'info')      
         self.assertEqual(messages[1].tags, 'success')      
 
@@ -111,4 +110,4 @@ class TestLocationImportForm(TestCase):
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[1].tags, 'error')
-        self.assertEqual(messages[1].message, 'Fout bij het importeren voor locatie Amstel 1: Misschien is not a valid boolean')
+        self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: 'Misschien' is not a valid boolean")
