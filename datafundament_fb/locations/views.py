@@ -6,7 +6,7 @@ from django.views import View
 from django.urls import reverse
 from locations.forms import LocationDataForm
 from locations.models import Location
-from locations.processors import LocationDataProcessor
+from locations.processors import LocationProcessor
 
 # Create your views here.
 class LocationListView(ListView):
@@ -22,7 +22,7 @@ class LocationDetailView(View):
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationDataProcessor.get(pandcode=self.kwargs['id'])
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
         form = self.form(initial=location_data.get_dict())
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
@@ -41,7 +41,7 @@ class LocationCreateView(View):
         form = self.form(request.POST)
 
         if form.is_valid():
-            location_data = LocationDataProcessor(form.cleaned_data)
+            location_data = LocationProcessor(form.cleaned_data)
             location_data.save()
 
             messages.success(request, 'De locatie is toegevoegd')
@@ -56,7 +56,7 @@ class LocationUpdateView(View):
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationDataProcessor.get(pandcode=self.kwargs['id'])
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
         form = self.form(initial=location_data.get_dict())
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
@@ -64,7 +64,7 @@ class LocationUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
-        location_data = LocationDataProcessor.get(pandcode=self.kwargs['id'])
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
 
         if form.is_valid():
             for field in form.cleaned_data:
