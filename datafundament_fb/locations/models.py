@@ -112,10 +112,9 @@ class LocationData(models.Model):
         verbose_name = 'Locatie gegeven'
         verbose_name_plural = 'Locatie gegevens'
         constraints = [
-            # Constraint so that either property_option or value is filled
+            # Constraint so that either property_option or value is filled, or empty
             models.CheckConstraint(
-                check=Q(property_option__isnull=False, value__isnull=True) | Q(
-                    property_option__isnull=True, value__isnull=False),
+                check=~Q(property_option__isnull=False, value__isnull=False),
                 name='either_field_filled',
                 violation_error_message=f'Either option or value must be filled.',
             ),
@@ -126,21 +125,20 @@ class LocationData(models.Model):
 
     def clean(self) -> None:
         # Validate for single instance
-        # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
-        # if not self.location_property.multiple:
-        #     if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
-        #         raise ValidationError(
-        #             _("Property %(property)s already exists for location %(location)s"),
-        #             code='unique',
-        #             params={
-        #                 'property': self.location_property.label,
-        #                 'location': self.location.pandcode
-        #             },
-        #         )
+        if not self.location_property.multiple and not self.pk:
+            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+                raise ValidationError(
+                    _("Property %(property)s already exists for location %(location)s"),
+                    code='unique',
+                    params={
+                        'property': self.location_property.label,
+                        'location': self.location.pandcode
+                    },
+                )
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:
-            if LocationData.objects.filter(location_property=self.location_property,value=self.value).exists():
+            if LocationData.objects.filter(location_property=self.location_property,value=self.value).exclude(location=self.location).exists():
                 raise ValidationError(
                     _("Value %(value)s already exists for property %(property)s"),
                     code='unique',
