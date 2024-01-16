@@ -75,6 +75,7 @@ class LocationUpdateView(View):
             return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
         else:
             context = {'form': form, 'location_data': location_data.get_dict()}
+            messages.error(request, 'Niet alle velden zijn juist ingevuld. Verhelp het probleem en sla opnieuw op')
             return render(request, template_name=self.template, context=context)
 
 

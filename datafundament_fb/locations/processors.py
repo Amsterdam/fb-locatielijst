@@ -52,7 +52,8 @@ class LocationProcessor():
         
         for location_data in object.location_instance.locationdata_set.all():
             if location_data.location_property.property_type == 'CHOICE':
-                value = location_data.property_option.option
+                if getattr(location_data, 'property_option'):
+                    value = location_data.property_option.option
             else:
                 value = location_data.value
             setattr(object, location_data.location_property.short_name, value)
