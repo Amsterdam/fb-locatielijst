@@ -11,7 +11,7 @@ class LocationDataValidator():
     # Function to validate the value depending on the chosen property type
     @staticmethod
     def valid_boolean(value)-> str:
-        accepted_boolean_values = ['Ja', 'Nee', 'ja', 'nee']
+        accepted_boolean_values = ['Ja', 'Nee']
         if value in accepted_boolean_values:
             return value
         else:
@@ -37,7 +37,7 @@ class LocationDataValidator():
 
     @staticmethod
     def valid_integer(value)-> str:
-        int_regex = r'^-?\d+([,.]\d+)?$'
+        int_regex = r'^-?\d+(,\d+)?$'
         if re.match(int_regex, value):
             return value
         else:
