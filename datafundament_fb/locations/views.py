@@ -8,7 +8,7 @@ from django.views import View
 from django.urls import reverse
 from django.utils import timezone
 from locations.models import Location
-from locations.processors import LocationDataProcessor
+from locations.processors import LocationProcessor
 
 # Create your views here.
 class LocationExportView(View):
@@ -21,7 +21,7 @@ class LocationExportView(View):
         locations = Location.objects.all()
         location_data = []
         for location in locations:
-            location_data.append(LocationDataProcessor.get(pandcode=location.pandcode).get_dict())
+            location_data.append(LocationProcessor.get(pandcode=location.pandcode).get_dict())
 
         date = timezone.now().strftime('%Y-%m-%d_%H.%M')
         response = HttpResponse(
