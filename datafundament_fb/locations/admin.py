@@ -26,8 +26,9 @@ class PropertyOptionAdmin(admin.ModelAdmin):
 class PropertyOptionInlineFormset(BaseInlineFormSet):
     def clean(self):
         super(PropertyOptionInlineFormset, self).clean()
+        # Raise an error when the user tries to add an option to any other property type than CHOICE
         if self.instance.property_type != 'CHOICE' and len(self.forms) > 0:
-            raise ValidationError("Opties kan je alleen aan een Keuzelijst toevoegen")
+            raise ValidationError("Opties kan je alleen aan een keuzelijst toevoegen")
 
 
 class PropertyOptionInline(admin.TabularInline):
@@ -42,12 +43,13 @@ class LocationPropertyAdmin(admin.ModelAdmin):
     inlines = [PropertyOptionInline]
 
     def get_readonly_fields(self, request, obj=None):
-        if obj: # editing an existing object
+        # Prevent the user from modifying an existing property_type 
+        if obj:
             return self.readonly_fields + ('property_type',)
         return self.readonly_fields
     
     def get_inline_instances(self, request, obj):
-        #Return inlines only when property_type = choice
+        #Return the inline form only when property_type = CHOICE
         if not obj:
             return super(LocationPropertyAdmin, self).get_inline_instances(request, obj)
         else:
