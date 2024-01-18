@@ -198,15 +198,15 @@ class TestLocationProcessor(TestCase):
         # Init a location
         location = LocationProcessor(self.location_data_dict)
 
-        # Set occupied to an empty string
-        location.occupied = ''
+        # Set occupied to an invalid string
+        location.occupied = 'Misschien'
         # Verify that a validation Error occurs because occupied is an empty string
         with self.assertRaises(ValidationError) as validation_error:
             location.validate()
         # Verify the error message
         self.assertEqual(
             validation_error.exception.message,
-            f"'' is not a valid boolean",
+            f"'Misschien' is not a valid boolean",
         )
 
     def test_location_get(self):

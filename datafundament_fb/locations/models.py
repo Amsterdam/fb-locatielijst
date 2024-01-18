@@ -185,7 +185,7 @@ class LocationExternalService(models.Model):
     '''
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
-    external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100)
+    external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Locatie koppeling'
