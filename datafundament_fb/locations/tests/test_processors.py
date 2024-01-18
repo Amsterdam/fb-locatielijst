@@ -179,7 +179,7 @@ class TestLocationProcessor(TestCase):
         )
 
     def test_location_save_with_empty_value(self):
-        # Test whether an precious filled value will be emptied
+        # Test whether an previous filled value will be emptied
         LocationProcessor(self.location_data_dict).save()
 
         # Get the location and delete a property value
