@@ -65,7 +65,7 @@ class LocationProcessor():
                 value = location_data.value
             setattr(object, location_data.location_property.short_name, value)
 
-        # Add location properties to the object
+        # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
             value = service.external_location_code
             setattr(object, service.external_service.short_name, value)
