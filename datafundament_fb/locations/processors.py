@@ -7,7 +7,6 @@ from locations.validators import LocationDataValidator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
-    location_instance = Location()
 
     def _set_location_properties(self)-> None:
         """
@@ -33,6 +32,9 @@ class LocationProcessor():
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
         """
+        # Set an empty Location instance
+        self.location_instance = Location()
+
         # Set the location data fields for this instance
         self._set_location_properties()
 

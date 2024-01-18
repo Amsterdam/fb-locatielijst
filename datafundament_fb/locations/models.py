@@ -153,7 +153,8 @@ class LocationData(models.Model):
                 code='required',
                 params={'property': self.location_property.label}
             )
-         # Validate the value (property_type CHOICE will always be skipped because value should always be empty)
+        
+        # Validate the value (property_type CHOICE will always be skipped because value should always be empty)
         if self.value:
             LocationDataValidator().validate(
                 location_property=self.location_property, value=self.value)
