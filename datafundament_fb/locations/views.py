@@ -178,9 +178,12 @@ class LocationExportView(View):
         # Setup the http response with the 
         date = timezone.now().strftime('%Y-%m-%d_%H.%M')
         response = HttpResponse(
-            content_type='text/csv',
+            content_type='text/csv, charset=utf-8',
             headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
         )
+
+        # Add BOM to the file; because otherwise Excel won't know what's happening
+        response.write('\ufeff'.encode('utf-8'))
 
         # Setup a csv dictwriter and write the location data to the response object
         headers = location_data[0].keys()

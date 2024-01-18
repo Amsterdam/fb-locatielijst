@@ -1,3 +1,4 @@
+import csv
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
 from django.test import TestCase
@@ -358,39 +359,39 @@ class TestLocationExportForm(TestCase):
             short_name='type', label='building_type', property_type='CHOICE', required=True)
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Office')
-        LocationData.objects.create(
+        self.occupied = LocationData.objects.create(
             location=self.location,
             location_property=self.boolean_property,
             value = 'Ja')
-        LocationData.objects.create(
+        self.build = LocationData.objects.create(
             location=self.location,
             location_property=self.date_property,
             value = '31-12-2023')
-        LocationData.objects.create(
+        self.mail = LocationData.objects.create(
             location=self.location,
             location_property=self.email_property,
             value = 'mail@example.org')
-        LocationData.objects.create(
+        self.floors = LocationData.objects.create(
             location=self.location,
             location_property=self.integer_property,
             value = '10')
-        LocationData.objects.create(
+        self.note = LocationData.objects.create(
             location=self.location,
             location_property=self.memo_property,
             value = 'Memo')
-        LocationData.objects.create(
+        self.postcode = LocationData.objects.create(
             location=self.location,
             location_property=self.postal_code_property,
             value = '1234 AB')
-        LocationData.objects.create(
+        self.color = LocationData.objects.create(
             location=self.location,
             location_property=self.string_property,
             value = 'Tekst')
-        LocationData.objects.create(
+        self.url = LocationData.objects.create(
             location=self.location,
             location_property=self.url_property,
             value = 'https://example.org')
-        LocationData.objects.create(
+        self.type = LocationData.objects.create(
             location=self.location,
             location_property=self.choice_property,
             property_option = self.choice_option)
@@ -405,8 +406,31 @@ class TestLocationExportForm(TestCase):
         self.assertContains(response, 'Exporteer Locaties naar CSV')
 
     def test_post_form(self):
+        #
+
         # Request the csv export
         response = self.client.post(reverse('location-export'), {})
 
         # Verify the response
-        breakpoint()
+        content = response.content
+        # Check for the BOM
+        self.assertEqual(content[0:3], b'\xef\xbb\xbf')
+        
+        # Create a csv dictionary from the list and read the first row 
+        data = content.decode('utf-8-sig').splitlines()
+        csv_dict = csv.DictReader(data)
+        row = next(csv_dict)
+        
+        # Verify the row values
+        self.assertEqual(row['pandcode'], str(self.location.pandcode))
+        self.assertEqual(row['naam'], self.location.name)
+        self.assertEqual(row['occupied'], self.occupied.value)
+        self.assertEqual(row['build'], self.build.value)
+        self.assertEqual(row['mail'], self.mail.value)
+        self.assertEqual(row['floors'], self.floors.value)
+        self.assertEqual(row['note'], self.note.value)
+        self.assertEqual(row['postcode'], self.postcode.value)
+        self.assertEqual(row['color'], self.color.value)
+        self.assertEqual(row['url'], self.url.value)
+        self.assertEqual(row['type'], self.type.property_option.option)
+
