@@ -2,7 +2,7 @@ from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
 from django.test import TestCase
 from django.urls import reverse
-from locations.models import Location, LocationProperty, LocationData
+from locations.models import Location, LocationProperty, LocationData, PropertyOption
 
 
 class LocationListViewTest(TestCase):
@@ -289,9 +289,11 @@ class TestLocationImportForm(TestCase):
         # Success message
         self.assertEqual(messages[1].message, f"Locatie Amstel 1 is geïmporteerd/ge-update")
 
-        # Verify that the location instance
+        # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
+        # Including the location from the setyp() there should be 2 locations now
+        self.assertEqual(Location.objects.all().count(), 2)
 
     def test_import_csv_post_invalid_file(self):
         """Post the form with an invalid file extension"""
