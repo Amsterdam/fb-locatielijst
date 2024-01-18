@@ -63,8 +63,8 @@ shell:
 dev: 						        ## Run the development app (and run extra migrations first)
 	$(run) --service-ports dev
 
-test:                               ## Execute tests. Use TEST= to define which specific test
-	$(manage) test $(TEST)
+test:                               ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
+	$(manage) test $(test)
 
 clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
@@ -75,16 +75,16 @@ env:                                ## Print current env
 superuser:                          ## Create a superuser (user with admin rights)
 	$(manage) createsuperuser
 
-janitor:							## Run the janitor
+janitor:                            ## Run the janitor
 	$(manage) janitor $(ARGS)
 
-dumpdata:							## Make a json dump of the db. Use APPS= to define which apps
-	$(run) dev bash -c './manage.py dumpdata -a --indent 2 --format=json $(APPS) > dump.json'
+dumpdata:                           ## Create a json dump. Optionally use apps= to define which apps (space seperated), i.e. apps=example_app another_example_app
+	$(run) dev bash -c './manage.py dumpdata -a --indent 2 --format=json $(apps)> dump.json'
 
-FIXTURES = locations location_properties property_options location_data external_services location_external_services
-loaddata:
-	$(run) dev bash -c './manage.py loaddata $(FIXTURES)'
+fixtures = locations location_properties property_options location_data external_services location_external_services
+loaddata:                           ## Load $fixtures. Multiple fixtures can be loaded (space seperated), i.e. fixtures=app.model1 app.model2; or a json file, i.e. fixtures=dump.json
+	$(manage) loaddata $(fixtures)
 
-trivy: 								## Detect image vulnerabilities
+trivy:                              ## Detect image vulnerabilities
 	$(dc) build --no-cache app
 	## trivy image --ignore-unfixed ## registry URL
