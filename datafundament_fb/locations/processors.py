@@ -20,6 +20,10 @@ class LocationProcessor():
         self.location_property_instances =  [obj for obj in LocationProperty.objects.all()]
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
+        # Get all external service links
+        self.external_service_instances = [obj for obj in ExternalService.objects.all()]
+        self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
+
         # Set attributes from all the available location properties
         for property in self.location_properties:
             setattr(self, property, None)
@@ -51,12 +55,18 @@ class LocationProcessor():
         last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
         setattr(object, 'gewijzigd', last_modified)
         
+        # Add location properties to the object
         for location_data in object.location_instance.locationdata_set.all():
-            if location_data.location_property.property_type == 'CHOICE':
+            if location_data.location_property.property_type == 'CHOICE' and getattr(location_data, 'property_option'):
                 value = location_data.property_option.option
             else:
                 value = location_data.value
             setattr(object, location_data.location_property.short_name, value)
+
+        # Add location properties to the object
+        for service in object.location_instance.locationexternalservice_set.all():
+            value = service.external_location_code
+            setattr(object, service.external_service.short_name, value)
 
         return object
 
@@ -66,7 +76,7 @@ class LocationProcessor():
         """
         dictionary = {attr: getattr(self, attr) for attr in self.location_properties}
         # Add last_modified date to the dictionary
-        if getattr(self, 'gewijzigd'):
+        if hasattr(self, 'gewijzigd'):
             dictionary['gewijzigd'] = self.gewijzigd
 
         return dictionary
@@ -77,7 +87,9 @@ class LocationProcessor():
         """
         for location_property in self.location_property_instances:
             # Validate the value of every location property
-            LocationDataValidator.validate(location_property, getattr(self, location_property.short_name))
+            value = getattr(self, location_property.short_name)
+            if value:
+                LocationDataValidator.validate(location_property, value)
 
     def save(self)-> Location:
         """
@@ -85,8 +97,7 @@ class LocationProcessor():
         """
         # Run validation
         self.validate()
-
-        # TODO: compute_pandcode verplaatsen naar save() van model en hieronder enkel controleren op aanwezigheid pandcode: dat is namelijk dan een update
+     
         # If a Location model instance has not been set yet
         if Location.objects.filter(pandcode=self.pandcode).exists():
             self.location_instance = Location.objects.get(pandcode=self.pandcode)
@@ -132,8 +143,23 @@ class LocationProcessor():
                 # Save the instance
                 location_data.save()
 
-                # Update timestamp for last_modified attribute
-                self.location_instance.save()   
+            # Add external service data tot the Location object
+            for service in self.external_service_instances:
+                if getattr(self, service.short_name):
+                    value = getattr(self, service.short_name)
+                else:
+                    value = None
+                
+                # Check if an external service instance exists; otherwise create a new instance
+                if self.location_instance.locationexternalservice_set.filter(location=self.location_instance, external_service=service).exists():
+                    location_external = self.location_instance.locationexternalservice_set.get(location=self.location_instance, external_service=service)
+                else:
+                    location_external = LocationExternalService(location = self.location_instance, external_service = service)
+
+                # Set the external service code and save the instance
+                location_external.external_location_code = value
+                location_external.full_clean()
+                location_external.save()
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'
