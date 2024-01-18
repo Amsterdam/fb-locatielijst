@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 # Register your models here.
@@ -21,6 +23,38 @@ class PropertyOptionAdmin(admin.ModelAdmin):
         return form
 
 
+class PropertyOptionInlineFormset(BaseInlineFormSet):
+    def clean(self):
+        super(PropertyOptionInlineFormset, self).clean()
+        # Raise an error when the user tries to add an option to any other property type than CHOICE
+        if self.instance.property_type != 'CHOICE' and len(self.forms) > 0:
+            raise ValidationError("Opties kan je alleen aan een keuzelijst toevoegen")
+
+
+class PropertyOptionInline(admin.TabularInline):
+    model = PropertyOption
+    formset = PropertyOptionInlineFormset
+    extra = 0
+
+
 @admin.register(LocationProperty)
 class LocationPropertyAdmin(admin.ModelAdmin):
     ordering = ['order']
+    inlines = [PropertyOptionInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        # Prevent the user from modifying an existing property_type 
+        if obj:
+            return self.readonly_fields + ('property_type',)
+        return self.readonly_fields
+    
+    def get_inline_instances(self, request, obj):
+        #Return the inline form only when property_type = CHOICE
+        if not obj:
+            return super(LocationPropertyAdmin, self).get_inline_instances(request, obj)
+        else:
+            if obj.property_type == 'CHOICE':
+                return super(LocationPropertyAdmin, self).get_inline_instances(request, obj)
+            else:
+                return []
+        

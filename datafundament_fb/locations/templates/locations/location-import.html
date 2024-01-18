@@ -1,0 +1,52 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; {% translate 'Import Locations' %}
+</div>
+{% endblock %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+
+{% block content %}
+<h1>Locaties importeren</h1>
+<div>
+    <p>
+        Importeer locaties uit een CSV bronbestand. Let hierbij op het volgende:<br>
+    <ul>
+        <li>De kolomnamen moeten gelijk zijn aan de korte namen in de database</li>
+        <li>Kolommen moeten gescheiden zijn door een komma ','</li>
+        <li>Nieuwe waardes voor keuzelijstje worden automatisch toegevoegd</li>
+    </ul>
+    </p>
+    <form action="." method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            {% for field in form %}
+            <div class="form-row">
+                {{ field.label_tag }} {{ field }}
+                {% if field.help_text %}
+                <div class="help">{{ field.help_text|safe }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </fieldset>
+        <div class="submit_row">
+            <input class="default" type="submit" name="_save" value="Importeer" formaction="{% url 'location-import' %}">
+        </div>
+    </form>
+</div>
+<br />
+
+{% endblock %}

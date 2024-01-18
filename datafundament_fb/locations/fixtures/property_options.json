@@ -118,5 +118,165 @@
         "location_property": 15,
         "option": "Nee"
     }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 16,
+    "fields": {
+        "location_property": 7,
+        "option": "Gymzaal"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 17,
+    "fields": {
+        "location_property": 7,
+        "option": "OKT"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 18,
+    "fields": {
+        "location_property": 7,
+        "option": "Parkeergarage"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 19,
+    "fields": {
+        "location_property": 7,
+        "option": "Sportpark/hal"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 20,
+    "fields": {
+        "location_property": 7,
+        "option": "Uitvoeringslocatie"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 21,
+    "fields": {
+        "location_property": 7,
+        "option": "Vergaderlocatie"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 22,
+    "fields": {
+        "location_property": 12,
+        "option": "Geen categorie"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 23,
+    "fields": {
+        "location_property": 12,
+        "option": "Satelliet"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 24,
+    "fields": {
+        "location_property": 13,
+        "option": "Bijzondere Projecten (voorheen Metro & Tram)"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 25,
+    "fields": {
+        "location_property": 13,
+        "option": "OJZ"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 26,
+    "fields": {
+        "location_property": 13,
+        "option": "Parkeren"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 27,
+    "fields": {
+        "location_property": 13,
+        "option": "Sport en Bos"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 28,
+    "fields": {
+        "location_property": 14,
+        "option": "6552002"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 29,
+    "fields": {
+        "location_property": 14,
+        "option": "6552007"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 30,
+    "fields": {
+        "location_property": 14,
+        "option": "6552009"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 31,
+    "fields": {
+        "location_property": 14,
+        "option": "6552239"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 32,
+    "fields": {
+        "location_property": 14,
+        "option": "6567406"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 33,
+    "fields": {
+        "location_property": 14,
+        "option": "6568406"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 34,
+    "fields": {
+        "location_property": 14,
+        "option": "6685202"
+    }
+},
+{
+    "model": "locations.propertyoption",
+    "pk": 35,
+    "fields": {
+        "location_property": 14,
+        "option": "75532615"
+    }
 }
 ]

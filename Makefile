@@ -81,8 +81,9 @@ janitor:							## Run the janitor
 dumpdata:							## Make a json dump of the db. Use APPS= to define which apps
 	$(run) dev bash -c './manage.py dumpdata -a --indent 2 --format=json $(APPS) > dump.json'
 
+FIXTURES = locations location_properties property_options location_data external_services location_external_services
 loaddata:
-	$(run) dev bash -c './manage.py loaddata locations location_properties property_options location_data'
+	$(run) dev bash -c './manage.py loaddata $(FIXTURES)'
 
 trivy: 								## Detect image vulnerabilities
 	$(dc) build --no-cache app
