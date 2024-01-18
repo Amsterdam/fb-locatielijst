@@ -5,7 +5,7 @@ from locations.models import Location, LocationProperty, PropertyOption
 from locations.processors import LocationProcessor
 
 
-class TestDataLocationProcessor(TestCase):
+class TestLocationProcessor(TestCase):
     '''
     Test processing of location property data
     '''
@@ -24,9 +24,9 @@ class TestDataLocationProcessor(TestCase):
         self.postal_code_property = LocationProperty.objects.create(
             short_name='postcode', label='postal_code', property_type='POST', required=True)
         self.string_property = LocationProperty.objects.create(
-            short_name='color', label='building_color', property_type='STR', required=True)
+            short_name='color', label='building_color', property_type='STR')
         self.url_property = LocationProperty.objects.create(
-            short_name='url', label='web_address', property_type='URL', required=True)
+            short_name='url', label='web_address', property_type='URL')
         self.choice_property = LocationProperty.objects.create(
             short_name='type', label='building_type', property_type='CHOICE', required=True)
         self.choice_option = PropertyOption.objects.create(
@@ -177,6 +177,19 @@ class TestDataLocationProcessor(TestCase):
             validation_error.exception.message,
             f"'Tomato' is not a valid choice for {self.choice_property.label}"
         )
+
+    def test_location_save_with_empty_value(self):
+        # Test whether a previously filled value will be emptied
+        LocationProcessor(self.location_data_dict).save()
+
+        # Get the location and delete a property value
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        location.url = None
+        location.save()
+
+        # Verify that the location properties have no value in the db
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        self.assertEqual(location.url, None)
 
     def test_validation(self):
         '''

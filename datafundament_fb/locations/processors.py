@@ -110,35 +110,27 @@ class LocationProcessor():
 
             # Add all the LocationData to the Location object
             for location_property in self.location_property_instances:
+                # Check if the location_data already exists; otherwise create new instance
+                if self.location_instance.locationdata_set.filter(location=self.location_instance, location_property=location_property).exists():
+                    location_data = self.location_instance.locationdata_set.get(location=self.location_instance, location_property=location_property)
+                else:
+                    location_data = LocationData(location = self.location_instance, location_property = location_property)
+
                 value = getattr(self, location_property.short_name)
-                if value:
-                    location_data = LocationData(
-                        location = self.location_instance,
-                        location_property = location_property,
-                    )
-                    # In case of a choice list, set the property_option attribute
-                    if location_property.property_type == 'CHOICE':
-                        location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
-                    else: 
-                        location_data.value = value
+                # In case of a choice list, set the property_option attribute
+                if location_property.property_type == 'CHOICE':
+                    location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
+                else: 
+                    location_data.value = value
 
-                    # Clean the data                    
-                    location_data.full_clean()
+                # Clean the data                    
+                location_data.full_clean()
 
-                    # Create or update the instance
-                    defaults = {}
-                    if location_property.property_type == 'CHOICE':
-                        defaults['property_option'] = PropertyOption.objects.get(location_property=location_property, option=value)
-                    else: 
-                        defaults['value'] = value
-                    obj, created = LocationData.objects.update_or_create(
-                        location = self.location_instance,
-                        location_property = location_property,
-                        defaults = defaults
-                    )
+                # Save the instance
+                location_data.save()
 
-                    # Update timestamp for last_modified attribute
-                    self.location_instance.save()
+                # Update timestamp for last_modified attribute
+                self.location_instance.save()   
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'

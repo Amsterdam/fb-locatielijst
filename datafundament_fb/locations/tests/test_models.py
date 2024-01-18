@@ -323,15 +323,10 @@ class TestLocationDataModel(TestCase):
         self.location_data.value = 'Yellow'
         self.assertEqual(self.location_data.clean(), None)
 
-        # Integrity error is raised when neither or both fields are filled
+        # Integrity error is raised when both fields are filled
         self.location_data.property_option = self.choice_option
         self.location_data.value = 'Yellow'
         # Prevent the error from breaking the transaction, atomic is needed
-        with transaction.atomic():
-            self.assertRaises(IntegrityError, self.location_data.save)
-
-        self.location_data.property_option = None
-        self.location_data.value = None
         with transaction.atomic():
             self.assertRaises(IntegrityError, self.location_data.save)
 
