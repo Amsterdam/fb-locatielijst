@@ -1,7 +1,7 @@
 from django import forms
 from django.test import TestCase
 from locations.forms import LocationDataForm
-from locations.models import Location, LocationProperty, PropertyOption
+from locations.models import Location, LocationProperty, PropertyOption, ExternalService
 
 
 class TestLocationDataForm(TestCase):
@@ -29,6 +29,8 @@ class TestLocationDataForm(TestCase):
             location_property=self.choice_property, option='Yellow')
         self.choice_option_2 = PropertyOption.objects.create(
             location_property=self.choice_property, option='Orange')
+        self.external_service = ExternalService.objects.create(
+            name='Externe service', short_name='extservice')
         self.location_data_form = LocationDataForm()
 
     def test_location_property_form_fields(self):
@@ -82,6 +84,11 @@ class TestLocationDataForm(TestCase):
         field = self.location_data_form.fields[self.choice_property.short_name] 
         self.assertIsInstance(field, forms.ChoiceField)
         self.assertEqual(field.label, self.choice_property.label)
+
+        # External service field
+        field = self.location_data_form.fields[self.external_service.short_name] 
+        self.assertIsInstance(field, forms.CharField)
+        self.assertEqual(field.label, self.external_service.name)
 
         # Test for error when a property type that is not defined is matched
         undefined_property = LocationProperty.objects.create(short_name='undefined', label='Undefined property', property_type='undefined')

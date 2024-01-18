@@ -1,9 +1,11 @@
-from django.views.generic import ListView, View
+import csv
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views import View
 from django.urls import reverse
+from django.views import View
+from django.views.generic import ListView
 from locations.forms import LocationDataForm
 from locations.models import Location
 from locations.processors import LocationProcessor
@@ -42,13 +44,26 @@ class LocationCreateView(View):
 
         if form.is_valid():
             location_data = LocationProcessor(form.cleaned_data)
-            location_data.save()
+            try:
+                # Save the locationprocessor instance
+                location_data.save()
+                messages.success(request, 'De locatie is toegevoegd')
 
-            messages.success(request, 'De locatie is toegevoegd')
+            except ValidationError as err:
+                # Return error message when the location is not saved
+                # TODO: err message is not pretty, could be better
+                message = f"Fout bij het aanmaken van de locatie: {err}"
+                messages.error(request, message)
+                context = {'form': form}
+                
+                return render(request, template_name=self.template, context=context)
+
             return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
-        else:
-            context = {'form': form}
-            return render(request, template_name=self.template, context=context)
+
+        message = f"Niet alle velden zijn juist ingevuld"
+        messages.error(request,message)
+        context = {'form': form}
+        return render(request, template_name=self.template, context=context)
 
 
 class LocationUpdateView(View):
@@ -68,11 +83,26 @@ class LocationUpdateView(View):
 
         if form.is_valid():
             for field in form.cleaned_data:
-                    setattr(location_data, field, form.cleaned_data[field])
-            location_data.save()
+                setattr(location_data, field, form.cleaned_data[field])
+            
+            try:
+                # Save the locationprocessor instance
+                location_data.save()
+                messages.success(request, 'De locatie is opgeslagen')
+            
+            except ValidationError as err:
+                # Return error message when the location is not saved
+                # TODO: err message is not pretty, could be better
+                message = f"Fout bij het updaten van de locatie: {err}"
+                messages.error(request, message)
+                context = {'form': form, 'location_data': location_data.get_dict()}
+                
+                return render(request, template_name=self.template, context=context)
 
-            messages.success(request, 'De locatie is opgeslagen')
-            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
-        else:
-            context = {'form': form, 'location_data': location_data.get_dict()}
-            return render(request, template_name=self.template, context=context)
+            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))           
+
+        message = f"Niet alle velden zijn juist ingevuld"
+        messages.error(request, message)
+        context = {'form': form, 'location_data': location_data.get_dict()}
+        return render(request, template_name=self.template, context=context)
+

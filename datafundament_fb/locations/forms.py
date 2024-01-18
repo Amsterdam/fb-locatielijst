@@ -1,5 +1,5 @@
 from django import forms
-from locations.models import LocationProperty
+from locations.models import LocationProperty, ExternalService
 from locations.validators import LocationDataValidator
 
 def set_location_property_fields()-> dict:
@@ -71,7 +71,7 @@ def set_location_property_fields()-> dict:
                 if location_property.propertyoption_set.values_list('option', flat=True):
                     choice_list = [(option, option) for option in location_property.propertyoption_set.values_list('option', flat=True)]
                 else:
-                    choice_list = [('', "Keuzelijst is leeg")] # TODO HOE OM TE GAAN MET LEGE CHOICE VELDEN, OF MOGEN DIE NIET BESTAAN?
+                    choice_list = [('', '')]
                 fields[location_property.short_name] = forms.ChoiceField(
                     choices=choice_list,
                     label=location_property.label,
@@ -80,6 +80,23 @@ def set_location_property_fields()-> dict:
             case _:
                 # If there is no match an exception will be raised
                 raise ValueError(f"No form field defined for '{location_property.property_type}'")
+    
+    return fields
+
+def set_external_services_fields() -> dict:
+    fields = dict()
+
+    # Get all extern service instances
+    external_services = [obj for obj in ExternalService.objects.all().order_by('short_name')]
+    
+    # Define a form field for each external service
+    for service in external_services:
+        fields[service.short_name] = forms.CharField(
+            label=service.name,
+            required=False,
+            validators=[LocationDataValidator.valid_string],
+            widget=forms.TextInput
+        )
     
     return fields
 
@@ -96,3 +113,7 @@ class LocationDataForm(forms.Form):
 
         # Add the location property fields to this form
         self.fields.update(set_location_property_fields())
+
+        # Add external services items to this form
+        self.fields.update(set_external_services_fields())
+
