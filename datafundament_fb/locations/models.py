@@ -167,6 +167,7 @@ class ExternalService(models.Model):
     '''
     name = models.CharField(verbose_name='Externe API', max_length=100)
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
+    public = models.BooleanField(verbose_name='Zichtbaar voor gebruikers', default=False)
 
     class Meta:
         verbose_name = 'Externe koppeling'

@@ -26,7 +26,7 @@ class LocationDetailView(View):
 
     def get(self, request, *args, **kwargs):
         location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-        form = self.form(initial=location_data.get_dict())
+        form = self.form(initial=location_data.get_dict(), private=True)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
@@ -36,12 +36,12 @@ class LocationCreateView(View):
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
-        form = self.form()
+        form = self.form(private=True)
         context = {'form': form}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST)
+        form = self.form(request.POST, private=True)
 
         if form.is_valid():
             location_data = LocationProcessor(form.cleaned_data, private=True)
@@ -73,13 +73,13 @@ class LocationUpdateView(View):
 
     def get(self, request, *args, **kwargs):
         location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-        form = self.form(initial=location_data.get_dict())
+        form = self.form(initial=location_data.get_dict(), private=True)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST)
+        form = self.form(request.POST, private=True)
         location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
 
         if form.is_valid():
