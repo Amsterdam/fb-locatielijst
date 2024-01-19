@@ -175,7 +175,7 @@ class TestLocationProcessor(TestCase):
         if an error occurs during save().
         '''
         # Init location with an invalid attribute type 
-        location = LocationProcessor(self.location_data_dict)
+        location = LocationProcessor(self.location_data_dict, private=True)
 
         # Mock the validation() so an error is raised
         mock.side_effect = (ValueError)
@@ -207,16 +207,16 @@ class TestLocationProcessor(TestCase):
         )
 
     def test_location_save_with_empty_value(self):
-        # Test whether an precious filled value will be emptied
-        LocationProcessor(self.location_data_dict).save()
+        # Test whether a previously filled value will be emptied
+        LocationProcessor(self.location_data_dict, private=True).save()
 
         # Get the location and delete a property value
-        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], private=True)
         location.url = None
         location.save()
 
         # Verify that the location properties have no value in the db
-        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], private=True)
         self.assertEqual(location.url, None)
 
     def test_validation(self):
@@ -227,14 +227,14 @@ class TestLocationProcessor(TestCase):
         location = LocationProcessor(private=True, data=self.location_data_dict)
 
         # Set occupied to an empty string
-        location.occupied = ''
+        location.occupied = 'Misschien'
         # Verify that a validation Error occurs because occupied is an empty string
         with self.assertRaises(ValidationError) as validation_error:
             location.validate()
         # Verify the error message
         self.assertEqual(
             validation_error.exception.message,
-            f"'' is not a valid boolean",
+            f"'Misschien' is not a valid boolean",
         )
 
     def test_location_get(self):
