@@ -78,11 +78,11 @@ superuser:                          ## Create a superuser (user with admin right
 janitor:                            ## Run the janitor
 	$(manage) janitor $(ARGS)
 
-dumpdata:                           ## Create a json dump. Optionally use apps= to define which apps (space seperated), i.e. apps=example_app another_example_app
-	$(run) dev bash -c './manage.py dumpdata -a --indent 2 --format=json $(apps)> dump.json'
+dumpdata:                           ## Create a json dump. Optionally use models= to define which tables (space seperated), i.e. models=app app2.model
+	$(run) dev bash -c './manage.py dumpdata -a --indent 2 --format=json $(model)> dump.json'
 
 fixtures = locations location_properties property_options location_data external_services location_external_services
-loaddata:                           ## Load $fixtures. Multiple fixtures can be loaded (space seperated), i.e. fixtures=app.model1 app.model2; or a json file, i.e. fixtures=dump.json
+loaddata:                           ## Load $fixtures. Multiple fixtures can be loaded (space seperated), i.e. fixtures=fixture1 fixture2; or a json file, i.e. fixtures=dump.json
 	$(manage) loaddata $(fixtures)
 
 trivy:                              ## Detect image vulnerabilities
