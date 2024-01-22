@@ -188,7 +188,7 @@ class LocationExportView(View):
                 location_data.append(LocationProcessor.get(pandcode=location.pandcode).get_dict())
 
         # Setup the http response with the 
-        date = timezone.now().strftime('%Y-%m-%d_%H.%M')
+        date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
         response = HttpResponse(
             content_type='text/csv, charset=utf-8',
             headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
@@ -207,7 +207,7 @@ class LocationExportView(View):
         return response
 
 
-class LocationBeheerView(LoginRequiredMixin, View):
+class LocationAdminView(LoginRequiredMixin, View):
     template = 'locations/location-beheer.html'
     
     def get(self, request, *args, **kwargs):

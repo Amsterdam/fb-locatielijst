@@ -58,3 +58,7 @@ class LocationPropertyAdmin(admin.ModelAdmin):
             else:
                 return []
         
+# Custom names
+admin.site.site_header = 'Datafundament Facilitair Bureau'
+admin.site.index_title = 'Beheer'
+admin.site.site_title = 'Datafundament Facilitair Bureau - Beheer'

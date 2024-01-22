@@ -1,5 +1,5 @@
 from django.urls import path
-from locations.views import LocationListView, LocationDetailView, LocationCreateView, LocationUpdateView, LocationBeheerView, LocationImportView, LocationExportView
+from locations.views import LocationListView, LocationDetailView, LocationCreateView, LocationUpdateView, LocationAdminView, LocationImportView, LocationExportView
 
 urlpatterns = [
     path('', view=LocationListView.as_view(), name='location-list'),
