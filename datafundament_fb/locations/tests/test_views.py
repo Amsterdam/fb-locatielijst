@@ -290,7 +290,7 @@ class TestLocationImportForm(TestCase):
         # Success message
         self.assertEqual(messages[1].message, f"Locatie Amstel 1 is geïmporteerd/ge-update")
 
-        # Verify that the location instance
+        # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
 

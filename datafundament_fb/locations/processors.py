@@ -1,6 +1,5 @@
 from typing import Self
 from django.db import transaction
-from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import LocationDataValidator
@@ -114,7 +113,7 @@ class LocationProcessor():
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
 
-         # Atomic is used to prevent incomplete locations being added;
+        # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
             # Save the location model first before adding LocationData

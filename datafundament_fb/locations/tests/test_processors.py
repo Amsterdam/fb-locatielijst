@@ -179,7 +179,7 @@ class TestLocationProcessor(TestCase):
         )
 
     def test_location_save_with_empty_value(self):
-        # Test whether an precious filled value will be emptied
+        # Test whether a previously filled value will be emptied
         LocationProcessor(self.location_data_dict).save()
 
         # Get the location and delete a property value
@@ -198,7 +198,7 @@ class TestLocationProcessor(TestCase):
         # Init a location
         location = LocationProcessor(self.location_data_dict)
 
-        # Set occupied to an empty string
+        # Set occupied to an invalid string
         location.occupied = 'Misschien'
         # Verify that a validation Error occurs because occupied is an empty string
         with self.assertRaises(ValidationError) as validation_error:
