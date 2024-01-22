@@ -117,7 +117,9 @@ class LocationDataForm(forms.Form):
     # Model fields pandcode and last_modified from the Location model are added in the View
     naam = forms.CharField(label='Naam')
 
-    def __init__(self, private: bool=False, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        # Set and remove private argument before calling init
+        private = kwargs.pop('private', None)  
         super().__init__(*args, **kwargs)
 
         # Add the location property fields to this form
