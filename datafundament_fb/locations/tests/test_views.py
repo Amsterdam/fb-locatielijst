@@ -408,8 +408,6 @@ class TestLocationExportForm(TestCase):
         self.assertContains(response, 'Exporteer Locaties naar CSV')
 
     def test_post_form(self):
-        #
-
         # Request the csv export
         response = self.client.post(reverse('location-export'), {})
 
@@ -420,7 +418,9 @@ class TestLocationExportForm(TestCase):
         
         # Create a csv dictionary from the list and read the first row 
         data = content.decode('utf-8-sig').splitlines()
-        csv_dict = csv.DictReader(data)
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
         row = next(csv_dict)
         
         # Verify the row values
