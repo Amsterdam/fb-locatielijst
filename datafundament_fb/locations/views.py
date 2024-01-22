@@ -1,5 +1,6 @@
 import csv
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -25,13 +26,18 @@ class LocationDetailView(View):
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-        form = self.form(initial=location_data.get_dict(), private=True)
+        # Return all location properties when a user is logged in
+        if request.user.is_authenticated:
+            location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
+            form = self.form(initial=location_data.get_dict(), private=True)
+        else:
+            location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
+            form = self.form(initial=location_data.get_dict())
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
 
-class LocationCreateView(View):
+class LocationCreateView(LoginRequiredMixin, View):
     form = LocationDataForm
     template = 'locations/location-create.html'
     
@@ -67,7 +73,7 @@ class LocationCreateView(View):
         return render(request, template_name=self.template, context=context)
 
 
-class LocationUpdateView(View):
+class LocationUpdateView(LoginRequiredMixin, View):
     form = LocationDataForm
     template = 'locations/location-update.html'
 
@@ -76,7 +82,6 @@ class LocationUpdateView(View):
         form = self.form(initial=location_data.get_dict(), private=True)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
-
 
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST, private=True)
@@ -108,7 +113,7 @@ class LocationUpdateView(View):
         return render(request, template_name=self.template, context=context)
 
 
-class LocationImportView(View):
+class LocationImportView(LoginRequiredMixin, View):
     form = LocationImportForm
     template_name = 'locations/location-import.html'
 
@@ -173,7 +178,11 @@ class LocationExportView(View):
         # Set all location data to a LocationProcessor
         location_data = []
         for location in locations:
-            location_data.append(LocationProcessor.get(pandcode=location.pandcode, private=True).get_dict())
+            # Return all location properties when a user is logged in
+            if request.user.is_authenticated:
+                location_data.append(LocationProcessor.get(pandcode=location.pandcode, private=True).get_dict())
+            else:
+                location_data.append(LocationProcessor.get(pandcode=location.pandcode).get_dict())
 
         # Setup the http response with the 
         date = timezone.now().strftime('%Y-%m-%d_%H.%M')
