@@ -1,6 +1,8 @@
 from django import forms
+from django.utils.safestring import mark_safe
 from locations.models import LocationProperty, ExternalService
 from locations.validators import LocationDataValidator
+
 
 def set_location_property_fields()-> dict:
     fields = dict()
@@ -117,3 +119,10 @@ class LocationDataForm(forms.Form):
         # Add external services items to this form
         self.fields.update(set_external_services_fields())
 
+
+class LocationImportForm(forms.Form):
+    """Form to import a CSV file with location data"""
+    csv_file = forms.FileField(
+        required=True, label='CSV bestand',
+        help_text=mark_safe('Kies het locatie bronbestand dat je wilt uploaden.')
+    )

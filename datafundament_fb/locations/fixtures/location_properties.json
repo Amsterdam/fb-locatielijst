@@ -19,7 +19,7 @@
         "short_name": "beschrving",
         "label": "Beschrijving",
         "property_type": "STR",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": true,
         "order": 20
@@ -32,7 +32,7 @@
         "short_name": "actief",
         "label": "Actief",
         "property_type": "BOOL",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 30
@@ -58,7 +58,7 @@
         "short_name": "ambtenaar",
         "label": "Ambtenaren huisvesting",
         "property_type": "BOOL",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 60
@@ -71,7 +71,7 @@
         "short_name": "soort",
         "label": "Soort locatie",
         "property_type": "CHOICE",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 70
@@ -97,7 +97,7 @@
         "short_name": "lt",
         "label": "Locatieteam",
         "property_type": "STR",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 90
@@ -123,7 +123,7 @@
         "short_name": "dvk_nr",
         "label": "Gewenste Cat. dienstverlenings kader",
         "property_type": "INT",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 110
@@ -136,7 +136,7 @@
         "short_name": "dvk_naam",
         "label": "Categorie Dienstverleningskader",
         "property_type": "CHOICE",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 120
@@ -149,7 +149,7 @@
         "short_name": "budget_dir",
         "label": "Budget verantwoordelijke directie",
         "property_type": "CHOICE",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 130
@@ -162,7 +162,7 @@
         "short_name": "routecode",
         "label": "Routecode indien geen budget FB",
         "property_type": "CHOICE",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 140
@@ -188,7 +188,7 @@
         "short_name": "straat",
         "label": "Straat",
         "property_type": "STR",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 160
@@ -201,7 +201,7 @@
         "short_name": "postcode",
         "label": "Postcode",
         "property_type": "POST",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 170
@@ -214,7 +214,7 @@
         "short_name": "huisnummer",
         "label": "Huisnummer",
         "property_type": "INT",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 180
@@ -253,7 +253,7 @@
         "short_name": "plaats",
         "label": "Plaats",
         "property_type": "STR",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 210
@@ -266,7 +266,7 @@
         "short_name": "lm",
         "label": "Locatiemanager",
         "property_type": "STR",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 220
@@ -279,7 +279,7 @@
         "short_name": "contact",
         "label": "Contactpersoon vanuit Directies",
         "property_type": "STR",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 230
@@ -318,7 +318,7 @@
         "short_name": "vvo",
         "label": "Vloeroppervlak",
         "property_type": "INT",
-        "required": false,
+        "required": true,
         "multiple": false,
         "unique": false,
         "order": 260
