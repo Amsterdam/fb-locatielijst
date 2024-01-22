@@ -33,8 +33,6 @@ class TestLocationDataForm(TestCase):
             name='Externe service', short_name='extservice')
         self.location_data_form = LocationDataForm(private=True)
 
-# TODO testen met en zonder private
-
     def test_location_property_form_fields(self):
         """
         Test if a form field is set for each location property type, ie:, BOOL, INT, etc 
