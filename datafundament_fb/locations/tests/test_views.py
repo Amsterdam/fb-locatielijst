@@ -171,7 +171,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het aanmaken van de locatie: {'name': ['Locatie with this Naam already exists.']}"
+            "Fout bij het aanmaken van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
         )
 
 
@@ -271,7 +271,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het updaten van de locatie: {'name': ['Locatie with this Naam already exists.']}"
+            "Fout bij het updaten van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
         )
 
 
