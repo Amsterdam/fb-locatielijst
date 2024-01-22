@@ -143,10 +143,9 @@ class LocationProcessor():
                 else:
                     location_data = LocationData(location = self.location_instance, location_property = location_property)
 
-                if getattr(self, location_property.short_name):
-                    value = getattr(self, location_property.short_name)
-                else:
-                    value = None
+                # Set value when not None or empty string
+                value = getattr(self, location_property.short_name) if getattr(self, location_property.short_name) else None
+
                 # In case of a choice list, set the property_option attribute
                 if location_property.property_type == 'CHOICE' and value:
                     location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
@@ -161,10 +160,8 @@ class LocationProcessor():
 
             # Add external service data tot the Location object
             for service in self.external_service_instances:
-                if getattr(self, service.short_name):
-                    value = getattr(self, service.short_name)
-                else:
-                    value = None
+                # Set value when not None or empty string
+                value = getattr(self, service.short_name) if getattr(self, service.short_name) else None
                 
                 # Check if an external service instance exists; otherwise create a new instance
                 if self.location_instance.locationexternalservice_set.filter(location=self.location_instance, external_service=service).exists():

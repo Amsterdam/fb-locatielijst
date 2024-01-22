@@ -28,7 +28,7 @@
 <nav>
   <ul>
     {% if user.is_anonymous %}
-    <li><a href="{% url 'admin:index' %}">Inloggen</a></li>
+    <li><a href="{% url 'admin:login' %}?next={{ request.path }}">Inloggen</a></li>
     {% endif %}
     {% if user.is_authenticated %}
     <li><a href="{% url 'location-beheer' %}">Beheer</a></li>

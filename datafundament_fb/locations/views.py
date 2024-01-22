@@ -13,6 +13,9 @@ from locations.models import Location
 from locations.processors import LocationProcessor
 
 # Create your views here.
+def home_page(request):
+    return HttpResponseRedirect(reverse('location-list'))
+
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
@@ -204,7 +207,7 @@ class LocationExportView(View):
         return response
 
 
-class LocationBeheerView(View):
+class LocationBeheerView(LoginRequiredMixin, View):
     template = 'locations/location-beheer.html'
     
     def get(self, request, *args, **kwargs):

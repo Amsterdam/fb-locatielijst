@@ -8,5 +8,4 @@ urlpatterns = [
     path('<int:id>/edit', view=LocationUpdateView.as_view(), name='location-update'),
     path('import', LocationImportView.as_view(), name='location-import'),
     path('export', view=LocationExportView.as_view(), name='location-export'),
-    path('beheer/', view=LocationBeheerView.as_view(), name='location-beheer'),
 ]
