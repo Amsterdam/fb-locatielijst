@@ -187,7 +187,7 @@ class LocationExportView(View):
 
         # Setup a csv dictwriter and write the location data to the response object
         headers = location_data[0].keys()
-        writer = csv.DictWriter(response, fieldnames=headers)
+        writer = csv.DictWriter(response, fieldnames=headers,delimiter=';')
         writer.writeheader()
         writer.writerows(location_data)
 
