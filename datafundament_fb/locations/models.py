@@ -63,6 +63,7 @@ class LocationProperty(models.Model):
     required = models.BooleanField(verbose_name='Verplicht veld', default=False)
     multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
     unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
+    public = models.BooleanField(verbose_name='Zichtbaar voor gebruikers', default=False)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
 
     class Meta:
@@ -122,17 +123,16 @@ class LocationData(models.Model):
     def clean(self) -> None:
         # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
         # Validate for single instance
-        # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
-        # if not self.location_property.multiple:
-        #     if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
-        #         raise ValidationError(
-        #             _("Property %(property)s already exists for location %(location)s"),
-        #             code='unique',
-        #             params={
-        #                 'property': self.location_property.label,
-        #                 'location': self.location.pandcode
-        #             },
-        #         )
+        if not self.location_property.multiple and not self.pk:
+            if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
+                raise ValidationError(
+                    _("Property %(property)s already exists for location %(location)s"),
+                    code='unique',
+                    params={
+                        'property': self.location_property.label,
+                        'location': self.location.pandcode
+                    },
+                )
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:
@@ -147,16 +147,16 @@ class LocationData(models.Model):
                 )
 
         # Ensure location property validation when submitted via a form
-        # Validate for empty properties
+        # Validate for required properties
         if self.location_property.required and not(self.value or self.property_option):
             raise ValidationError(
                 _("Value required for %(property)s"),
                 code='required',
                 params={'property': self.location_property.label}
             )
-
-         # Skip for choice validation, because value should be empty
-        if self.location_property.property_type != 'CHOICE': 
+        
+        # Validate the value (property_type CHOICE will always be skipped because value should always be empty)
+        if self.value:
             LocationDataValidator().validate(
                 location_property=self.location_property, value=self.value)
 
@@ -167,6 +167,7 @@ class ExternalService(models.Model):
     '''
     name = models.CharField(verbose_name='Externe API', max_length=100)
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
+    public = models.BooleanField(verbose_name='Zichtbaar voor gebruikers', default=False)
 
     class Meta:
         verbose_name = 'Externe koppeling'
@@ -186,7 +187,7 @@ class LocationExternalService(models.Model):
     '''
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
-    external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100)
+    external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Locatie koppeling'

@@ -15,15 +15,14 @@ class LocationDataValidator():
         if value in accepted_boolean_values:
             return value
         else:
-            # TODO een validatie error raisen moet eigenlijk zo gebeuren: https://docs.djangoproject.com/en/5.0/ref/forms/validation/#raising-validationerror
-            raise ValidationError(f"{value} is not a valid boolean")
+            raise ValidationError(f"'{value}' is not a valid boolean")
 
     @staticmethod
     def valid_date(value)-> str: 
         try:
             datetime.strptime(value, '%d-%m-%Y')
         except:
-            raise ValidationError(f"{value} is not a valid date")
+            raise ValidationError(f"'{value}' is not a valid date")
         return value
 
     @staticmethod
@@ -32,7 +31,7 @@ class LocationDataValidator():
             validate_email(value)
         except:
             raise ValidationError(
-                f"{value} is not a valid email address")
+                f"'{value}' is not a valid email address")
         return value
 
     @staticmethod
@@ -41,21 +40,19 @@ class LocationDataValidator():
         if re.match(int_regex, value):
             return value
         else:
-            raise ValidationError(f"{value} is not a valid number")
+            raise ValidationError(f"'{value}' is not a valid number")
 
-    # TODO test schrijven
     @staticmethod
     def valid_memo(value)-> str:
         return value
 
-    # TODO test schrijven/verplaatsen
     @staticmethod
     def valid_postal_code(value)-> str:
         postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
         if re.match(postal_code_regex, value):
             return value
         else:
-            raise ValidationError("This is not a valid postal code in the format 0000XX")
+            raise ValidationError(f"'{value}' is not a valid postal code")
 
     @staticmethod
     def valid_string(value)-> str:
@@ -67,7 +64,7 @@ class LocationDataValidator():
         try:
             url(value)
         except:
-            raise ValidationError(f"{value} is not a valid Url")                
+            raise ValidationError(f"'{value}' is not a valid Url")                
         return value
 
     @staticmethod
@@ -79,7 +76,7 @@ class LocationDataValidator():
         if value in allowed_options:
             return value
         else:
-            raise ValidationError(f"{value} is not a valid choice for {location_property.label}")
+            raise ValidationError(f"'{value}' is not a valid choice for {location_property.label}")
 
     @classmethod
     def validate(cls, location_property, value) -> str:
