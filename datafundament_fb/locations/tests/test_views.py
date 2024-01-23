@@ -39,11 +39,12 @@ class LocationDetailViewTest(TestCase):
             location=self.location, location_property=self.private_property, value='Private')
         self.public_data = LocationData.objects.create(
             location=self.location, location_property=self.public_property, value='Public')
-
-    def test_get_view_anonyous(self):
-        """Test getting the Location Detail View as an anonymous visitor"""
-        
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+
+    def test_get_view_anonymous(self):
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Log out the user
+        self.client.logout()
         # Request location detail page
         response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -54,11 +55,10 @@ class LocationDetailViewTest(TestCase):
         self.assertEqual(response.context['location_data']['pandcode'], self.location.pandcode)
         self.assertIsNotNone(response.context['location_data']['gewijzigd'])
         self.assertEqual(response.context['location_data']['public'], self.public_data.value)
+        self.assertIsNone(response.context['location_data'].get('private'))
 
     def test_get_view_authenticated(self):
         """Test getting the Location Detail View as an authenticaed user"""
-        # Force login of an authenticated user
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         # Request location detail page
         response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -474,7 +474,9 @@ class TestLocationExportForm(TestCase):
         
         # Create a csv dictionary from the list and read the first row 
         data = content.decode('utf-8-sig').splitlines()
-        csv_dict = csv.DictReader(data)
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
         row = next(csv_dict)
         
         # Verify the row values
