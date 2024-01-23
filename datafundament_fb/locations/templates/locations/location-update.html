@@ -1,4 +1,4 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/admin_base.html' %}
 {% load i18n admin_urls static admin_modify %}
 
 {% block extrastyle %}{{ block.super }}
@@ -6,9 +6,11 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'location-list' %}">{% translate 'Locations' %}</a>
-    &rsaquo; <a href="{% url 'location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
+    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
+    <span>&rsaquo;</span>
+    Wijzigen
 </div>
 {% endblock %}
 
@@ -16,21 +18,34 @@
 <ul class="messages">
     {% for message in messages %}
     <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
+    {% endfor %}
 </ul>
 {% endif %}
+
 {% block content %}
+<h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
+
 <form action="." method="POST">
-    {% csrf_token %}
-    <div>
-        Pandcode: {{ location_data.pandcode }}<br>
+    <div class="data-view">
+        {% csrf_token %}
+        <div class="data-view-row">
+            <div class="data-label">Pandcode</div>
+            <div class="data-value">{{ location_data.pandcode }}</div>
+        </div>
+        {% for field in form %}
+        <div class="data-view-row">
+            <div class="data-label"><label for="{{ field.auto_id }}">{{ field.label }}</label></div>
+            <div class="data-value">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {{ form }}
-    <div class="submit_row">
-        <input class="default" type="submit" name="_save" value="Save"
-            formaction="{% url 'location-update' location_data.pandcode %}">
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}">Opslaan</button>
+        <a href="{% url 'location-detail' location_data.pandcode %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>
-</div>
-<br />
+
 {% endblock %}

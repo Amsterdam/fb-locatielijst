@@ -1,0 +1,106 @@
+
+body #content {
+  padding: 1.125rem 2rem;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.page-left {
+  flex: 1 1 65%;
+  margin-bottom: 1rem;
+}
+.page-right {
+  flex: 1 1 35%;
+  margin-bottom: 1rem;
+}
+
+
+/*******************************************/
+
+ul.data-list > li a {
+  text-decoration: none;
+}
+
+ul.data-list > li a:hover,
+ul.data-list > li a:focus {
+  text-decoration: underline;
+}
+
+ul.data-list > li .icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+ul.data-list > li .icon:after {
+  content: ".";
+  visibility: hidden;
+  width: 0;
+}
+
+ul.data-list > li .icon svg {
+  width: 0.625rem;
+  fill: var(--color-blue)
+}
+
+/*******************************************/
+
+.data-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-view-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.data-label {
+  flex: 0 1 40%;
+  max-width: 330px;
+  color: var(--body-quiet-color);
+  margin-top: 0;
+  font-weight: normal;
+}
+
+.data-value {
+  flex: 1 1 auto;
+  color: var(--body-loud-color);
+}
+
+/*******************************************/
+
+.data-label label {
+  color: var(--body-quiet-color);
+  font-size: 1rem;
+  line-height: 2rem;
+}
+
+.data-value input,
+.data-value textarea,
+.data-value select {
+  width: 100%;
+  max-width: 350px;
+  box-sizing: border-box;
+  height: auto;
+}
+
+input, textarea, select, .form-row p, form .button {
+  font-size: 1rem;
+}
+
+
+@media screen and (max-width: 839px) {
+
+  .page-content {
+    flex-direction: column-reverse;
+  }
+  
+  .data-view-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+}

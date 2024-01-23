@@ -191,7 +191,7 @@ class LocationExternalService(models.Model):
 
     class Meta:
         verbose_name = 'Locatie koppeling'
-        verbose_name_plural = 'Locatie koppeling'
+        verbose_name_plural = 'Locatie koppelingen'
 
     def __str__(self):
-        return f'{self.location}, {self.external_service}, {self.external_location_code} '
+        return f'{self.location}, {self.external_service}, {self.external_location_code}'

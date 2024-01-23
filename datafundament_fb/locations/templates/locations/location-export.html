@@ -1,4 +1,4 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/admin_base.html' %}
 {% load i18n admin_urls static admin_modify %}
 
 {% block extrastyle %}{{ block.super }}
@@ -6,8 +6,9 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; {% translate 'Export Locaties' %}
+    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <span>&rsaquo;</span>
+    {% translate 'Export Locaties' %}
 </div>
 {% endblock %}
 
@@ -20,19 +21,16 @@
 {% endif %}
 
 {% block content %}
-<h1>Exporteer Locaties naar CSV</h1>
-<div>
-    <p>
-        Start een de download van een CSV met alle (actieve) locaties<br>
-    </p>
-    <form action="." method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="submit_row">
-            <input class="default" type="submit" name="_save" value="Download CSV"
-                formaction="{% url 'location-export' %}">
-        </div>
-    </form>
-</div>
-<br />
+<h2>Exporteer Locaties naar CSV</h2>
+<p>
+    Start een de download van een CSV met alle (actieve) locaties<br>
+</p>
+<form action="." method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="btn-container">
+        <button class="default" type="submit" name="_save" value="Download CSV"
+            formaction="{% url 'location-export' %}">Download export</button>
+    </div>
+</form>
 
 {% endblock %}

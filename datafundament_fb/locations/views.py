@@ -13,6 +13,10 @@ from locations.models import Location
 from locations.processors import LocationProcessor
 
 # Create your views here.
+def home_page(request):
+    return HttpResponseRedirect(reverse('location-list'))
+
+
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
@@ -181,7 +185,7 @@ class LocationExportView(View):
             )
 
         # Setup the http response with the 
-        date = timezone.now().strftime('%Y-%m-%d_%H.%M')
+        date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
         response = HttpResponse(
             content_type='text/csv, charset=utf-8',
             headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
