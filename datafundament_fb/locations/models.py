@@ -40,6 +40,7 @@ class Location(models.Model):
             models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
 
+
 class LocationProperty(models.Model):
     '''
     Custom entries for location specific data.
@@ -121,7 +122,6 @@ class LocationData(models.Model):
         return f'{self.location}, {self.location_property}, {self.property_option}, {self.value}'
 
     def clean(self) -> None:
-        # TODO deze werkt niet in het geval van een update; de waarde bestaat immers al en de controle vindt plaats voor het update van de waarde
         # Validate for single instance
         if not self.location_property.multiple and not self.pk:
             if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
