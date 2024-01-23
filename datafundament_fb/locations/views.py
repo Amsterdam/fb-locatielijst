@@ -38,7 +38,7 @@ class LocationCreateView(LoginRequiredMixin, View):
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
-        form = self.form(include_private_properties=True)
+        form = self.form(include_private_properties=request.user.is_authenticated)
         context = {'form': form}
         return render(request=request, template_name=self.template, context=context)
 

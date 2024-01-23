@@ -344,9 +344,11 @@ class TestLocationImportForm(TestCase):
         # Success message
         self.assertEqual(messages[1].message, f"Locatie Amstel 1 is geïmporteerd/ge-update")
 
-        # Verify that the location instance
+        # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
+        # Including the location from the setup() there should be 2 locations now
+        self.assertEqual(Location.objects.all().count(), 2)
 
     def test_import_csv_post_invalid_file(self):
         """Post the form with an invalid file extension"""
@@ -497,7 +499,9 @@ class TestLocationExportForm(TestCase):
         
         # Create a csv dictionary from the list and read the first row 
         data = content.decode('utf-8-sig').splitlines()
-        csv_dict = csv.DictReader(data)
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
         row = next(csv_dict)
         
         # Verify the row values
