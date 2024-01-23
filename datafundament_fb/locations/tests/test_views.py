@@ -39,11 +39,12 @@ class LocationDetailViewTest(TestCase):
             location=self.location, location_property=self.private_property, value='Private')
         self.public_data = LocationData.objects.create(
             location=self.location, location_property=self.public_property, value='Public')
-
-    def test_get_view_anonyous(self):
-        """Test getting the Location Detail View as an anonymous visitor"""
-        
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+
+    def test_get_view_anonymous(self):
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Log out the user
+        self.client.logout()
         # Request location detail page
         response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -54,11 +55,10 @@ class LocationDetailViewTest(TestCase):
         self.assertEqual(response.context['location_data']['pandcode'], self.location.pandcode)
         self.assertIsNotNone(response.context['location_data']['gewijzigd'])
         self.assertEqual(response.context['location_data']['public'], self.public_data.value)
+        self.assertIsNone(response.context['location_data'].get('private'))
 
     def test_get_view_authenticated(self):
         """Test getting the Location Detail View as an authenticaed user"""
-        # Force login of an authenticated user
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         # Request location detail page
         response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -171,7 +171,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het aanmaken van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
+            "Fout bij het aanmaken van de locatie: {'name': ['Locatie with this Naam already exists.']}"
         )
 
 
@@ -271,7 +271,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het updaten van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
+            "Fout bij het updaten van de locatie: {'name': ['Locatie with this Naam already exists.']}"
         )
 
 
@@ -344,9 +344,11 @@ class TestLocationImportForm(TestCase):
         # Success message
         self.assertEqual(messages[1].message, f"Locatie Amstel 1 is geïmporteerd/ge-update")
 
-        # Verify that the location instance
+        # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
+        # Including the location from the setup() there should be 2 locations now
+        self.assertEqual(Location.objects.all().count(), 2)
 
     def test_import_csv_post_invalid_file(self):
         """Post the form with an invalid file extension"""
@@ -472,7 +474,9 @@ class TestLocationExportForm(TestCase):
         
         # Create a csv dictionary from the list and read the first row 
         data = content.decode('utf-8-sig').splitlines()
-        csv_dict = csv.DictReader(data)
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
         row = next(csv_dict)
         
         # Verify the row values
@@ -497,7 +501,9 @@ class TestLocationExportForm(TestCase):
         
         # Create a csv dictionary from the list and read the first row 
         data = content.decode('utf-8-sig').splitlines()
-        csv_dict = csv.DictReader(data)
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
         row = next(csv_dict)
         
         # Verify the row values

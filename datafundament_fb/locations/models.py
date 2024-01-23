@@ -64,7 +64,7 @@ class LocationProperty(models.Model):
     required = models.BooleanField(verbose_name='Verplicht veld', default=False)
     multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
     unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
-    public = models.BooleanField(verbose_name='Zichtbaar voor gebruikers', default=False)
+    public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
 
     class Meta:
@@ -167,7 +167,7 @@ class ExternalService(models.Model):
     '''
     name = models.CharField(verbose_name='Externe API', max_length=100)
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
-    public = models.BooleanField(verbose_name='Zichtbaar voor gebruikers', default=False)
+    public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
 
     class Meta:
         verbose_name = 'Externe koppeling'

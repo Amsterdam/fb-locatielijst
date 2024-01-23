@@ -16,6 +16,7 @@ from locations.processors import LocationProcessor
 def home_page(request):
     return HttpResponseRedirect(reverse('location-list'))
 
+
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
@@ -29,13 +30,9 @@ class LocationDetailView(View):
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
-        # Return all location properties when a user is logged in
-        if request.user.is_authenticated:
-            location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-            form = self.form(initial=location_data.get_dict(), private=True)
-        else:
-            location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
-            form = self.form(initial=location_data.get_dict())
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
@@ -45,15 +42,15 @@ class LocationCreateView(LoginRequiredMixin, View):
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
-        form = self.form(private=True)
+        form = self.form(include_private_properties=request.user.is_authenticated)
         context = {'form': form}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, private=True)
+        form = self.form(request.POST, include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
-            location_data = LocationProcessor(form.cleaned_data, private=True)
+            location_data = LocationProcessor(form.cleaned_data, include_private_properties=request.user.is_authenticated)
             try:
                 # Save the locationprocessor instance
                 location_data.save()
@@ -81,14 +78,15 @@ class LocationUpdateView(LoginRequiredMixin, View):
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-        form = self.form(initial=location_data.get_dict(), private=True)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, private=True)
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
+        form = self.form(request.POST, include_private_properties=request.user.is_authenticated)
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
             for field in form.cleaned_data:
@@ -136,7 +134,7 @@ class LocationImportView(LoginRequiredMixin, View):
                 csv_dict = csv.DictReader(csv_reader)
 
                 # Report columns that will be processed during import
-                location_properties = set(LocationProcessor(private=True).location_properties)
+                location_properties = set(LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties)
                 headers = set(csv_dict.fieldnames)
 
                 used_columns = list(headers & location_properties)
@@ -146,7 +144,7 @@ class LocationImportView(LoginRequiredMixin, View):
                 # Process the rows from the import file
                 for row in csv_dict:
                     # Initiatie a location processor with the row data
-                    location = LocationProcessor(data=row, private=True)
+                    location = LocationProcessor(data=row, include_private_properties=request.user.is_authenticated)
                     try:
                         # Save the locationprocessor instance                        
                         location.save()
@@ -181,11 +179,10 @@ class LocationExportView(View):
         # Set all location data to a LocationProcessor
         location_data = []
         for location in locations:
-            # Return all location properties when a user is logged in
-            if request.user.is_authenticated:
-                location_data.append(LocationProcessor.get(pandcode=location.pandcode, private=True).get_dict())
-            else:
-                location_data.append(LocationProcessor.get(pandcode=location.pandcode).get_dict())
+            # Get loction data  depending on user context; include_private_properties == True is all location properties
+            location_data.append(
+                LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
+            )
 
         # Setup the http response with the 
         date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
@@ -199,17 +196,9 @@ class LocationExportView(View):
 
         # Setup a csv dictwriter and write the location data to the response object
         headers = location_data[0].keys()
-        writer = csv.DictWriter(response, fieldnames=headers)
+        writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
         writer.writeheader()
         writer.writerows(location_data)
 
         # Return the response
         return response
-
-
-class LocationAdminView(LoginRequiredMixin, View):
-    template = 'locations/location-beheer.html'
-    
-    def get(self, request, *args, **kwargs):
-        return render(request, template_name=self.template)
-

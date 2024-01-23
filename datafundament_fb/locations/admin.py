@@ -15,7 +15,7 @@ class PropertyOptionAdmin(admin.ModelAdmin):
     ordering = ['location_property__order']
 
     def get_form(self, request, obj=None, **kwargs):
-        form = super(PropertyOptionAdmin, self).get_form(
+        form = super().get_form(
             request, obj, **kwargs)
         # list only property options of the list type
         form.base_fields['location_property'].queryset = LocationProperty.objects.filter(

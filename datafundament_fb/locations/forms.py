@@ -5,14 +5,11 @@ from locations.processors import LocationProcessor
 from locations.validators import LocationDataValidator
 
 
-def set_location_property_fields(private: bool=False)-> dict:
+def set_location_property_fields(include_private_properties: bool=False)-> dict:
     fields = dict()
     
     # Get all location properties instances; filter on public attribute
-    if private:
-        location_properties = LocationProcessor(private=True).location_property_instances
-    else:
-        location_properties = LocationProcessor().location_property_instances
+    location_properties = LocationProcessor(include_private_properties=include_private_properties).location_property_instances
     
     for location_property in location_properties:
 
@@ -89,14 +86,11 @@ def set_location_property_fields(private: bool=False)-> dict:
     
     return fields
 
-def set_external_services_fields(private: bool=False) -> dict:
+def set_external_services_fields(include_private_properties: bool=False) -> dict:
     fields = dict()
 
     # Get all external service instances; filter on public attribute
-    if private:
-        external_services = LocationProcessor(private=True).external_service_instances
-    else:
-        external_services = LocationProcessor().external_service_instances
+    external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
     
     # Define a form field for each external service
     for service in external_services:
@@ -118,15 +112,15 @@ class LocationDataForm(forms.Form):
     naam = forms.CharField(label='Naam')
 
     def __init__(self, *args, **kwargs):
-        # Set and remove private argument before calling init
-        private = kwargs.pop('private', None)  
+        # Set and remove include_private_properties argument before calling init
+        include_private_properties = kwargs.pop('include_private_properties', None)  
         super().__init__(*args, **kwargs)
 
         # Add the location property fields to this form
-        self.fields.update(set_location_property_fields(private=private))
+        self.fields.update(set_location_property_fields(include_private_properties=include_private_properties))
 
         # Add external services items to this form
-        self.fields.update(set_external_services_fields(private=private))
+        self.fields.update(set_external_services_fields(include_private_properties=include_private_properties))
 
 
 class LocationImportForm(forms.Form):

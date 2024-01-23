@@ -1,13 +1,13 @@
 from typing import Self
 from django.db import transaction
-from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import LocationDataValidator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
-    private = False
+    # Switch to include all properties (including private), or only public properties
+    include_private_properties = False
 
     def _set_location_properties(self)-> None:
         """
@@ -18,14 +18,14 @@ class LocationProcessor():
 
         # Get all location properties and add the names to the location properties list
         # List is filtered for private accessibility
-        if self.private:
+        if self.include_private_properties:
             self.location_property_instances =  [obj for obj in LocationProperty.objects.all().order_by('order', 'short_name')]
         else:
             self.location_property_instances =  [obj for obj in LocationProperty.objects.filter(public=True).order_by('order', 'short_name')]
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
-        if self.private:
+        if self.include_private_properties:
             self.external_service_instances = [obj for obj in ExternalService.objects.all().order_by('short_name')]
         else:
             self.external_service_instances = [obj for obj in ExternalService.objects.filter(public=True).order_by('short_name')]
@@ -35,16 +35,16 @@ class LocationProcessor():
         for property in self.location_properties:
             setattr(self, property, None)
 
-    def __init__(self, data: dict=None, private: bool=False):
+    def __init__(self, data: dict=None, include_private_properties: bool=False):
         """
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
-        attr: Private
+        attr: include_private_properties
           Properties are filtered on whether they are publicly or privately visible.
         Default is false; only the public properties will be set
         """
         # Set location properties access
-        self.private = private
+        self.include_private_properties = include_private_properties
 
         # Set an empty Location instance
         self.location_instance = Location()
@@ -59,11 +59,11 @@ class LocationProcessor():
                     setattr(self, key, value)
 
     @classmethod
-    def get(cls, pandcode: int, private: bool=False)-> Self: 
+    def get(cls, pandcode: int, include_private_properties: bool=False)-> Self: 
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls(private=private)
+        object = cls(include_private_properties=include_private_properties)
         object.location_instance = Location.objects.get(pandcode=pandcode)
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
@@ -79,7 +79,7 @@ class LocationProcessor():
                 value = location_data.value
             setattr(object, location_data.location_property.short_name, value)
 
-        # Add location properties to the object
+        # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
             value = service.external_location_code
             setattr(object, service.external_service.short_name, value)
@@ -143,9 +143,10 @@ class LocationProcessor():
                 else:
                     location_data = LocationData(location = self.location_instance, location_property = location_property)
 
-                # Set value when not None or empty string
-                value = getattr(self, location_property.short_name) if getattr(self, location_property.short_name) else None
-
+                if getattr(self, location_property.short_name):
+                    value = getattr(self, location_property.short_name)
+                else:
+                    value = None
                 # In case of a choice list, set the property_option attribute
                 if location_property.property_type == 'CHOICE' and value:
                     location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
@@ -160,8 +161,10 @@ class LocationProcessor():
 
             # Add external service data tot the Location object
             for service in self.external_service_instances:
-                # Set value when not None or empty string
-                value = getattr(self, service.short_name) if getattr(self, service.short_name) else None
+                if getattr(self, service.short_name):
+                    value = getattr(self, service.short_name)
+                else:
+                    value = None
                 
                 # Check if an external service instance exists; otherwise create a new instance
                 if self.location_instance.locationexternalservice_set.filter(location=self.location_instance, external_service=service).exists():
