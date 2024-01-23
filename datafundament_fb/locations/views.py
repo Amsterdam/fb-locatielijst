@@ -1,5 +1,6 @@
 import csv
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -25,26 +26,27 @@ class LocationDetailView(View):
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-        form = self.form(initial=location_data.get_dict(), private=True)
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
 
-class LocationCreateView(View):
+class LocationCreateView(LoginRequiredMixin, View):
     form = LocationDataForm
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
-        form = self.form(private=True)
+        form = self.form(include_private_properties=request.user.is_authenticated)
         context = {'form': form}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, private=True)
+        form = self.form(request.POST, include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
-            location_data = LocationProcessor(form.cleaned_data, private=True)
+            location_data = LocationProcessor(form.cleaned_data, include_private_properties=request.user.is_authenticated)
             try:
                 # Save the locationprocessor instance
                 location_data.save()
@@ -67,20 +69,20 @@ class LocationCreateView(View):
         return render(request, template_name=self.template, context=context)
 
 
-class LocationUpdateView(View):
+class LocationUpdateView(LoginRequiredMixin, View):
     form = LocationDataForm
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
-        form = self.form(initial=location_data.get_dict(), private=True)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
-
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, private=True)
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
+        form = self.form(request.POST, include_private_properties=request.user.is_authenticated)
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
             for field in form.cleaned_data:
@@ -108,7 +110,7 @@ class LocationUpdateView(View):
         return render(request, template_name=self.template, context=context)
 
 
-class LocationImportView(View):
+class LocationImportView(LoginRequiredMixin, View):
     form = LocationImportForm
     template_name = 'locations/location-import.html'
 
@@ -128,7 +130,7 @@ class LocationImportView(View):
                 csv_dict = csv.DictReader(csv_reader)
 
                 # Report columns that will be processed during import
-                location_properties = set(LocationProcessor(private=True).location_properties)
+                location_properties = set(LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties)
                 headers = set(csv_dict.fieldnames)
 
                 used_columns = list(headers & location_properties)
@@ -138,7 +140,7 @@ class LocationImportView(View):
                 # Process the rows from the import file
                 for row in csv_dict:
                     # Initiatie a location processor with the row data
-                    location = LocationProcessor(data=row, private=True)
+                    location = LocationProcessor(data=row, include_private_properties=request.user.is_authenticated)
                     try:
                         # Save the locationprocessor instance                        
                         location.save()
@@ -173,7 +175,10 @@ class LocationExportView(View):
         # Set all location data to a LocationProcessor
         location_data = []
         for location in locations:
-            location_data.append(LocationProcessor.get(pandcode=location.pandcode, private=True).get_dict())
+            # Get loction data  depending on user context; include_private_properties == True is all location properties
+            location_data.append(
+                LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
+            )
 
         # Setup the http response with the 
         date = timezone.now().strftime('%Y-%m-%d_%H.%M')
@@ -187,7 +192,7 @@ class LocationExportView(View):
 
         # Setup a csv dictwriter and write the location data to the response object
         headers = location_data[0].keys()
-        writer = csv.DictWriter(response, fieldnames=headers,delimiter=';')
+        writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
         writer.writeheader()
         writer.writerows(location_data)
 

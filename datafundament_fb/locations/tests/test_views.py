@@ -1,4 +1,5 @@
 import csv
+from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
 from django.test import TestCase
@@ -30,13 +31,20 @@ class LocationDetailViewTest(TestCase):
 
     def setUp(self) -> None:
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='property', label='property', property_type='INT', required=True)
-        self.location_data = LocationData.objects.create(
-            location=self.location, location_property=self.integer_property, value='10')
+        self.private_property = LocationProperty.objects.create(
+            short_name='private', label='Private property', property_type='INT', required=True)
+        self.public_property = LocationProperty.objects.create(
+            short_name='public', label='Public property', property_type='INT', required=True, public=True)
+        self.private_data = LocationData.objects.create(
+            location=self.location, location_property=self.private_property, value='Private')
+        self.public_data = LocationData.objects.create(
+            location=self.location, location_property=self.public_property, value='Public')
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
 
-    def test_get_view(self):
-        """Test getting the Location Detail View"""
+    def test_get_view_anonymous(self):
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Log out the user
+        self.client.logout()
         # Request location detail page
         response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -46,7 +54,22 @@ class LocationDetailViewTest(TestCase):
         self.assertEqual(response.context['location_data']['naam'], self.location.name)
         self.assertEqual(response.context['location_data']['pandcode'], self.location.pandcode)
         self.assertIsNotNone(response.context['location_data']['gewijzigd'])
-        self.assertEqual(response.context['location_data']['property'], self.location_data.value)
+        self.assertEqual(response.context['location_data']['public'], self.public_data.value)
+        self.assertIsNone(response.context['location_data'].get('private'))
+
+    def test_get_view_authenticated(self):
+        """Test getting the Location Detail View as an authenticaed user"""
+        # Request location detail page
+        response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
+        # Verify the response
+        self.assertEqual(response.status_code, 200)
+        # Verify the response values for the location
+        self.assertTemplateUsed(response, 'locations/location-detail.html')
+        self.assertEqual(response.context['location_data']['naam'], self.location.name)
+        self.assertEqual(response.context['location_data']['pandcode'], self.location.pandcode)
+        self.assertIsNotNone(response.context['location_data']['gewijzigd'])
+        self.assertEqual(response.context['location_data']['private'], self.private_data.value)
+        self.assertEqual(response.context['location_data']['public'], self.public_data.value)
 
 
 class LocationCreateViewTest(TestCase):
@@ -55,14 +78,26 @@ class LocationCreateViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.integer_property = LocationProperty.objects.create(
-            short_name='property', label='property', property_type='INT', required=True)
+            short_name='property', label='property', property_type='INT', required=True, public=True)
         self.location_data = LocationData.objects.create(
             location=self.location, location_property=self.integer_property, value='10')
     
-    def test_get_view(self):
+    def test_get_view_anonymous(self):
+        """Test getting the location create page"""
+        # Log out the user
+        self.client.logout()
+        # Requesting the page
+        response = self.client.get(reverse('location-create'))
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('admin:login') + '?next=' + reverse('location-create')
+        self.assertEqual(response.url, url)
+
+    def test_get_view_authenticated(self):
         """Test getting the location create page"""
         # Requesting the page
         response = self.client.get(reverse('location-create'))
@@ -141,8 +176,12 @@ class LocationCreateViewTest(TestCase):
 
 
 class LocationUpdateViewTest(TestCase):
+    """
+    Test for updating existing locations
+    """
 
     def setUp(self) -> None:
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.integer_property = LocationProperty.objects.create(
@@ -150,8 +189,19 @@ class LocationUpdateViewTest(TestCase):
         self.location_data = LocationData.objects.create(
             location=self.location, location_property=self.integer_property, value='10')
 
-    def test_get_view(self):
-        """Test getting the location update page"""
+    def test_get_view_anonymous(self):
+        """Test getting the location update page as an anonymous user"""
+        # Log out the user
+        self.client.logout()
+        # Requesting the page
+        response = self.client.get(reverse('location-update', args=[self.location.pandcode]))
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('admin:login') + '?next=' + reverse('location-update', args=[self.location.pandcode])
+        self.assertEqual(response.url, url)
+
+    def test_get_view_authenticated(self):
+        """Test getting the location update page as an authenticated user"""
         # Requesting the page
         response = self.client.get(reverse('location-update', args=[self.location.pandcode]))
         # Verify the response
@@ -226,7 +276,11 @@ class LocationUpdateViewTest(TestCase):
 
 
 class TestLocationImportForm(TestCase):
+    """
+    Test importing / updating locations by uploading a csv file
+    """
     def setUp(self) -> None:
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
@@ -342,11 +396,11 @@ class TestLocationExportForm(TestCase):
     def setUp(self) -> None:
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
-            short_name='occupied', label='occupied', property_type='BOOL', required=True)
+            short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True)
         self.date_property = LocationProperty.objects.create(
-            short_name='build', label='build_year', property_type='DATE', required=True)
+            short_name='build', label='build_year', property_type='DATE', required=True, public=True)
         self.email_property = LocationProperty.objects.create(
-            short_name='mail', label='mail_address', property_type='EMAIL', required=True)
+            short_name='mail', label='mail_address', property_type='EMAIL', required=True, public=True)
         self.integer_property = LocationProperty.objects.create(
             short_name='floors', label='number_of_floors', property_type='INT', required=True)
         self.memo_property = LocationProperty.objects.create(
@@ -399,6 +453,7 @@ class TestLocationExportForm(TestCase):
             property_option = self.choice_option)
 
     def test_get_form(self):
+        """ Test requesting the csv export page"""
         # Request the download form
         response = self.client.get(reverse('location-export'))
         
@@ -407,8 +462,36 @@ class TestLocationExportForm(TestCase):
         self.assertTemplateUsed(response, 'locations/location-export.html')
         self.assertContains(response, 'Exporteer Locaties naar CSV')
 
-    def test_post_form(self):
+    def test_post_form_anonymous(self):
+        """ Test requesting the csv as an anonymous user; less fields should be in the csv"""
         # Request the csv export
+        response = self.client.post(reverse('location-export'), {})
+
+        # Verify the response
+        content = response.content
+        # Check for the BOM
+        self.assertEqual(content[0:3], b'\xef\xbb\xbf')
+        
+        # Create a csv dictionary from the list and read the first row 
+        data = content.decode('utf-8-sig').splitlines()
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
+        row = next(csv_dict)
+        
+        # Verify the row values
+        self.assertEqual(row['pandcode'], str(self.location.pandcode))
+        self.assertEqual(row['naam'], self.location.name)
+        self.assertEqual(row['occupied'], self.occupied.value)
+        self.assertEqual(row['build'], self.build.value)
+        self.assertEqual(row['mail'], self.mail.value)
+        # Verify that floors is not included in the result
+        self.assertNotIn('floors', row)
+
+    def test_post_form_authenticated(self):
+        """ Test requesting the csv as an authenticated user; all fields should be in the csv"""        
+        # Request the csv export as an authenticated user
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         response = self.client.post(reverse('location-export'), {})
 
         # Verify the response
