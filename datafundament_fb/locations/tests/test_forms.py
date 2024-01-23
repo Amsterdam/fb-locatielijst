@@ -31,7 +31,7 @@ class TestLocationDataForm(TestCase):
             location_property=self.choice_property, option='Orange')
         self.external_service = ExternalService.objects.create(
             name='Externe service', short_name='extservice')
-        self.location_data_form = LocationDataForm(include_private=True)
+        self.location_data_form = LocationDataForm(include_private_properties=True)
 
     def test_location_property_form_fields(self):
         """
@@ -94,7 +94,7 @@ class TestLocationDataForm(TestCase):
         undefined_property = LocationProperty.objects.create(short_name='undefined', label='Undefined property', property_type='undefined')
         field = self.location_data_form.fields[self.boolean_property.short_name] 
         with self.assertRaises(ValueError) as value_error:
-            LocationDataForm(include_private=True)
+            LocationDataForm(include_private_properties=True)
         
         # Verify the error message
         self.assertIn(
