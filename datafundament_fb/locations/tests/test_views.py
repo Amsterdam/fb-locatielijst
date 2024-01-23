@@ -293,7 +293,7 @@ class TestLocationImportForm(TestCase):
         # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
-        # Including the location from the setyu() there should be 2 locations now
+        # Including the location from the setup() there should be 2 locations now
         self.assertEqual(Location.objects.all().count(), 2)
 
     def test_import_csv_post_invalid_file(self):
