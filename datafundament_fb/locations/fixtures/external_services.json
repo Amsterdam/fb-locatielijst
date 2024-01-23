@@ -1,50 +1,56 @@
 [
-{
-    "model": "locations.externalservice",
-    "pk": 1,
-    "fields": {
-        "name": "BAG id",
-        "short_name": "bag_id"
+    {
+        "model": "locations.externalservice",
+        "pk": 1,
+        "fields": {
+            "name": "BAG id",
+            "short_name": "bag_id",
+            "public": false
+        }
+    },
+    {
+        "model": "locations.externalservice",
+        "pk": 2,
+        "fields": {
+            "name": "1s1p locatie",
+            "short_name": "pas_loc",
+            "public": false
+        }
+    },
+    {
+        "model": "locations.externalservice",
+        "pk": 3,
+        "fields": {
+            "name": "A-net locatie",
+            "short_name": "anet_loc",
+            "public": false
+        }
+    },
+    {
+        "model": "locations.externalservice",
+        "pk": 4,
+        "fields": {
+            "name": "GV",
+            "short_name": "gv",
+            "public": true
+        }
+    },
+    {
+        "model": "locations.externalservice",
+        "pk": 5,
+        "fields": {
+            "name": "Energiemissie object",
+            "short_name": "emobj",
+            "public": false
+        }
+    },
+    {
+        "model": "locations.externalservice",
+        "pk": 6,
+        "fields": {
+            "name": "P&O locatie code",
+            "short_name": "po",
+            "public": false
+        }
     }
-},
-{
-    "model": "locations.externalservice",
-    "pk": 2,
-    "fields": {
-        "name": "1s1p locatie",
-        "short_name": "pas_loc"
-    }
-},
-{
-    "model": "locations.externalservice",
-    "pk": 3,
-    "fields": {
-        "name": "A-net locatie",
-        "short_name": "anet_loc"
-    }
-},
-{
-    "model": "locations.externalservice",
-    "pk": 4,
-    "fields": {
-        "name": "GV",
-        "short_name": "gv"
-    }
-},
-{
-    "model": "locations.externalservice",
-    "pk": 5,
-    "fields": {
-        "name": "Energiemissie object",
-        "short_name": "emobj"
-    }
-},
-{
-    "model": "locations.externalservice",
-    "pk": 6,
-    "fields": {
-        "name": "P&O locatie code",
-        "short_name": "po"
-    }
-}
 ]

@@ -25,8 +25,8 @@ class LocationDetailView(View):
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
-        form = self.form(initial=location_data.get_dict())
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
+        form = self.form(initial=location_data.get_dict(), private=True)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
@@ -36,15 +36,15 @@ class LocationCreateView(View):
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
-        form = self.form()
+        form = self.form(private=True)
         context = {'form': form}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST)
+        form = self.form(request.POST, private=True)
 
         if form.is_valid():
-            location_data = LocationProcessor(form.cleaned_data)
+            location_data = LocationProcessor(form.cleaned_data, private=True)
             try:
                 # Save the locationprocessor instance
                 location_data.save()
@@ -72,15 +72,15 @@ class LocationUpdateView(View):
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
-        form = self.form(initial=location_data.get_dict())
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
+        form = self.form(initial=location_data.get_dict(), private=True)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST)
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'])
+        form = self.form(request.POST, private=True)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], private=True)
 
         if form.is_valid():
             for field in form.cleaned_data:
@@ -128,7 +128,7 @@ class LocationImportView(View):
                 csv_dict = csv.DictReader(csv_reader)
 
                 # Report columns that will be processed during import
-                location_properties = set(LocationProcessor().location_properties)
+                location_properties = set(LocationProcessor(private=True).location_properties)
                 headers = set(csv_dict.fieldnames)
 
                 used_columns = list(headers & location_properties)
@@ -138,7 +138,7 @@ class LocationImportView(View):
                 # Process the rows from the import file
                 for row in csv_dict:
                     # Initiatie a location processor with the row data
-                    location = LocationProcessor(row)
+                    location = LocationProcessor(data=row, private=True)
                     try:
                         # Save the locationprocessor instance                        
                         location.save()
@@ -173,7 +173,7 @@ class LocationExportView(View):
         # Set all location data to a LocationProcessor
         location_data = []
         for location in locations:
-            location_data.append(LocationProcessor.get(pandcode=location.pandcode).get_dict())
+            location_data.append(LocationProcessor.get(pandcode=location.pandcode, private=True).get_dict())
 
         # Setup the http response with the 
         date = timezone.now().strftime('%Y-%m-%d_%H.%M')

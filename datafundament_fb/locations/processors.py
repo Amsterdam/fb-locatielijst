@@ -6,6 +6,7 @@ from locations.validators import LocationDataValidator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
+    private = False
 
     def _set_location_properties(self)-> None:
         """
@@ -15,22 +16,35 @@ class LocationProcessor():
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
-        self.location_property_instances =  [obj for obj in LocationProperty.objects.all()]
+        # List is filtered for private accessibility
+        if self.private:
+            self.location_property_instances =  [obj for obj in LocationProperty.objects.all().order_by('order', 'short_name')]
+        else:
+            self.location_property_instances =  [obj for obj in LocationProperty.objects.filter(public=True).order_by('order', 'short_name')]
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
-        self.external_service_instances = [obj for obj in ExternalService.objects.all()]
+        if self.private:
+            self.external_service_instances = [obj for obj in ExternalService.objects.all().order_by('short_name')]
+        else:
+            self.external_service_instances = [obj for obj in ExternalService.objects.filter(public=True).order_by('short_name')]
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
 
         # Set attributes from all the available location properties
         for property in self.location_properties:
             setattr(self, property, None)
 
-    def __init__(self, data: dict=None):
+    def __init__(self, data: dict=None, private: bool=False):
         """
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
+        attr: Private
+          Properties are filtered on whether they are publicly or privately visible.
+        Default is false; only the public properties will be set
         """
+        # Set location properties access
+        self.private = private
+
         # Set an empty Location instance
         self.location_instance = Location()
 
@@ -44,11 +58,11 @@ class LocationProcessor():
                     setattr(self, key, value)
 
     @classmethod
-    def get(cls, pandcode)-> Self: 
+    def get(cls, pandcode: int, private: bool=False)-> Self: 
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls()
+        object = cls(private=private)
         object.location_instance = Location.objects.get(pandcode=pandcode)
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
