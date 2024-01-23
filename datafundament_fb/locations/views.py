@@ -2,10 +2,6 @@ import csv
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
-import csv
-from django.contrib import messages
-from django.core.exceptions import ValidationError
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import View, ListView
@@ -191,7 +187,7 @@ class LocationExportView(View):
 
         # Setup a csv dictwriter and write the location data to the response object
         headers = location_data[0].keys()
-        writer = csv.DictWriter(response, fieldnames=headers)
+        writer = csv.DictWriter(response, fieldnames=headers,delimiter=';')
         writer.writeheader()
         writer.writerows(location_data)
 

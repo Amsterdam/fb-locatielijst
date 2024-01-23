@@ -71,7 +71,6 @@ class LocationProcessor():
         setattr(object, 'gewijzigd', last_modified)
         
         # Add location properties to the object
-        # Add location properties to the object
         for location_data in object.location_instance.locationdata_set.all():
             if location_data.location_property.property_type == 'CHOICE' and getattr(location_data, 'property_option'):
                 value = location_data.property_option.option
@@ -79,7 +78,7 @@ class LocationProcessor():
                 value = location_data.value
             setattr(object, location_data.location_property.short_name, value)
 
-        # Add location properties to the object
+        # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
             value = service.external_location_code
             setattr(object, service.external_service.short_name, value)
@@ -128,7 +127,7 @@ class LocationProcessor():
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
 
-         # Atomic is used to prevent incomplete locations being added;
+        # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
             # Save the location model first before adding LocationData
