@@ -226,7 +226,7 @@ class TestLocationProcessor(TestCase):
         # Init a location
         location = LocationProcessor(private=True, data=self.location_data_dict)
 
-        # Set occupied to an empty string
+        # Set occupied to an invalid string
         location.occupied = 'Misschien'
         # Verify that a validation Error occurs because occupied is an empty string
         with self.assertRaises(ValidationError) as validation_error:

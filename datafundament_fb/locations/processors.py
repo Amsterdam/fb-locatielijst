@@ -1,6 +1,5 @@
 from typing import Self
 from django.db import transaction
-from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import LocationDataValidator
@@ -71,6 +70,7 @@ class LocationProcessor():
         last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
         setattr(object, 'gewijzigd', last_modified)
         
+        # Add location properties to the object
         # Add location properties to the object
         for location_data in object.location_instance.locationdata_set.all():
             if location_data.location_property.property_type == 'CHOICE' and getattr(location_data, 'property_option'):
