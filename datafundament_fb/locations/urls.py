@@ -1,5 +1,5 @@
 from django.urls import path
-from locations.views import LocationListView, LocationDetailView, LocationCreateView, LocationUpdateView, LocationImportView
+from locations.views import LocationListView, LocationDetailView, LocationCreateView, LocationUpdateView, LocationImportView, LocationExportView
 
 urlpatterns = [
     path('', view=LocationListView.as_view(), name='location-list'),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('<int:id>', view=LocationDetailView.as_view(), name='location-detail'),
     path('<int:id>/edit', view=LocationUpdateView.as_view(), name='location-update'),
     path('import', LocationImportView.as_view(), name='location-import'),
+    path('export', view=LocationExportView.as_view(), name='location-export'),
 ]

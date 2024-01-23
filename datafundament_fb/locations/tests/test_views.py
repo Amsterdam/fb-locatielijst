@@ -1,3 +1,4 @@
+import csv
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
 from django.test import TestCase
@@ -292,7 +293,7 @@ class TestLocationImportForm(TestCase):
         # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
-        # Including the location from the setyp() there should be 2 locations now
+        # Including the location from the setup() there should be 2 locations now
         self.assertEqual(Location.objects.all().count(), 2)
 
     def test_import_csv_post_invalid_file(self):
@@ -331,3 +332,107 @@ class TestLocationImportForm(TestCase):
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[1].tags, 'error')
         self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: 'Misschien' is not a valid boolean")
+
+
+class TestLocationExportForm(TestCase):
+    """
+    Test exporting locations to a csv file for download
+    """
+
+    def setUp(self) -> None:
+        self.location = Location.objects.create(pandcode=25000, name='Stopera')
+        self.boolean_property = LocationProperty.objects.create(
+            short_name='occupied', label='occupied', property_type='BOOL', required=True)
+        self.date_property = LocationProperty.objects.create(
+            short_name='build', label='build_year', property_type='DATE', required=True)
+        self.email_property = LocationProperty.objects.create(
+            short_name='mail', label='mail_address', property_type='EMAIL', required=True)
+        self.integer_property = LocationProperty.objects.create(
+            short_name='floors', label='number_of_floors', property_type='INT', required=True)
+        self.memo_property = LocationProperty.objects.create(
+            short_name='note', label='note', property_type='MEMO', required=True)
+        self.postal_code_property = LocationProperty.objects.create(
+            short_name='postcode', label='postal_code', property_type='POST', required=True)
+        self.string_property = LocationProperty.objects.create(
+            short_name='color', label='building_color', property_type='STR')
+        self.url_property = LocationProperty.objects.create(
+            short_name='url', label='web_address', property_type='URL')
+        self.choice_property = LocationProperty.objects.create(
+            short_name='type', label='building_type', property_type='CHOICE', required=True)
+        self.choice_option = PropertyOption.objects.create(
+            location_property=self.choice_property, option='Office')
+        self.occupied = LocationData.objects.create(
+            location=self.location,
+            location_property=self.boolean_property,
+            value = 'Ja')
+        self.build = LocationData.objects.create(
+            location=self.location,
+            location_property=self.date_property,
+            value = '31-12-2023')
+        self.mail = LocationData.objects.create(
+            location=self.location,
+            location_property=self.email_property,
+            value = 'mail@example.org')
+        self.floors = LocationData.objects.create(
+            location=self.location,
+            location_property=self.integer_property,
+            value = '10')
+        self.note = LocationData.objects.create(
+            location=self.location,
+            location_property=self.memo_property,
+            value = 'Memo')
+        self.postcode = LocationData.objects.create(
+            location=self.location,
+            location_property=self.postal_code_property,
+            value = '1234 AB')
+        self.color = LocationData.objects.create(
+            location=self.location,
+            location_property=self.string_property,
+            value = 'Tekst')
+        self.url = LocationData.objects.create(
+            location=self.location,
+            location_property=self.url_property,
+            value = 'https://example.org')
+        self.type = LocationData.objects.create(
+            location=self.location,
+            location_property=self.choice_property,
+            property_option = self.choice_option)
+
+    def test_get_form(self):
+        # Request the download form
+        response = self.client.get(reverse('location-export'))
+        
+        # Verify the response
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'locations/location-export.html')
+        self.assertContains(response, 'Exporteer Locaties naar CSV')
+
+    def test_post_form(self):
+        # Request the csv export
+        response = self.client.post(reverse('location-export'), {})
+
+        # Verify the response
+        content = response.content
+        # Check for the BOM
+        self.assertEqual(content[0:3], b'\xef\xbb\xbf')
+        
+        # Create a csv dictionary from the list and read the first row 
+        data = content.decode('utf-8-sig').splitlines()
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
+        row = next(csv_dict)
+        
+        # Verify the row values
+        self.assertEqual(row['pandcode'], str(self.location.pandcode))
+        self.assertEqual(row['naam'], self.location.name)
+        self.assertEqual(row['occupied'], self.occupied.value)
+        self.assertEqual(row['build'], self.build.value)
+        self.assertEqual(row['mail'], self.mail.value)
+        self.assertEqual(row['floors'], self.floors.value)
+        self.assertEqual(row['note'], self.note.value)
+        self.assertEqual(row['postcode'], self.postcode.value)
+        self.assertEqual(row['color'], self.color.value)
+        self.assertEqual(row['url'], self.url.value)
+        self.assertEqual(row['type'], self.type.property_option.option)
+

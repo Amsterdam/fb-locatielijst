@@ -1,12 +1,12 @@
-# TODO Excel exporteert standaard niet met quoted velden en is komma gescheiden!!!! Wat o wat te doen? Import xslx?
 import csv
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import View, ListView
+from django.urls import reverse
+from django.utils import timezone
 from locations.forms import LocationDataForm, LocationImportForm
 from locations.models import Location
 from locations.processors import LocationProcessor
@@ -158,3 +158,38 @@ class LocationImportView(View):
             messages.add_message(request, messages.ERROR, message)
         
         return HttpResponseRedirect(reverse('location-import'))
+    
+
+class LocationExportView(View):
+    template = 'locations/location-export.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request=request, template_name=self.template)
+
+    def post(self, request, *args, **kwargs):
+        # Get all Location instances()
+        locations = Location.objects.all()
+
+        # Set all location data to a LocationProcessor
+        location_data = []
+        for location in locations:
+            location_data.append(LocationProcessor.get(pandcode=location.pandcode).get_dict())
+
+        # Setup the http response with the 
+        date = timezone.now().strftime('%Y-%m-%d_%H.%M')
+        response = HttpResponse(
+            content_type='text/csv, charset=utf-8',
+            headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
+        )
+
+        # Add BOM to the file; because otherwise Excel won't know what's happening
+        response.write('\ufeff'.encode('utf-8'))
+
+        # Setup a csv dictwriter and write the location data to the response object
+        headers = location_data[0].keys()
+        writer = csv.DictWriter(response, fieldnames=headers,delimiter=';')
+        writer.writeheader()
+        writer.writerows(location_data)
+
+        # Return the response
+        return response

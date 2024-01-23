@@ -1,6 +1,5 @@
 from typing import Self
 from django.db import transaction
-from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import LocationDataValidator
@@ -77,9 +76,9 @@ class LocationProcessor():
         Return a dictionary of all the 'real' properties of a location  
         """
         dictionary = {attr: getattr(self, attr) for attr in self.location_properties}
+        
         # Add last_modified date to the dictionary
-        if hasattr(self, 'gewijzigd'):
-            dictionary['gewijzigd'] = self.gewijzigd
+        dictionary['gewijzigd'] = getattr(self, 'gewijzigd', None)
 
         return dictionary
 
