@@ -10,7 +10,7 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
     
     # Get all location properties instances; filter on public attribute
     if include_private_properties:
-        location_properties = LocationProcessor(include_private_properties=True).location_property_instances
+        location_properties = LocationProcessor(include_private_properties=include_private_properties).location_property_instances
     else:
         location_properties = LocationProcessor().location_property_instances
     
@@ -94,7 +94,7 @@ def set_external_services_fields(include_private_properties: bool=False) -> dict
 
     # Get all external service instances; filter on public attribute
     if include_private_properties:
-        external_services = LocationProcessor(include_private_properties=True).external_service_instances
+        external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
     else:
         external_services = LocationProcessor().external_service_instances
     

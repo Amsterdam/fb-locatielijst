@@ -15,7 +15,7 @@ class PropertyOptionAdmin(admin.ModelAdmin):
     ordering = ['location_property__order']
 
     def get_form(self, request, obj=None, **kwargs):
-        form = super(PropertyOptionAdmin, self).get_form(
+        form = super().get_form(
             request, obj, **kwargs)
         # list only property options of the list type
         form.base_fields['location_property'].queryset = LocationProperty.objects.filter(
@@ -25,7 +25,7 @@ class PropertyOptionAdmin(admin.ModelAdmin):
 
 class PropertyOptionInlineFormset(BaseInlineFormSet):
     def clean(self):
-        super(PropertyOptionInlineFormset, self).clean()
+        super().clean()
         # Raise an error when the user tries to add an option to any other property type than CHOICE
         if self.instance.property_type != 'CHOICE' and len(self.forms) > 0:
             raise ValidationError("Opties kan je alleen aan een keuzelijst toevoegen")
@@ -51,10 +51,10 @@ class LocationPropertyAdmin(admin.ModelAdmin):
     def get_inline_instances(self, request, obj):
         #Return the inline form only when property_type = CHOICE
         if not obj:
-            return super(LocationPropertyAdmin, self).get_inline_instances(request, obj)
+            return super().get_inline_instances(request, obj)
         else:
             if obj.property_type == 'CHOICE':
-                return super(LocationPropertyAdmin, self).get_inline_instances(request, obj)
+                return super().get_inline_instances(request, obj)
             else:
                 return []
         
