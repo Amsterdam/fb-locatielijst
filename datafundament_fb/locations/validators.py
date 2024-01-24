@@ -2,102 +2,116 @@ import re
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator, validate_email
+from django.utils.deconstruct import deconstructible
 
-class LocationDataValidator():
-    """
-    Validate data values before further processing
-    """
-    
-    # Function to validate the value depending on the chosen property type
-    @staticmethod
-    def valid_boolean(value)-> str:
-        accepted_boolean_values = ['Ja', 'Nee']
-        if value in accepted_boolean_values:
-            return value
-        else:
-            raise ValidationError(f"'{value}' is not a valid boolean")
 
-    @staticmethod
-    def valid_date(value)-> str: 
-        try:
-            datetime.strptime(value, '%d-%m-%Y')
-        except:
-            raise ValidationError(f"'{value}' is not a valid date")
+def valid_boolean(value)-> str:
+    """Validator for Boolean type location property"""
+    accepted_boolean_values = ['Ja', 'Nee']
+    if value in accepted_boolean_values:
         return value
+    else:
+        raise ValidationError(f"'{value}' is geen geldige boolean.")
 
-    @staticmethod
-    def valid_email(value)-> str:
-        try:
-            validate_email(value)
-        except:
-            raise ValidationError(
-                f"'{value}' is not a valid email address")
+def valid_date(value)-> str: 
+    """Validator for Date type location property"""
+    try:
+        datetime.strptime(value, '%d-%m-%Y')
+    except:
+        raise ValidationError(f"'{value}' is geen geldige datum.")
+    return value
+
+def valid_email(value)-> str:
+    """Validator for Email type location property"""
+    try:
+        validate_email(value)
+    except:
+        raise ValidationError(
+            f"'{value}' is geen geldig e-mail adres.")
+    return value
+
+def valid_integer(value)-> str:
+    """Validator for Integer type location property"""
+    int_regex = r'^-?\d+(,\d+)?$'
+    if re.match(int_regex, value):
         return value
+    else:
+        raise ValidationError(f"'{value}' is geen geldig getal.")
 
-    @staticmethod
-    def valid_integer(value)-> str:
-        int_regex = r'^-?\d+(,\d+)?$'
-        if re.match(int_regex, value):
-            return value
-        else:
-            raise ValidationError(f"'{value}' is not a valid number")
-
-    @staticmethod
-    def valid_memo(value)-> str:
+def valid_memo(value)-> str:
+    """Validator for Memo type location property"""
+    if isinstance(value, str):
         return value
+    else:
+        raise ValidationError(f"'{value}' is geen geldige tekst.")
 
-    @staticmethod
-    def valid_postal_code(value)-> str:
-        postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
-        if re.match(postal_code_regex, value):
-            return value
-        else:
-            raise ValidationError(f"'{value}' is not a valid postal code")
-
-    @staticmethod
-    def valid_string(value)-> str:
+def valid_postal_code(value)-> str:
+    """Validator for Postal Code type location property"""
+    postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
+    if re.match(postal_code_regex, value):
         return value
+    else:
+        raise ValidationError(f"'{value}' is geen geldige postcode.")
 
-    @staticmethod
-    def valid_url(value) -> str:
-        url = URLValidator()
-        try:
-            url(value)
-        except:
-            raise ValidationError(f"'{value}' is not a valid Url")                
+def valid_string(value)-> str:
+    """Validator for String type location property"""
+    if isinstance(value, str):
         return value
+    else:
+        raise ValidationError(f"'{value}' is geen geldige tekst.")
 
-    @staticmethod
-    def valid_choice(location_property, value)-> str:
+def valid_url(value) -> str:
+    """Validator for Url type location property"""
+    url = URLValidator()
+    try:
+        url(value)
+    except:
+        raise ValidationError(f"'{value}' is geen geldige url.")                
+    return value
+
+
+@deconstructible
+class ChoiceValidator:
+    """Validator for Choice type location property"""
+    def __init__(self, location_property):
+        self.location_property = location_property
+
+    def __call__(self, value):
         # get related choice options, compare value in model with value from field
         # this validation will not work when called from clean() in LocationData because the value should be empty (but this is not enforced in the model)
-        allowed_options = location_property.propertyoption_set.values_list(
-            'option', flat=True)
-        if value in allowed_options:
-            return value
+        allowed_options = self.location_property.propertyoption_set.values_list('option', flat=True)            
+        if not type(value) == list:
+            values = value.split(',')
         else:
-            raise ValidationError(f"'{value}' is not a valid choice for {location_property.label}")
+            values = value
+        for v in values:
+            if v not in allowed_options:
+                raise ValidationError(f"'{v}' is geen geldige invoer voor {self.location_property.label}.")
+        return value
 
-    @classmethod
-    def validate(cls, location_property, value) -> str:
+def get_locationdata_validator(location_property, value):
+    """
+    Based upon the location property instance, the appropriate validator will be called for a
+    """
+    if value != None:
         # match the property_type to the proper validation method
-        if value != None:
-            match location_property.property_type:
-                case 'BOOL':
-                    return cls.valid_boolean(value)
-                case 'DATE':
-                    return cls.valid_date(value)
-                case 'EMAIL':
-                    return cls.valid_email(value)
-                case 'INT':
-                    return cls.valid_integer(value)
-                case 'MEMO':
-                    return cls.valid_memo(value)
-                case 'POST':
-                    return cls.valid_postal_code(value)
-                case 'STR':
-                    return cls.valid_string(value)
-                case 'URL':
-                    return cls.valid_url(value)
-                case 'CHOICE':
-                    return cls.valid_choice(location_property, value)
+        match location_property.property_type:
+            case 'BOOL':
+                return valid_boolean(value)
+            case 'DATE':
+                return valid_date(value)
+            case 'EMAIL':
+                return valid_email(value)
+            case 'INT':
+                return valid_integer(value)
+            case 'MEMO':
+                return valid_memo(value)
+            case 'POST':
+                return valid_postal_code(value)
+            case 'STR':
+                return valid_string(value)
+            case 'URL':
+                return valid_url(value)
+            case 'CHOICE':
+                validator = ChoiceValidator(location_property)
+                return validator(value)

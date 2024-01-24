@@ -1,8 +1,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
-from locations.models import LocationProperty, ExternalService
 from locations.processors import LocationProcessor
-from locations.validators import LocationDataValidator
+from locations import validators
 
 
 def set_location_property_fields(include_private_properties: bool=False)-> dict:
@@ -20,69 +19,81 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
                     label=location_property.label,
                     required=location_property.required,
                     choices=(('Ja', 'Ja'),('Nee','Nee')),
-                    validators=[LocationDataValidator.valid_boolean],
+                    validators=[validators.valid_boolean],
                 )
             case 'DATE':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_date],
+                    validators=[validators.valid_date],
                     widget=forms.DateInput
                 )
             case 'EMAIL':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_email],
+                    validators=[validators.valid_email],
                     widget=forms.EmailInput
                 )
             case 'INT':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_integer],
+                    validators=[validators.valid_integer],
                     widget=forms.NumberInput
                 )
             case 'MEMO':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_memo],
+                    validators=[validators.valid_memo],
                     widget=forms.Textarea)
             case 'POST':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_postal_code],
+                    validators=[validators.valid_postal_code],
                     widget=forms.TextInput
                 )
             case 'STR':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_string],
+                    validators=[validators.valid_string],
                     widget=forms.TextInput
                 )
             case 'URL':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[LocationDataValidator.valid_url],
+                    validators=[validators.valid_url],
                     widget=forms.URLInput
                 )
             case 'CHOICE':
+                # Fill option list with related PropertyOptions
                 if location_property.propertyoption_set.values_list('option', flat=True):
                     choice_list = [(option, option) for option in location_property.propertyoption_set.values_list('option', flat=True)]
                 else:
                     choice_list = [('', '')]
-                fields[location_property.short_name] = forms.ChoiceField(
-                    choices=choice_list,
-                    label=location_property.label,
-                    required=location_property.required,
-                )
+
+                if location_property.multiple:
+                    fields[location_property.short_name] = forms.MultipleChoiceField(
+                        choices=choice_list,
+                        label=location_property.label,
+                        required=location_property.required,
+                        widget=forms.CheckboxSelectMultiple,
+                        validators=[validators.ChoiceValidator(location_property)]
+                    )
+                else:
+                    fields[location_property.short_name] = forms.ChoiceField(
+                        choices=choice_list,
+                        label=location_property.label,
+                        required=location_property.required,
+                        validators=[validators.ChoiceValidator(location_property)]
+                    )
             case _:
                 # If there is no match an exception will be raised
-                raise ValueError(f"No form field defined for '{location_property.property_type}'")
+                raise ValueError(f"Er bestaat geen formulierveld voor '{location_property.property_type}'.")
     
     return fields
 
@@ -97,7 +108,7 @@ def set_external_services_fields(include_private_properties: bool=False) -> dict
         fields[service.short_name] = forms.CharField(
             label=service.name,
             required=False,
-            validators=[LocationDataValidator.valid_string],
+            validators=[validators.valid_string],
             widget=forms.TextInput
         )
     

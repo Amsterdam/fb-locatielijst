@@ -30,6 +30,7 @@ class LocationDetailViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.private_property = LocationProperty.objects.create(
             short_name='private', label='Private property', property_type='INT', required=True)
@@ -39,7 +40,16 @@ class LocationDetailViewTest(TestCase):
             location=self.location, location_property=self.private_property, value='Private')
         self.public_data = LocationData.objects.create(
             location=self.location, location_property=self.public_property, value='Public')
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+        self.multichoice_property = LocationProperty.objects.create(
+            short_name='multi', label='teams', property_type='CHOICE', multiple=True)
+        self.multichoice_option1 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 1')
+        self.multichoice_option2 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 2')
+        self.location_data_option1 = LocationData.objects.create(
+            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option1)
+        self.location_data_option2 = LocationData.objects.create(
+            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option2)
 
     def test_get_view_anonymous(self):
         """Test getting the Location Detail View as an anonymous visitor"""
@@ -58,7 +68,10 @@ class LocationDetailViewTest(TestCase):
         self.assertIsNone(response.context['location_data'].get('private'))
 
     def test_get_view_authenticated(self):
-        """Test getting the Location Detail View as an authenticaed user"""
+        """
+        Test getting the Location Detail View as an authenticated user,
+        including a multiple choice location property
+        """
         # Request location detail page
         response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -70,6 +83,9 @@ class LocationDetailViewTest(TestCase):
         self.assertIsNotNone(response.context['location_data']['gewijzigd'])
         self.assertEqual(response.context['location_data']['private'], self.private_data.value)
         self.assertEqual(response.context['location_data']['public'], self.public_data.value)
+        # Verify the response values for the multiple choice location_data
+        value = [self.multichoice_option1.option, self.multichoice_option2.option]
+        self.assertEqual(response.context['location_data']['multi'], value)
 
 
 class LocationCreateViewTest(TestCase):
@@ -85,7 +101,17 @@ class LocationCreateViewTest(TestCase):
             short_name='property', label='property', property_type='INT', required=True, public=True)
         self.location_data = LocationData.objects.create(
             location=self.location, location_property=self.integer_property, value='10')
-    
+        self.multichoice_property = LocationProperty.objects.create(
+            short_name='multitype', label='teams', property_type='CHOICE', multiple=True)
+        self.multichoice_option1 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 1')
+        self.multichoice_option2 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 2')
+        self.location_data_option1 = LocationData.objects.create(
+            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option1)
+        self.location_data_option2 = LocationData.objects.create(
+            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option2)
+
     def test_get_view_anonymous(self):
         """Test getting the location create page"""
         # Log out the user
@@ -105,13 +131,14 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-create.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        self.assertListEqual(['naam', self.integer_property.short_name], field_names)
+        location_data_names = ['naam', self.multichoice_property.short_name, self.integer_property.short_name, ]
+        self.assertListEqual(location_data_names, field_names)
         
     def test_post_view(self):
         """Test posting the create form"""
 
         # Data for the form        
-        data = {'naam': 'Amstel 1', 'property': '10'}
+        data = {'naam': 'Amstel 1', 'property': '10', 'multi': ['Team 1', 'Team 2']}
         url = reverse('location-create')
         # Request the post for the form
         response = self.client.post(path=url, data=data)
@@ -132,7 +159,7 @@ class LocationCreateViewTest(TestCase):
         # Verify the response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'success')
-        self.assertEqual(messages[0].message, 'De locatie is toegevoegd')
+        self.assertEqual(messages[0].message, 'De locatie is toegevoegd.')
 
     def test_post_view_invalid_form(self):
         """Test posting a form with invalid values"""
@@ -150,8 +177,7 @@ class LocationCreateViewTest(TestCase):
         # Verify the response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, 'Niet alle velden zijn juist ingevuld')
-
+        self.assertEqual(messages[0].message, 'Niet alle velden zijn juist ingevuld.')
 
     def test_post_view_validation_error(self):
         """Test posting when a validation error occurs in LocationProcessor"""
@@ -171,7 +197,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het aanmaken van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
+            "Fout bij het aanmaken van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}."
         )
 
 
@@ -188,6 +214,16 @@ class LocationUpdateViewTest(TestCase):
             short_name='property', label='property', property_type='INT', required=True)
         self.location_data = LocationData.objects.create(
             location=self.location, location_property=self.integer_property, value='10')
+        self.multichoice_property = LocationProperty.objects.create(
+            short_name='multi', label='teams', property_type='CHOICE', multiple=True)
+        self.multichoice_option1 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 1')
+        self.multichoice_option2 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 2')
+        self.location_data_option1 = LocationData.objects.create(
+            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option1)
+        self.location_data_option2 = LocationData.objects.create(
+            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option2)
 
     def test_get_view_anonymous(self):
         """Test getting the location update page as an anonymous user"""
@@ -208,12 +244,13 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-update.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        self.assertListEqual(['naam', self.integer_property.short_name], field_names)
+        location_data_names = ['naam', self.multichoice_property.short_name, self.integer_property.short_name, ]
+        self.assertListEqual(location_data_names, field_names)
 
     def test_post_view(self):
         """Test posting the update form"""
         # Data for the form 
-        data = {'naam': 'Amstel 1', 'property': '10'}
+        data = {'naam': 'Amstel 1', 'property': '10', 'multi': ['Team 1','Team 2']}
         url = reverse('location-update', args=[self.location.pandcode])
         # Request the post for the form
         response = self.client.post(path=url, data=data)
@@ -232,7 +269,7 @@ class LocationUpdateViewTest(TestCase):
         # Verify the response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'success')
-        self.assertEqual(messages[0].message, 'De locatie is opgeslagen')
+        self.assertEqual(messages[0].message, 'De locatie is opgeslagen.')
 
     def test_post_view_invalid_form(self):
         """Test posting a form with invalid values"""
@@ -250,8 +287,8 @@ class LocationUpdateViewTest(TestCase):
         # Verify the response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, 'Niet alle velden zijn juist ingevuld')
-        self.assertContains(response, 'is not a valid number')
+        self.assertEqual(messages[0].message, 'Niet alle velden zijn juist ingevuld.')
+        self.assertContains(response, 'is geen geldig getal.')
 
     def test_post_view_validation_error(self):
         """Test posting when a validation error occurs in LocationProcessor"""
@@ -271,7 +308,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het updaten van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
+            "Fout bij het updaten van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}."
         )
 
 
@@ -302,9 +339,15 @@ class TestLocationImportForm(TestCase):
             short_name='choice', label='Choice', property_type='CHOICE')
         self.choice_option_ = PropertyOption.objects.create(
             location_property=self.choice_property, option='Orange')
+        self.multichoice_property = LocationProperty.objects.create(
+            short_name='multi', label='teams', property_type='CHOICE', multiple=True)
+        self.multichoice_option1 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 1')
+        self.multichoice_option2 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 2')
         self.csv_content  = [
-            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
-            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Orange'
+            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice;multi',
+            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Orange;Team 1,Team 2'
         ]
 
     def test_import_csv_get(self):
@@ -330,7 +373,7 @@ class TestLocationImportForm(TestCase):
         # Verify response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'info')      
-        self.assertEqual(messages[1].tags, 'success')      
+        self.assertEqual(messages[1].tags, 'success')
 
         # Message with used columns
         message = messages[0].message
@@ -342,7 +385,7 @@ class TestLocationImportForm(TestCase):
         self.assertEqual(set(used_columns), set(headers))
 
         # Success message
-        self.assertEqual(messages[1].message, f"Locatie Amstel 1 is geïmporteerd/ge-update")
+        self.assertEqual(messages[1].message, f"Locatie Amstel 1 is geïmporteerd/ge-update.")
 
         # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
@@ -364,7 +407,7 @@ class TestLocationImportForm(TestCase):
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, "import-file.xlsx is geen gelding CSV bestand")
+        self.assertEqual(messages[0].message, "import-file.xlsx is geen gelding CSV bestand.")
 
     def test_import_csv_post_invalid_value(self):
         """Post the form with an invalid form value"""
@@ -385,7 +428,7 @@ class TestLocationImportForm(TestCase):
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[1].tags, 'error')
-        self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: 'Misschien' is not a valid boolean")
+        self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: 'Misschien' is geen geldige boolean.")
 
 
     def test_import_csv_wrong_delimiter(self):
@@ -482,6 +525,12 @@ class TestLocationExportForm(TestCase):
             short_name='type', label='building_type', property_type='CHOICE', required=True)
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Office')
+        self.multichoice_property = LocationProperty.objects.create(
+            short_name='multi', label='teams', property_type='CHOICE', multiple=True)
+        self.multichoice_option1 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 1')
+        self.multichoice_option2 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Team 2')
         self.occupied = LocationData.objects.create(
             location=self.location,
             location_property=self.boolean_property,
@@ -518,6 +567,14 @@ class TestLocationExportForm(TestCase):
             location=self.location,
             location_property=self.choice_property,
             property_option = self.choice_option)
+        self.location_data_option1 = LocationData.objects.create(
+            location=self.location,
+            location_property=self.multichoice_property,
+            property_option=self.multichoice_option1)
+        self.location_data_option2 = LocationData.objects.create(
+            location=self.location,
+            location_property=self.multichoice_property,
+            property_option=self.multichoice_option2)
 
     def test_get_form(self):
         """ Test requesting the csv export page"""

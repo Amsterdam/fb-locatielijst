@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.db import transaction
 from locations.models import compute_pandcode, validate_short_name, Location, LocationProperty, PropertyOption, LocationData
-from locations.validators import LocationDataValidator
+from locations import validators
 
 
 class TestModelFunctions(TestCase):
@@ -75,21 +75,21 @@ class TestLocationDataValidation(TestCase):
         # Test valid boolean value
         values = ['Ja', 'Nee']
         for value in values:
-            self.assertEqual(LocationDataValidator.valid_boolean(value), value)
+            self.assertEqual(validators.valid_boolean(value), value)
 
         # Test for invalid boolean called 'maybe'
-        self.assertRaises(ValidationError, LocationDataValidator.valid_boolean, 'maybe')
+        self.assertRaises(ValidationError, validators.valid_boolean, 'maybe')
         
     def test_date_validation(self):
         # Test valid date values
         values = ['31-12-2000', '1-1-2000', '29-02-2004']
         for value in values:
-            self.assertEqual(LocationDataValidator.valid_date(value), value)
+            self.assertEqual(validators.valid_date(value), value)
 
         # Test invalid date values
         values = ['12-31-2000', '29-02-2001', '31-12-20', '31-04-2000']
         for value in values:
-            self.assertRaises(ValidationError, LocationDataValidator.valid_date, value)
+            self.assertRaises(ValidationError, validators.valid_date, value)
 
     def test_email_validation(self):
         # Test valid email values
@@ -99,7 +99,7 @@ class TestLocationDataValidation(TestCase):
             'test+test@example.amsterdam'
         ]
         for value in values:
-            self.assertEqual(LocationDataValidator.valid_email(value), value)
+            self.assertEqual(validators.valid_email(value), value)
 
         # Test invalid email values
         values = [
@@ -108,39 +108,39 @@ class TestLocationDataValidation(TestCase):
             'test@test@example.nl'
         ]
         for value in values:
-            self.assertRaises(ValidationError, LocationDataValidator.valid_email, value)
+            self.assertRaises(ValidationError, validators.valid_email, value)
 
     def test_int_validation(self):
         # Test valid integer values
         values = ['1', '0', '-100', '-1,1', '0,5', '16,3635']
         for value in values:
-            self.assertEqual(LocationDataValidator.valid_integer(value), value)
+            self.assertEqual(validators.valid_integer(value), value)
 
         # Test invalid integer values
         values = ['0.5', '.5', ',5', '100.239,00']
         for value in values:
-            self.assertRaises(ValidationError, LocationDataValidator.valid_integer, value)
+            self.assertRaises(ValidationError, validators.valid_integer, value)
 
     def test_memo_validation(self):
         # Test valid string value; this functions always returns the input, because the value it is already a string
         value = 'string'
-        self.assertEqual(LocationDataValidator.valid_memo(value), value)
+        self.assertEqual(validators.valid_memo(value), value)
 
     def test_postal_code_validation(self):
         # Test valid postal codes
         values = ['1234AA', '1234 AA']
         for value in values:
-            self.assertEqual(LocationDataValidator.valid_postal_code(value), value)
+            self.assertEqual(validators.valid_postal_code(value), value)
 
         # Test for invalid postal codes
         values = ['1234A', '123 AA', '1234aa', '0234 AA', '1234SS']
         for value in values:
-            self.assertRaises(ValidationError, LocationDataValidator.valid_postal_code, value)
+            self.assertRaises(ValidationError, validators.valid_postal_code, value)
 
     def test_str_validation(self):
         # Test valid string value; this functions always returns the input, because the value it is already a string
         value = 'string'
-        self.assertEqual(LocationDataValidator.valid_string(value), value)
+        self.assertEqual(validators.valid_string(value), value)
 
     def test_url_validation(self):
         # Test valid URL values
@@ -153,7 +153,7 @@ class TestLocationDataValidation(TestCase):
             'https://example.org/path/to/dir/parameters?values',
         ]
         for value in values:
-            self.assertEqual(LocationDataValidator.valid_url(value), value)
+            self.assertEqual(validators.valid_url(value), value)
 
         # Test invalid email values
         values = [
@@ -163,7 +163,7 @@ class TestLocationDataValidation(TestCase):
             'http:// example.org',
         ]
         for value in values:
-            self.assertRaises(ValidationError, LocationDataValidator.valid_url, value)
+            self.assertRaises(ValidationError, validators.valid_url, value)
 
     def test_choice_validation(self):
         choice_property = LocationProperty.objects.create(
@@ -175,22 +175,38 @@ class TestLocationDataValidation(TestCase):
 
         # Test valid choice value input
         value = 'Yellow'
-        self.assertEqual(LocationDataValidator.valid_choice(
-            choice_property, value), value
-        )
+        validator = validators.ChoiceValidator(choice_property)
+        self.assertEqual(validator(value), value)
 
-        # Test invalid choice value input
-        self.assertRaises(
-            ValidationError, LocationDataValidator.valid_choice, value='Magenta', location_property=choice_property
-        )
-        self.assertRaises(
-            ValidationError, LocationDataValidator.valid_choice, value='yellow', location_property=choice_property
-        )
+        # Test invalid choice value input; Magenta does not exist, yellow only exists with capital Y
+        with self.assertRaises(ValidationError):
+            validator('Magenta')
+        with self.assertRaises(ValidationError):
+            validator('yellow')
+
+    def test_multiple_choice_validation(self):
+        choice_property = LocationProperty.objects.create(
+            short_name='choice', label='Choice', property_type='CHOICE', multiple=True)
+        PropertyOption.objects.create(
+            location_property=choice_property, option='Yellow')
+        PropertyOption.objects.create(
+            location_property=choice_property, option='Orange')
+
+        # Test valid choice value input
+        value = ['Yellow', 'Orange']
+        validator = validators.ChoiceValidator(choice_property)
+        self.assertEqual(validator(value), value)
+
+        # Test invalid choice value input; Magenta does not exist, yellow only exists with capital Y
+        with self.assertRaises(ValidationError):
+            validator(['Yellow', 'Magenta'])
+        with self.assertRaises(ValidationError):
+            validator(['yellow', 'orange'])
 
 
-class TestLocationDataValidate(TestCase):
+class TestGetLocationDataValidate(TestCase):
     """
-    Test if the correct validation method is selected when running the validate() function in LocationDataValidator
+    Test if the correct validation method is selected when running the validate() function in get_locationdata_validator
     """
 
     def setUp(self) -> None:
@@ -220,67 +236,67 @@ class TestLocationDataValidate(TestCase):
             location_property=self.choice_property, option='Orange')
         self.location_data = LocationData(location=self.location1)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_boolean')
+    @mock.patch('locations.validators.valid_boolean')
     def test_clean_boolean(self, mock):
         # Test if valid_boolean() is called
         value = 'Ja'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.boolean_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_date')
+    @mock.patch('locations.validators.valid_date')
     def test_clean_date(self, mock):
         # Test if valid_date() is called
         value = '31-12-2000'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.date_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_integer')
+    @mock.patch('locations.validators.valid_integer')
     def test_clean_integer(self, mock):
         # Test if valid_integer is called
         value = '1'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.integer_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_memo')
+    @mock.patch('locations.validators.valid_memo')
     def test_clean_memo(self, mock):
         # Test if valid_integer is called
         value = 'string'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.memo_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_postal_code')
+    @mock.patch('locations.validators.valid_postal_code')
     def test_clean_postal_code(self, mock):
         # Test if valid string is called
         value = '1234 AA'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.postal_code_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_string')
+    @mock.patch('locations.validators.valid_string')
     def test_clean_string(self, mock):
         # Test if valid string is called
         value = 'string'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.string_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_url')
+    @mock.patch('locations.validators.valid_url')
     def test_clean_url(self, mock):
         # Test if valid_url is called
         value = 'http://example.org'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.url_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.LocationDataValidator.valid_choice')
+    @mock.patch('locations.validators.ChoiceValidator')
     def test_validate_choice(self, mock):
         # Test if valid_choice is called
         value = 'Yellow'
-        LocationDataValidator.validate(
+        validators.get_locationdata_validator(
             location_property=self.choice_property, value=value)
         self.assertTrue(mock.called)
 
@@ -351,7 +367,7 @@ class TestLocationDataModel(TestCase):
         self.assertEqual(validation_error.exception.code, 'unique')
         self.assertEqual(
             validation_error.exception.message,
-            f'Value %(value)s already exists for property %(property)s',
+            f'Waarde %(value)s bestaat al voor eigenschap %(property)s.',
         )
 
     def test_for_single_constraint(self):
@@ -375,7 +391,7 @@ class TestLocationDataModel(TestCase):
         self.assertEqual(validation_error.exception.code, 'unique')
         self.assertEqual(
             validation_error.exception.message,
-            f'Property %(property)s already exists for location %(location)s',
+            f'De locatie eigenschap %(property)s bestaat al voor locatie %(location)s.',
         )
 
         # Test when multiple is enabled for a property

@@ -54,12 +54,12 @@ class LocationCreateView(LoginRequiredMixin, View):
             try:
                 # Save the locationprocessor instance
                 location_data.save()
-                messages.success(request, 'De locatie is toegevoegd')
+                messages.success(request, 'De locatie is toegevoegd.')
 
             except ValidationError as err:
                 # Return error message when the location is not saved
                 # TODO: err message is not pretty, could be better
-                message = f"Fout bij het aanmaken van de locatie: {err}"
+                message = f"Fout bij het aanmaken van de locatie: {err}."
                 messages.error(request, message)
                 context = {'form': form}
                 
@@ -67,7 +67,7 @@ class LocationCreateView(LoginRequiredMixin, View):
 
             return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
 
-        message = f"Niet alle velden zijn juist ingevuld"
+        message = f"Niet alle velden zijn juist ingevuld."
         messages.error(request,message)
         context = {'form': form}
         return render(request, template_name=self.template, context=context)
@@ -95,12 +95,12 @@ class LocationUpdateView(LoginRequiredMixin, View):
             try:
                 # Save the locationprocessor instance
                 location_data.save()
-                messages.success(request, 'De locatie is opgeslagen')
+                messages.success(request, 'De locatie is opgeslagen.')
             
             except ValidationError as err:
                 # Return error message when the location is not saved
                 # TODO: err message is not pretty, could be better
-                message = f"Fout bij het updaten van de locatie: {err}"
+                message = f"Fout bij het updaten van de locatie: {err}."
                 messages.error(request, message)
                 context = {'form': form, 'location_data': location_data.get_dict()}
                 
@@ -108,7 +108,7 @@ class LocationUpdateView(LoginRequiredMixin, View):
 
             return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))           
 
-        message = f"Niet alle velden zijn juist ingevuld"
+        message = f"Niet alle velden zijn juist ingevuld."
         messages.error(request, message)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request, template_name=self.template, context=context)
@@ -147,7 +147,7 @@ class LocationImportView(LoginRequiredMixin, View):
                 headers = set(csv_dict.fieldnames)
 
                 used_columns = list(headers & location_properties)
-                message = f"Kolommen {used_columns} worden verwerkt"
+                message = f"Kolommen {used_columns} worden verwerkt."
                 messages.add_message(request, messages.INFO, message)
 
                 # Process the rows from the import file
@@ -163,7 +163,7 @@ class LocationImportView(LoginRequiredMixin, View):
                         message = f"Rij {i+1} is niet verwerkt want deze heeft teveel kolommen"
                         messages.add_message(request, messages.WARNING, message)
                         continue
-
+                    
                     # Initiatie a location processor with the row data
                     location = LocationProcessor(data=row, include_private_properties=request.user.is_authenticated)
                     try:
@@ -171,17 +171,17 @@ class LocationImportView(LoginRequiredMixin, View):
                         location.save()
 
                         # Return message for success
-                        message = f"Locatie {row['naam']} is geïmporteerd/ge-update"
+                        message = f"Locatie {row['naam']} is geïmporteerd/ge-update."
                         messages.add_message(request, messages.SUCCESS, message)
 
                     except ValidationError as err:
                         message = f"Fout bij het importeren voor locatie {row['naam']}: {err.message}"
                         messages.add_message(request, messages.ERROR, message)
             else:
-                message = f"{csv_file.name} is geen gelding CSV bestand"
+                message = f"{csv_file.name} is geen gelding CSV bestand."
                 messages.add_message(request, messages.ERROR, message)
         else:
-            message = f"Something went wrong validating your input: {form.errors}"
+            message = f"Het formulier is niet juist ingevuld, verhelp de volgende problemen: {form.errors}"
             messages.add_message(request, messages.ERROR, message)
         
         return HttpResponseRedirect(reverse('location-import'))
