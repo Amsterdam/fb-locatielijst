@@ -22,6 +22,6 @@ urlpatterns = [
     path('locations/', include('locations.urls'), name='location-urls'),
     path('admin/', admin.site.urls),
     path('locations/', include('locations.urls')),
-    path('beheer/', view=LocationAdminView.as_view(), name='location-beheer'),
+    path('beheer/', view=LocationAdminView.as_view(), name='location-admin'),
     path('', home_page, name='home'),
 ]
