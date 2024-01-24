@@ -171,7 +171,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het aanmaken van de locatie: {'name': ['Locatie with this Naam already exists.']}"
+            "Fout bij het aanmaken van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
         )
 
 
@@ -271,7 +271,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het updaten van de locatie: {'name': ['Locatie with this Naam already exists.']}"
+            "Fout bij het updaten van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}"
         )
 
 
@@ -585,4 +585,31 @@ class TestLocationExportForm(TestCase):
         self.assertEqual(row['color'], self.color.value)
         self.assertEqual(row['url'], self.url.value)
         self.assertEqual(row['type'], self.type.property_option.option)
+
+
+class TestLocationAdminView(TestCase):
+    """
+    Tests for the LocationAdminView
+    """
+    def setUp(self) -> None:
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+
+    def test_get_view_authenticated(self):
+        """Test requesting the view as an authenticated user"""
+        # Request the location admin page
+        response = self.client.get(reverse('location-admin'))
+        self.assertEqual(response.status_code, 200)
+        # Verify if the correct template is used
+        self.assertTemplateUsed(response, 'locations/location-admin.html')
+
+    def test_get_view_anonymous(self):
+        """Test getting the location admin page as an anonymous user"""
+        # Log out the user
+        self.client.logout()
+        # Requesting the page
+        response = self.client.get(reverse('location-admin'))
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('admin:login') + '?next=' + reverse('location-admin')
+        self.assertEqual(response.url, url)
 

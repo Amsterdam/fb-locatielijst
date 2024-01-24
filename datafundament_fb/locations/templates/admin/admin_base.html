@@ -33,7 +33,7 @@
     <li><a href="{% url 'admin:login' %}?next={{ request.path }}">Inloggen</a></li>
     {% endif %}
     {% if user.is_authenticated %}
-    <li><a href="{% url 'location-beheer' %}">Beheer</a></li>
+    <li><a href="{% url 'location-admin' %}">Beheer</a></li>
     <li><form id="logout-form" method="post" action="{% url 'admin:logout' %}">
       {% csrf_token %}
       <button type="submit">Uitloggen</button>
