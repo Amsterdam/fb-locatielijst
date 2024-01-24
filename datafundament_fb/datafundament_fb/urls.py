@@ -19,9 +19,8 @@ from django.urls import include, path
 from locations.views import home_page, LocationAdminView
 
 urlpatterns = [
-    path('locations/', include('locations.urls'), name='location-urls'),
     path('admin/', admin.site.urls),
-    path('locations/', include('locations.urls')),
+    path('locaties/', include('locations.urls')),
     path('beheer/', view=LocationAdminView.as_view(), name='location-admin'),
     path('', home_page, name='home'),
 ]

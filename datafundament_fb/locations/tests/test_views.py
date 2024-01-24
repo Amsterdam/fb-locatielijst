@@ -303,8 +303,8 @@ class TestLocationImportForm(TestCase):
         self.choice_option_ = PropertyOption.objects.create(
             location_property=self.choice_property, option='Orange')
         self.csv_content  = [
-            'pandcode,naam,bool,date,mail,int,memo,post,str,url,choice',
-            '25001,Amstel 1,Ja,31-12-2023,mail@example.org,99,Memo tekst,1234AB,Tekst,https://example.org,Orange'
+            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Orange'
         ]
 
     def test_import_csv_get(self):
@@ -338,7 +338,7 @@ class TestLocationImportForm(TestCase):
         index_left = message.find('[')
         index_right = message.find(']')
         used_columns = message[index_left +1: index_right].split(', ')
-        headers = self.csv_content[0].split(',')
+        headers = self.csv_content[0].split(';')
         self.assertEqual(set(used_columns), set(headers))
 
         # Success message
@@ -369,9 +369,9 @@ class TestLocationImportForm(TestCase):
     def test_import_csv_post_invalid_value(self):
         """Post the form with an invalid form value"""
         # CSV data
-        csv_content  = [
-            'pandcode,naam,bool,date,mail,int,memo,post,str,url,choice',
-            '25001,Amstel 1,Misschien,31-12-2023,mail@example.org,99,Memo tekst,1234AB,Tekst,https://example.org,Yellow'
+        csv_content = [
+            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            '25001;Amstel 1;Misschien;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Yellow'
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
         data = {'csv_file': csv_file}
@@ -386,6 +386,73 @@ class TestLocationImportForm(TestCase):
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[1].tags, 'error')
         self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: 'Misschien' is not a valid boolean")
+
+
+    def test_import_csv_wrong_delimiter(self):
+        """ Test csv import when the delimiter is not set to semicolin """
+        csv_content = [
+            'pandcode,naam,bool,date,mail,int,memo,post,str,url,choice',
+            '25001,Amstel 1,Ja,31-12-2023,mail@example.org,99,Memo tekst,1234AB,Tekst,https://example.org,Orange'
+        ]
+        csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
+        data = {'csv_file': csv_file}
+        url = reverse('location-import')
+        response = self.client.post(url, data)
+
+        # Verify response
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+
+        # Verify response message
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, 'error')
+        self.assertEqual(messages[0].message, "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken gebruikt.")
+
+    def test_import_csv_with_excess_columns(self):
+        """ Test csv import when a data row has more columns than the header; for instance when a value has a semicolon"""
+        csv_content = [
+            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;;Yellow'
+        ]
+        csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
+        data = {'csv_file': csv_file}
+        url = reverse('location-import')
+        response = self.client.post(url, data)
+
+        # Verify response
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+
+        # Verify response message
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[1].tags, 'warning')
+        self.assertEqual(messages[1].message, "Rij 1 is niet verwerkt want deze heeft teveel kolommen")
+
+        # There should be only one location from the setup()
+        self.assertEqual(Location.objects.all().count(), 1)
+
+    def test_import_csv_with_missing_columns(self):
+        """ Test csv import when a data row has less columns than the header"""
+        csv_content = [
+            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org'
+        ]
+        csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
+        data = {'csv_file': csv_file}
+        url = reverse('location-import')
+        response = self.client.post(url, data)
+
+        # Verify response
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+
+        # Verify response message
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[1].tags, 'warning')
+        self.assertEqual(messages[1].message, "Rij 1 is niet verwerkt want deze mist een kolom")
+
+        # There should be only one location from the setup()
+        self.assertEqual(Location.objects.all().count(), 1)
 
 
 class TestLocationExportForm(TestCase):

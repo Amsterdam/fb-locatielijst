@@ -131,7 +131,16 @@ class LocationImportView(LoginRequiredMixin, View):
             csv_file = form.cleaned_data.get('csv_file')
             if csv_file.name.endswith('.csv'):
                 csv_reader = csv_file.read().decode('utf-8-sig').splitlines()
-                csv_dict = csv.DictReader(csv_reader)
+                # Set the correct format for the csv by 'sniffing' the first line of the csv data and setting the delimiter
+                try:
+                    csv_dialect = csv.Sniffer().sniff(sample=csv_reader[0], delimiters=';')
+                except:
+                    message = "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken gebruikt."
+                    messages.add_message(request, messages.ERROR, message)
+                    
+                    return HttpResponseRedirect(reverse('location-import'))
+
+                csv_dict = csv.DictReader(csv_reader, dialect=csv_dialect, restval='missing', restkey='excess')
 
                 # Report columns that will be processed during import
                 location_properties = set(LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties)
@@ -142,7 +151,19 @@ class LocationImportView(LoginRequiredMixin, View):
                 messages.add_message(request, messages.INFO, message)
 
                 # Process the rows from the import file
-                for row in csv_dict:
+                for i, row in enumerate(csv_dict):
+                    # Check if a row is missing a value/column
+                    if 'missing' in row.values():
+                        message = f"Rij {i+1} is niet verwerkt want deze mist een kolom"
+                        messages.add_message(request, messages.WARNING, message)
+                        continue
+
+                    # Check if a row has to many values/columns
+                    if row.get('excess'):
+                        message = f"Rij {i+1} is niet verwerkt want deze heeft teveel kolommen"
+                        messages.add_message(request, messages.WARNING, message)
+                        continue
+
                     # Initiatie a location processor with the row data
                     location = LocationProcessor(data=row, include_private_properties=request.user.is_authenticated)
                     try:
