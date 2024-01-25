@@ -8,6 +8,8 @@
 <div class="breadcrumbs">
     <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
     <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
     <a href="{% url 'location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
     <span>&rsaquo;</span>
     Wijzigen

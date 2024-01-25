@@ -2,12 +2,56 @@ from typing import Self
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from locations.validators import LocationDataValidator
+from locations.validators import get_locationdata_validator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 class LocationProcessor():
     # Switch to include all properties (including private), or only public properties
     include_private_properties = False
+    
+    def _add_location_data(self, location, location_property, property_option, value)-> LocationData:
+        """Helper function to create a LocationData instance"""
+        location_data = LocationData(
+            location = location,
+            location_property = location_property,
+            property_option = property_option,
+            value = value,
+        )
+        return location_data
+
+    def _to_location_data_list(self)-> list:
+        """Helper function to create a list of LocationData instances"""
+        location_data_list = []
+
+        # Create for each location property a locationData instance
+        for location_property in self.location_property_instances:
+            property_value = getattr(self, location_property.short_name) if getattr(self, location_property.short_name) else None
+
+            # In case of a choice list, set the property_option attribute
+            if location_property.property_type == 'CHOICE' and property_value:
+                # If multiple choice is enabled for this location property
+                if location_property.multiple:
+                    # Cast the value to a list
+                    if not type(property_value) == list:
+                        property_value = property_value.split(',') # Could be a thingy when the list is not comma seperated
+                    # Create a LocationData object and add it to the list 
+                    for option in property_value:
+                        property_option = PropertyOption.objects.get(location_property=location_property, option=option)
+                        location_data_list.append(
+                            self._add_location_data(self.location_instance, location_property, property_option, None)
+                        )
+                else:
+                    # Create a LocationData object and add it to the list
+                    property_option = PropertyOption.objects.get(location_property=location_property, option=property_value) 
+                    location_data_list.append(
+                        self._add_location_data(self.location_instance, location_property, property_option, None)
+                    )
+            else:
+                # Create a LocationData object and add it to the list
+                location_data_list.append(
+                    self._add_location_data(self.location_instance, location_property, None, property_value)
+                )
+        return location_data_list
 
     def _set_location_properties(self)-> None:
         """
@@ -64,20 +108,41 @@ class LocationProcessor():
         Retrieve a location from the database and return it as an instance of this class
         """
         object = cls(include_private_properties=include_private_properties)
-        object.location_instance = Location.objects.get(pandcode=pandcode)
+        object.location_instance = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
         setattr(object, 'naam', getattr(object.location_instance, 'name'))
         last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
         setattr(object, 'gewijzigd', last_modified)
-        
-        # Add location properties to the object
-        for location_data in object.location_instance.locationdata_set.all():
-            if location_data.location_property.property_type == 'CHOICE' and getattr(location_data, 'property_option'):
-                value = location_data.property_option.option
+
+        # Add location properties to the object; filter to include non-public properties
+        if object.include_private_properties:
+            location_data_set = object.location_instance.locationdata_set.all()
+        else:
+            location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
+
+        # Set the value from the LocationData as attribute in the object instance
+        for location_data in location_data_set:
+            location_property = location_data.location_property
+            property_option = location_data.property_option
+            value = None
+
+            # Get value for CHOICE location properties
+            if location_property.property_type == 'CHOICE' and property_option:
+                if location_property.multiple:
+                    current_value = getattr(object, location_property.short_name)
+                    if not current_value:
+                        value = list([property_option.option])
+                    else:
+                        current_value.append(property_option.option)
+                        value = current_value
+                else:
+                    value = property_option.option
             else:
                 value = location_data.value
-            setattr(object, location_data.location_property.short_name, value)
+            
+            # Set the attribute value
+            setattr(object, location_property.short_name, value)
 
         # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
@@ -105,15 +170,15 @@ class LocationProcessor():
             # Validate the value of every location property
             value = getattr(self, location_property.short_name)
             if value:
-                LocationDataValidator.validate(location_property, value)
+                get_locationdata_validator(location_property, value)
 
     def save(self)-> Location:
         """
         Save the object as a Location model with related LocationData objects
         """
-        # Run validation
+        # Validate the instance
         self.validate()
-     
+
         # If a Location model instance has not been set yet
         if Location.objects.filter(pandcode=self.pandcode).exists():
             self.location_instance = Location.objects.get(pandcode=self.pandcode)
@@ -135,29 +200,18 @@ class LocationProcessor():
             self.location_instance.full_clean()
             self.location_instance.save()
 
-            # Add all the LocationData to the Location object
-            for location_property in self.location_property_instances:
-                # Check if the location_data already exists; otherwise create new instance
-                if self.location_instance.locationdata_set.filter(location=self.location_instance, location_property=location_property).exists():
-                    location_data = self.location_instance.locationdata_set.get(location=self.location_instance, location_property=location_property)
-                else:
-                    location_data = LocationData(location = self.location_instance, location_property = location_property)
+            # Old location_data is deleted and the (new) data is (re)added;
+            # this circumvents the necessity for updating existing objects
+            self.location_instance.locationdata_set.all().delete()
 
-                if getattr(self, location_property.short_name):
-                    value = getattr(self, location_property.short_name)
-                else:
-                    value = None
-                # In case of a choice list, set the property_option attribute
-                if location_property.property_type == 'CHOICE' and value:
-                    location_data.property_option = PropertyOption.objects.get(location_property=location_property, option=value)
-                else: 
-                    location_data.value = value
+            # Create a list of LocationData objects
+            location_data_list = self._to_location_data_list()
 
-                # Clean the data                    
-                location_data.full_clean()
+            # Validate the LocationData objects
+            [obj.full_clean() for obj in location_data_list]
 
-                # Save the instance
-                location_data.save()
+            # Save the location data objects
+            LocationData.objects.bulk_create(location_data_list)
 
             # Add external service data tot the Location object
             for service in self.external_service_instances:

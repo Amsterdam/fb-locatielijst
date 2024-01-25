@@ -29,6 +29,12 @@ class TestLocationDataForm(TestCase):
             location_property=self.choice_property, option='Yellow')
         self.choice_option_2 = PropertyOption.objects.create(
             location_property=self.choice_property, option='Orange')
+        self.multichoice_property = LocationProperty.objects.create(
+            short_name='multichoic', label='Multiple choice', property_type='CHOICE', multiple=True)
+        self.multi_choice_option_1 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Car')
+        self.choice_option_2 = PropertyOption.objects.create(
+            location_property=self.multichoice_property, option='Bus')
         self.external_service = ExternalService.objects.create(
             name='Externe service', short_name='extservice')
         self.location_data_form = LocationDataForm(include_private_properties=True)
@@ -85,19 +91,24 @@ class TestLocationDataForm(TestCase):
         self.assertIsInstance(field, forms.ChoiceField)
         self.assertEqual(field.label, self.choice_property.label)
 
+        # Multiple choice field
+        field = self.location_data_form.fields[self.multichoice_property.short_name] 
+        self.assertIsInstance(field, forms.MultipleChoiceField)
+        self.assertEqual(field.label, self.multichoice_property.label)
+
         # External service field
         field = self.location_data_form.fields[self.external_service.short_name] 
         self.assertIsInstance(field, forms.CharField)
         self.assertEqual(field.label, self.external_service.name)
 
         # Test for error when a property type that is not defined is matched
-        undefined_property = LocationProperty.objects.create(short_name='undefined', label='Undefined property', property_type='undefined')
+        undefined_property = LocationProperty.objects.create(short_name='undefined', label='Undefined property', property_type='onbekend')
         field = self.location_data_form.fields[self.boolean_property.short_name] 
         with self.assertRaises(ValueError) as value_error:
             LocationDataForm(include_private_properties=True)
         
         # Verify the error message
         self.assertIn(
-            f"No form field defined for '{undefined_property.property_type}'",
+            f"Er bestaat geen formulierveld voor '{undefined_property.property_type}'.",
             value_error.exception.__str__()
         )

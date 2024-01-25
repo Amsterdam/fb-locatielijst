@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Max, Q
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
-from locations.validators import LocationDataValidator
+from locations.validators import get_locationdata_validator
 
 # Create your models here.
 
@@ -16,7 +16,7 @@ def validate_short_name(value)-> str:
     if re.match(name_regex, value):
         return value
     raise ValidationError(
-        _("Invalid value for: %(value)s"),
+        _("Ongeldige waarde voor: %(value)s"),
         code="invalid",
         params={"value": value},   
     )
@@ -75,6 +75,13 @@ class LocationProperty(models.Model):
             models.UniqueConstraint(fields=['label'], name='unique_location_property_label')
         ]
 
+    def clean(self):
+        super().clean()
+
+        # Only allow multiple == True when property_type == CHOICE
+        if self.multiple and self.property_type != 'CHOICE':
+            raise ValidationError("Meervoudige invoer is alleen mogelijk bij keuzelijsten.")
+
     def __str__(self):
         return f'{self.label}'
 
@@ -126,7 +133,7 @@ class LocationData(models.Model):
         if not self.location_property.multiple and not self.pk:
             if LocationData.objects.filter(location=self.location, location_property=self.location_property).exists():
                 raise ValidationError(
-                    _("Property %(property)s already exists for location %(location)s"),
+                    _("De locatie eigenschap %(property)s bestaat al voor locatie %(location)s."),
                     code='unique',
                     params={
                         'property': self.location_property.label,
@@ -138,7 +145,7 @@ class LocationData(models.Model):
         if self.location_property.unique:
             if LocationData.objects.filter(location_property=self.location_property,value=self.value).exclude(location=self.location).exists():
                 raise ValidationError(
-                    _("Value %(value)s already exists for property %(property)s"),
+                    _("Waarde %(value)s bestaat al voor eigenschap %(property)s."),
                     code='unique',
                     params={
                         'value': self.value,
@@ -150,15 +157,10 @@ class LocationData(models.Model):
         # Validate for required properties
         if self.location_property.required and not(self.value or self.property_option):
             raise ValidationError(
-                _("Value required for %(property)s"),
+                _("Waarde verplicht voor %(property)s"),
                 code='required',
                 params={'property': self.location_property.label}
             )
-        
-        # Validate the value (property_type CHOICE will always be skipped because value should always be empty)
-        if self.value:
-            LocationDataValidator().validate(
-                location_property=self.location_property, value=self.value)
 
 
 class ExternalService(models.Model):
