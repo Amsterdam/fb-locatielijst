@@ -163,7 +163,7 @@ class LocationImportView(LoginRequiredMixin, View):
                         message = f"Rij {i+1} is niet verwerkt want deze heeft teveel kolommen"
                         messages.add_message(request, messages.WARNING, message)
                         continue
-                    
+
                     # Initiatie a location processor with the row data
                     location = LocationProcessor(data=row, include_private_properties=request.user.is_authenticated)
                     try:

@@ -355,7 +355,7 @@ class TestLocationProcessor(TestCase):
 
     def test_location_update(self):
         '''
-        Test if a LocationProcessor object can be updated thourgh the location processor'''
+        Test if a LocationProcessor object can be updated through the location processor'''
         # Create and save a Location
         LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
 
