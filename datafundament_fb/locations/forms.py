@@ -76,6 +76,7 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
                 else:
                     choice_list = [('', '')]
 
+                # For multiple choice fileds, select the appropriate field and widget
                 if location_property.multiple:
                     fields[location_property.short_name] = forms.MultipleChoiceField(
                         choices=choice_list,

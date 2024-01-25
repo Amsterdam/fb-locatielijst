@@ -161,10 +161,6 @@ class LocationData(models.Model):
                 code='required',
                 params={'property': self.location_property.label}
             )
-        
-        # Validate the value (property_type CHOICE will always be skipped because value should always be empty)
-        if self.value:
-            get_locationdata_validator(self.location_property, self.value)
 
 
 class ExternalService(models.Model):
