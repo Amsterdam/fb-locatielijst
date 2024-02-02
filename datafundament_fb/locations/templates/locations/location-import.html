@@ -32,16 +32,15 @@
     <li>Nieuwe waardes voor keuzelijstje worden automatisch toegevoegd</li>
 </ul>
 </p>
-<form action="." method="POST" enctype="multipart/form-data">
+<form action="." method="POST" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     <fieldset class="module aligned">
         {% for field in form %}
-        <div class="form-row">
-            {{ field.label_tag }} {{ field }}
-            {% if field.help_text %}
-            <div class="help">{{ field.help_text|safe }}</div>
-            {% endif %}
-            </div>
+        <div class="data-label"><label for="{{ field.auto_id }}">{{ field.label }}</label></div>
+        <div class="data-value">
+            {{ field }}
+            {{ field.errors }}
+        </div>
         {% endfor %}
     </fieldset>
     <div class="btn-container">

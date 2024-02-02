@@ -21,7 +21,7 @@
 
 {% block content %}
 <h2>Nieuwe locatie</h2>
-<form action="." method="POST">
+<form action="." method="POST" novalidate>
     <div class="data-view">
         {% csrf_token %}
         <div class="data-view-row">
