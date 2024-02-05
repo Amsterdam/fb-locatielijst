@@ -219,7 +219,7 @@ class TestLocationProcessor(TestCase):
 
         # Verify the error message
         self.assertEqual(
-            validation_error.exception.message,
+            validation_error.exception.error_list[0].message,
             f"'Tomato' is geen geldige invoer voor {self.choice_property.label}."
         )
 
@@ -237,7 +237,7 @@ class TestLocationProcessor(TestCase):
 
         # Verify the error message
         self.assertEqual(
-            validation_error.exception.message,
+            validation_error.exception.error_list[0].message,
             f"'Tomato' is geen geldige invoer voor {self.multichoice_property.label}."
         )
 
@@ -268,7 +268,7 @@ class TestLocationProcessor(TestCase):
             location.validate()
         # Verify the error message
         self.assertEqual(
-            validation_error.exception.message,
+            validation_error.exception.error_list[0].message,
             f"'Misschien' is geen geldige boolean.",
         )
 

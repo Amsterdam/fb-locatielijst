@@ -76,7 +76,7 @@ class ChoiceValidator:
     def __init__(self, location_property):
         self.location_property = location_property
 
-    def __call__(self, value):
+    def __call__(self, value)-> str:
         # get related choice options, compare value in model with value from field
         # this validation will not work when called from clean() in LocationData because the value should be empty (but this is not enforced in the model)
         allowed_options = self.location_property.propertyoption_set.values_list('option', flat=True)            
@@ -115,3 +115,22 @@ def get_locationdata_validator(location_property, value):
             case 'CHOICE':
                 validator = ChoiceValidator(location_property)
                 return validator(value)
+
+
+@deconstructible
+class LocationNameValidator():
+    """Custom validation to check if the name is unique"""
+    def __init__(self, id):
+        self.id = id
+
+    def __call__(self, value)-> str:
+        from locations.models import Location
+
+        # An existing instance mustn't be included in the queryset; otherwise you can't update the instance itself
+        if self.id:
+            if Location.objects.filter(name=value).exclude(id=id).exists():
+                raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")
+        else:
+            if Location.objects.filter(name=value).exists():
+                raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")  
+        return value
