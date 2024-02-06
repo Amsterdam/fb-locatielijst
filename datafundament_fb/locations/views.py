@@ -58,7 +58,6 @@ class LocationCreateView(LoginRequiredMixin, View):
 
             except ValidationError as err:
                 # Return error message when the location is not saved
-                # TODO: err message is not pretty, could be better
                 message = f"Fout bij het aanmaken van de locatie: {err}."
                 messages.error(request, message)
                 context = {'form': form}
@@ -99,7 +98,6 @@ class LocationUpdateView(LoginRequiredMixin, View):
             
             except ValidationError as err:
                 # Return error message when the location is not saved
-                # TODO: err message is not pretty, could be better
                 message = f"Fout bij het updaten van de locatie: {err}."
                 messages.error(request, message)
                 context = {'form': form, 'location_data': location_data.get_dict()}
@@ -175,7 +173,8 @@ class LocationImportView(LoginRequiredMixin, View):
                         messages.add_message(request, messages.SUCCESS, message)
 
                     except ValidationError as err:
-                        message = f"Fout bij het importeren voor locatie {row['naam']}: {err.message}"
+                        error_messages = [error.message for error in err.error_list]
+                        message = f"Fout bij het importeren voor locatie {row['naam']}: {error_messages}"
                         messages.add_message(request, messages.ERROR, message)
             else:
                 message = f"{csv_file.name} is geen gelding CSV bestand."

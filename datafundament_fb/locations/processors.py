@@ -1,4 +1,5 @@
 from typing import Self
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -166,11 +167,19 @@ class LocationProcessor():
         """
         Validate class specific properties
         """
+        validation_errors = []
+
         for location_property in self.location_property_instances:
             # Validate the value of every location property
             value = getattr(self, location_property.short_name)
             if value:
-                get_locationdata_validator(location_property, value)
+                try:
+                    get_locationdata_validator(location_property, value)
+                except ValidationError as validation_error:
+                    validation_errors.append(validation_error)
+
+        if validation_errors:
+            raise ValidationError([validation_errors])
 
     def save(self)-> Location:
         """

@@ -189,7 +189,7 @@ class LocationCreateViewTest(TestCase):
         
         # Verify the response
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['form'].is_valid())
+        self.assertFalse(response.context['form'].is_valid())
         self.assertTemplateUsed(response, 'locations/location-create.html')
 
         # Verify the response messages
@@ -197,8 +197,12 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het aanmaken van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}."
+            "Niet alle velden zijn juist ingevuld."
         )
+
+        # Verify the form error
+        form_errors = response.context['form'].errors
+        self.assertEqual(form_errors['naam'][0], f"Er bestaat al een locatie met de naam '{data['naam']}'.")
 
 
 class LocationUpdateViewTest(TestCase):
@@ -300,7 +304,7 @@ class LocationUpdateViewTest(TestCase):
         
         # Verify the response
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['form'].is_valid())
+        self.assertFalse(response.context['form'].is_valid())
         self.assertTemplateUsed(response, 'locations/location-update.html')
 
         # Verify the response messages
@@ -308,8 +312,12 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(messages[0].tags, 'error')
         self.assertEqual(
             messages[0].message,
-            "Fout bij het updaten van de locatie: {'name': ['Er bestaat al een Locatie met eenzelfde Naam.']}."
+            "Niet alle velden zijn juist ingevuld."
         )
+
+        # Verify the form error
+        form_errors = response.context['form'].errors
+        self.assertEqual(form_errors['naam'][0], f"Er bestaat al een locatie met de naam '{data['naam']}'.")
 
 
 class TestLocationImportForm(TestCase):
@@ -428,7 +436,7 @@ class TestLocationImportForm(TestCase):
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[1].tags, 'error')
-        self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: 'Misschien' is geen geldige boolean.")
+        self.assertEqual(messages[1].message, "Fout bij het importeren voor locatie Amstel 1: [\"'Misschien' is geen geldige boolean.\", \"'Yellow' is geen geldige invoer voor Choice.\"]")
 
 
     def test_import_csv_wrong_delimiter(self):
