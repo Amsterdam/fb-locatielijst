@@ -27,7 +27,7 @@
 {% block content %}
 <h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
 
-<form action="." method="POST">
+<form action="." method="POST" novalidate>
     <div class="data-view">
         {% csrf_token %}
         <div class="data-view-row">

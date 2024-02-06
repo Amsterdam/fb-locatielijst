@@ -181,10 +181,10 @@ class LocationImportView(LoginRequiredMixin, View):
                 message = f"{csv_file.name} is geen gelding CSV bestand."
                 messages.add_message(request, messages.ERROR, message)
         else:
-            message = f"Het formulier is niet juist ingevuld, verhelp de volgende problemen: {form.errors}"
+            message = f"Het formulier is niet juist ingevuld."
             messages.add_message(request, messages.ERROR, message)
-        
-        return HttpResponseRedirect(reverse('location-import'))
+        context = {'form': form}
+        return render(request, template_name=self.template_name, context=context)        
     
 
 class LocationExportView(View):

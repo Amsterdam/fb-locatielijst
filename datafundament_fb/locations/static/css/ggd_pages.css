@@ -91,9 +91,23 @@ input, textarea, select, .form-row p, form .button {
   font-size: 1rem;
 }
 
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button:hover,
+input::-webkit-inner-spin-button:hover,
+input::-webkit-outer-spin-button:focus,
+input::-webkit-inner-spin-button:focus {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 
 @media screen and (max-width: 839px) {
-
   .page-content {
     flex-direction: column-reverse;
   }
