@@ -71,10 +71,10 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
                 )
             case 'CHOICE':
                 # Fill option list with related PropertyOptions
-                if location_property.propertyoption_set.values_list('option', flat=True):
-                    choice_list = [(option, option) for option in location_property.propertyoption_set.values_list('option', flat=True)]
+                if (options := location_property.propertyoption_set.values_list('option', flat=True)):
+                    choice_list = [(option, option) for option in options]
                 else:
-                    choice_list = [('', '')]
+                    choice_list = []
 
                 # For multiple choice fileds, select the appropriate field and widget
                 if location_property.multiple:
