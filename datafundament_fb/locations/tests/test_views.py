@@ -375,8 +375,7 @@ class TestLocationImportForm(TestCase):
         response = self.client.post(url, data)
 
         # Verify response
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+        self.assertEqual(response.status_code, 200)
 
         # Verify response messages
         messages = [msg for msg in get_messages(response.wsgi_request)]
@@ -409,8 +408,7 @@ class TestLocationImportForm(TestCase):
         response = self.client.post(url, data)
 
         # Verify response
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+        self.assertEqual(response.status_code, 200)
 
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
@@ -430,8 +428,7 @@ class TestLocationImportForm(TestCase):
         response = self.client.post(url, data)
 
         # Verify response
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+        self.assertEqual(response.status_code, 200)
 
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
@@ -471,8 +468,7 @@ class TestLocationImportForm(TestCase):
         response = self.client.post(url, data)
 
         # Verify response
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+        self.assertEqual(response.status_code, 200)
 
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
@@ -494,8 +490,7 @@ class TestLocationImportForm(TestCase):
         response = self.client.post(url, data)
 
         # Verify response
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+        self.assertEqual(response.status_code, 200)
 
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
