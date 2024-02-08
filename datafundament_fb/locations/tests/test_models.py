@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.deletion import RestrictedError
 from django.db.utils import IntegrityError
 from django.db import transaction
-from locations.models import *
+from locations.models import compute_pandcode, validate_short_name, Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 from locations import validators
 
 
