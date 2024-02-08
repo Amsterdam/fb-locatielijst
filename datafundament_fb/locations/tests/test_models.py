@@ -1,9 +1,10 @@
 import unittest.mock as mock
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.db.models.deletion import RestrictedError
 from django.db.utils import IntegrityError
 from django.db import transaction
-from locations.models import compute_pandcode, validate_short_name, Location, LocationProperty, PropertyOption, LocationData
+from locations.models import compute_pandcode, validate_short_name, Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 from locations import validators
 
 
@@ -413,3 +414,102 @@ class TestLocationDataModel(TestCase):
         for item in Location.objects.get(pandcode=self.location.pandcode).locationdata_set.all():
             self.assertEqual(item.location, self.location)
             self.assertEqual(item.location_property, self.string_property)
+
+
+class TestReferencedModelOnDelete(TestCase):
+    """
+    Explicity test the on_delete attribute for models with foreign keys
+    """
+
+    def setUp(self) -> None:
+        self.location = Location.objects.create(pandcode=25000, name='Stadhuis')
+        self.location_property = LocationProperty.objects.create(
+            short_name='property', label='Location property', property_type='CHOICE')
+        self.property_option = PropertyOption.objects.create(
+            location_property=self.location_property, option='Optiewaarde 1')
+        self.location_data = LocationData.objects.create(
+            location=self.location, location_property=self.location_property, property_option=self.property_option)
+        self.external_service = ExternalService.objects.create(
+            name='Externe service', short_name='ext_srv')
+        self.location_external_service = LocationExternalService.objects.create(
+            location=self.location, external_service=self.external_service, external_location_code='code'
+        )
+
+    def test_location_cascading(self):
+        """
+        When deleting a location, referenced intances in LocationData
+        and LocationExternalService should also be removed from the database
+        """
+
+        # Delete the Location
+        self.location.delete()
+        
+        # Verify cascading of the referenced models
+        # There should be 0 instances left of the following models
+        self.assertEqual(len(Location.objects.all()), 0)
+        self.assertEqual(len(LocationData.objects.all()), 0)
+        self.assertEqual(len(LocationExternalService.objects.all()), 0)
+
+        # There should be 1 instance left of the following models
+        self.assertEqual(len(LocationProperty.objects.all()), 1)
+        self.assertEqual(len(PropertyOption.objects.all()), 1)
+        self.assertEqual(len(ExternalService.objects.all()), 1)
+
+    def test_location_property_cascading(self):
+        """
+        When deleting a location property, referenced instances in LocationData and
+        PropertyOptions should als be removed  
+        """
+        # Delete the LocationProperty
+        self.location_property.delete()
+
+        # Verify cascading of the referenced models
+        # There should be 0 instances left of the following models
+        self.assertEqual(len(LocationProperty.objects.all()), 0)
+        self.assertEqual(len(LocationData.objects.all()), 0)
+        self.assertEqual(len(PropertyOption.objects.all()), 0)
+
+        # There should be 1 instance left of the following models
+        self.assertEqual(len(Location.objects.all()), 1)
+        self.assertEqual(len(ExternalService.objects.all()), 1)
+        self.assertEqual(len(LocationExternalService.objects.all()), 1)
+
+    def test_property_option_restriction(self):
+        """
+        When deleting a property option, restriction should be enforced
+        if there is a referenced LocationData instance
+        """
+
+        # Deleting a referenced PropertyOption should result in a restriction exception 
+        self.assertRaises(RestrictedError, self.property_option.delete)
+
+        # There should be 1 instances left of the following models
+        self.assertEqual(len(PropertyOption.objects.all()), 1)
+        self.assertEqual(len(LocationProperty.objects.all()), 1)
+        self.assertEqual(len(LocationData.objects.all()), 1)
+        self.assertEqual(len(Location.objects.all()), 1)
+        self.assertEqual(len(ExternalService.objects.all()), 1)
+        self.assertEqual(len(LocationExternalService.objects.all()), 1)
+
+        # Delete the referenced LocationData instance
+        self.location_data.delete()
+        # Verify that there are no LocationData instances
+        self.assertEqual(len(LocationData.objects.all()), 0)
+
+        # Deletion should now be possible
+        self.property_option.delete()
+        # Verify that there is no PropertyOption anymore
+        self.assertEqual(len(PropertyOption.objects.all()), 0)
+
+    def test_external_service_cascading(self):
+        """
+        When an ExternalService instance is deleted, the referenced LocationExternalService instance
+        should als be removed
+        """
+
+        # Delete the ExternalService
+        self.external_service.delete()
+
+        # Verify that the ExternalService and referenced LocationExternalService instance has been deleted
+        self.assertEqual(len(ExternalService.objects.all()), 0)
+        self.assertEqual(len(LocationExternalService.objects.all()), 0)

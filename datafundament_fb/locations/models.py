@@ -109,7 +109,7 @@ class LocationData(models.Model):
     '''
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
-    property_option = models.ForeignKey(PropertyOption, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Optie')
+    property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
     value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
     last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True)
 
