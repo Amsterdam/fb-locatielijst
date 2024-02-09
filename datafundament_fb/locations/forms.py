@@ -123,16 +123,16 @@ class LocationDataForm(forms.Form):
     # Model fields pandcode and last_modified from the Location model are added in the View
 
     def __init__(self, *args, **kwargs):
-        # Set and remove include_private_properties argument before calling init
-        include_private_properties = kwargs.pop('include_private_properties', None)  
+        # Set and remove pandcode and include_private_properties argument before calling init
+        pandcode = kwargs.pop('pandcode', None)
+        include_private_properties = kwargs.pop('include_private_properties', None)
         super().__init__(*args, **kwargs)
 
         # Add location name field for custom validation
-        id = self.data.get('id', None) if getattr(self, 'data') else None
         self.fields['naam'] = forms.CharField(
             label='Naam',
             required=True,
-            validators=[validators.LocationNameValidator(id=id)],
+            validators=[validators.LocationNameValidator(pandcode=pandcode)],
             widget=forms.TextInput,
         )
 

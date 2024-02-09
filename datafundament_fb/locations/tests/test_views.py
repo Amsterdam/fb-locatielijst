@@ -253,8 +253,8 @@ class LocationUpdateViewTest(TestCase):
 
     def test_post_view(self):
         """Test posting the update form"""
-        # Data for the form 
-        data = {'naam': 'Amstel 1', 'property': '10', 'multi': ['Team 1','Team 2']}
+        # Data for the form
+        data = {'naam': 'Stopera', 'property': '11', 'multi': ['Team 1']}
         url = reverse('location-update', args=[self.location.pandcode])
         # Request the post for the form
         response = self.client.post(path=url, data=data)

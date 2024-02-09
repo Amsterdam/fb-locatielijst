@@ -83,7 +83,7 @@ class LocationUpdateView(LoginRequiredMixin, View):
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, include_private_properties=request.user.is_authenticated)
+        form = self.form(request.POST, pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
         # Get loction data  depending on user context; include_private_properties == True is all location properties
         location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
 
@@ -104,7 +104,7 @@ class LocationUpdateView(LoginRequiredMixin, View):
                 
                 return render(request, template_name=self.template, context=context)
 
-            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))           
+            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
 
         message = f"Niet alle velden zijn juist ingevuld."
         messages.error(request, message)
