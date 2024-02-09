@@ -135,6 +135,7 @@ class LocationDataForm(forms.Form):
             validators=[validators.LocationNameValidator(pandcode=pandcode)],
             widget=forms.TextInput,
         )
+        self.fields['archief'] = forms.BooleanField(label='Archief', required=False,widget=forms.CheckboxInput)
 
         # Add the location property fields to this form
         self.fields.update(set_location_property_fields(include_private_properties=include_private_properties))

@@ -59,7 +59,7 @@ class LocationProcessor():
         Get location data fields from the Location model and LocationProperties 
         """
         # List to hold all location data items, starting with fields from Location
-        self.location_properties = list(['pandcode', 'naam'])
+        self.location_properties = list(['pandcode', 'naam', 'archief'])
 
         # Get all location properties and add the names to the location properties list
         # List is filtered for private accessibility
@@ -115,6 +115,7 @@ class LocationProcessor():
         setattr(object, 'naam', getattr(object.location_instance, 'name'))
         last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
         setattr(object, 'gewijzigd', last_modified)
+        setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
 
         # Add location properties to the object; filter to include non-public properties
         if object.include_private_properties:
@@ -193,6 +194,7 @@ class LocationProcessor():
             self.location_instance = Location.objects.get(pandcode=self.pandcode)
             # Update the attributes for the Location model instance
             setattr(self.location_instance, 'name', getattr(self, 'naam'))
+            setattr(self.location_instance, 'is_archived', getattr(self, 'archief'))
         else:
             # When importing locations, pandcode exists
             if getattr(self, 'pandcode'):

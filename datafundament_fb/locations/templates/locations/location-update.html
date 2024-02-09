@@ -26,7 +26,9 @@
 
 {% block content %}
 <h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
-
+{% if location_data.archief %}
+<h3>Gearchiveerd</h3>
+{% endif %}
 <form action="." method="POST" novalidate>
     <div class="data-view">
         {% csrf_token %}
@@ -48,6 +50,7 @@
         <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'location-update' location_data.pandcode %}">Opslaan</button>
         <a href="{% url 'location-detail' location_data.pandcode %}" class="btn btn-secundair">Annuleren</a>
     </div>
+    
 </form>
 
 {% endblock %}

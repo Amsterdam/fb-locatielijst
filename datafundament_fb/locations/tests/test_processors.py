@@ -67,6 +67,7 @@ class TestLocationProcessor(TestCase):
         expected_location_properties = {
             'pandcode',
             'naam',
+            'archief',
             'occupied',
             'build',
         }
@@ -94,6 +95,7 @@ class TestLocationProcessor(TestCase):
         expected_location_properties = {
             'pandcode',
             'naam',
+            'archief',
             'occupied',
             'build',
             'mail',

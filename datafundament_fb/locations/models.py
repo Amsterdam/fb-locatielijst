@@ -29,7 +29,8 @@ class Location(models.Model):
     pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
     name = models.CharField(verbose_name='Naam', max_length=100)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
-    
+    is_archived = models.BooleanField(verbose_name="Archief", default=False)
+
     def __str__(self):
         return f'{self.pandcode}, {self.name}'
 
