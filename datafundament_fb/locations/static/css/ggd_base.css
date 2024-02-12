@@ -61,6 +61,9 @@ html[data-theme="light"] {
   --header-link-color: #000000;
   --color-blue: #004699;
   --color-dark-blue: #00387a;
+  --color-red: #EC0000;
+  --color-green: #00A03C;
+  --color-yellow: #FFE600;
   --color-grey: #b4b4b4;
   --color-white: #ffffff;
   --color-black: #000000;
