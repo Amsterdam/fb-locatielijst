@@ -42,10 +42,19 @@
     </div>
     {% endfor %}
 </dl>
-
 <div class="btn-container">
     {% if user.is_authenticated %}
+    <form action="." method="POST">
+    {% csrf_token %}
+    {% if location_data.archief %}
+    <input name="_archive" type="hidden" value="dearchive">
+    {% else %}
     <a href="{% url 'location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
+    <input name="_archive" type="hidden" value="archive">
+    {% endif %}
+    <button class="btn btn-secundair" type="submit"
+        formaction="{% url 'location-detail' location_data.pandcode %}">{{ location_data.archief|yesno:"Dearchiveren,Archiveren" }}</button>
+    </form>
     {% endif %}
     <a href="{% url 'location-list' %}" class="btn btn-secundair">Terug</a>
 </div>

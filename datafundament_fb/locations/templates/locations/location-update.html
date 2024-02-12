@@ -26,9 +26,6 @@
 
 {% block content %}
 <h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
-{% if location_data.archief %}
-<h3>Gearchiveerd</h3>
-{% endif %}
 <form action="." method="POST" novalidate>
     <div class="data-view">
         {% csrf_token %}

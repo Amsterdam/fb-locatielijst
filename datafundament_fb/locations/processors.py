@@ -59,7 +59,7 @@ class LocationProcessor():
         Get location data fields from the Location model and LocationProperties 
         """
         # List to hold all location data items, starting with fields from Location
-        self.location_properties = list(['pandcode', 'naam', 'archief'])
+        self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
         # List is filtered for private accessibility
@@ -161,6 +161,7 @@ class LocationProcessor():
         
         # Add last_modified date to the dictionary
         dictionary['gewijzigd'] = getattr(self, 'gewijzigd', None)
+        dictionary['archief'] = getattr(self, 'archief', None)
 
         return dictionary
 
@@ -194,7 +195,6 @@ class LocationProcessor():
             self.location_instance = Location.objects.get(pandcode=self.pandcode)
             # Update the attributes for the Location model instance
             setattr(self.location_instance, 'name', getattr(self, 'naam'))
-            setattr(self.location_instance, 'is_archived', getattr(self, 'archief'))
         else:
             # When importing locations, pandcode exists
             if getattr(self, 'pandcode'):

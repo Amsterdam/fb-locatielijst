@@ -87,6 +87,47 @@ class LocationDetailViewTest(TestCase):
         value = [self.multichoice_option1.option, self.multichoice_option2.option]
         self.assertEqual(response.context['location_data']['multi'], value)
 
+    def test_post_view_to_archive(self):
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Verifiy that the location is not archived
+        location = Location.objects.get(pandcode=self.location.pandcode)
+        self.assertFalse(location.is_archived)
+
+        # Post to the location detail page
+        url = reverse('location-detail', args=[self.location.pandcode])
+        data = {'_archive': ['archive'],}
+        response = self.client.post(path=url, data=data)
+
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('location-detail', args=[self.location.pandcode])
+        self.assertEqual(response.url, url)
+
+        # Verify that the location is archived now
+        location.refresh_from_db()
+        self.assertTrue(location.is_archived)
+
+    def test_post_view_to_archive_anonymous(self):
+        # Log out the user
+        self.client.logout()
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Verifiy that the location is not archived
+        location = Location.objects.get(pandcode=self.location.pandcode)
+        self.assertFalse(location.is_archived)
+
+        # Post to the location detail page
+        url = reverse('location-detail', args=[self.location.pandcode])
+        data = {'_archive': ['archive'],}
+        response = self.client.post(path=url, data=data)
+
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('admin:login') + '?next=' + reverse('location-detail', args=[self.location.pandcode])
+        self.assertEqual(response.url, url)
+
+        # Verify that the location is not archived
+        location.refresh_from_db()
+        self.assertFalse(location.is_archived)
 
 class LocationCreateViewTest(TestCase):
     """
@@ -131,7 +172,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-create.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        location_data_names = ['naam', 'archief', self.multichoice_property.short_name, self.integer_property.short_name, ]
+        location_data_names = ['naam', self.multichoice_property.short_name, self.integer_property.short_name, ]
         self.assertListEqual(location_data_names, field_names)
         
     def test_post_view(self):
@@ -248,7 +289,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-update.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        location_data_names = ['naam', 'archief', self.multichoice_property.short_name, self.integer_property.short_name, ]
+        location_data_names = ['naam', self.multichoice_property.short_name, self.integer_property.short_name, ]
         self.assertListEqual(location_data_names, field_names)
 
     def test_post_view(self):
