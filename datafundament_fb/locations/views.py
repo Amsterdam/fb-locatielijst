@@ -40,7 +40,7 @@ class LocationDetailView(View):
     
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        pandcode = self.kwargs['id']
+        pandcode = self.kwargs['pandcode']
         
         # Set is_archived based on _archive value
         location = Location.objects.get(pandcode=pandcode)
