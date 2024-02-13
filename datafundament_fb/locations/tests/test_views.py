@@ -93,7 +93,7 @@ class LocationDetailViewTest(TestCase):
         location = Location.objects.get(pandcode=self.location.pandcode)
         self.assertFalse(location.is_archived)
 
-        # Post to the location detail page
+        # Post to the location detail page to archive the location
         url = reverse('location-detail', args=[self.location.pandcode])
         data = {'_archive': ['archive'],}
         response = self.client.post(path=url, data=data)
@@ -106,6 +106,15 @@ class LocationDetailViewTest(TestCase):
         # Verify that the location is archived now
         location.refresh_from_db()
         self.assertTrue(location.is_archived)
+
+        # Post to the location detail page to de-archive the location
+        url = reverse('location-detail', args=[self.location.pandcode])
+        data = {'_archive': ['dearchive'],}
+        response = self.client.post(path=url, data=data)
+
+        # Verify that the location is archived now
+        location.refresh_from_db()
+        self.assertFalse(location.is_archived)
 
     def test_post_view_to_archive_anonymous(self):
         # Log out the user
