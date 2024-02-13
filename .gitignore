@@ -1,5 +1,6 @@
 # project folders
 .git-ignore/
+datafundament_fb/static/
 
 # project files
 *.sqlite3
