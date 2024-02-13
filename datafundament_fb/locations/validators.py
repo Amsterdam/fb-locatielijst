@@ -120,17 +120,17 @@ def get_locationdata_validator(location_property, value):
 @deconstructible
 class LocationNameValidator():
     """Custom validation to check if the name is unique"""
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, pandcode):
+        self.pandcode = pandcode
 
     def __call__(self, value)-> str:
         from locations.models import Location
 
         # An existing instance mustn't be included in the queryset; otherwise you can't update the instance itself
-        if self.id:
-            if Location.objects.filter(name=value).exclude(id=id).exists():
+        if self.pandcode:
+            if Location.objects.filter(name__iexact=value).exclude(pandcode=self.pandcode).exists():
                 raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")
         else:
-            if Location.objects.filter(name=value).exists():
-                raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")  
+            if Location.objects.filter(name__iexact=value).exists():
+                raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")
         return value
