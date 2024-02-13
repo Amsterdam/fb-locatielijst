@@ -128,9 +128,9 @@ class LocationNameValidator():
 
         # An existing instance mustn't be included in the queryset; otherwise you can't update the instance itself
         if self.pandcode:
-            if Location.objects.filter(name=value).exclude(pandcode=self.pandcode).exists():
+            if Location.objects.filter(name__iexact=value).exclude(pandcode=self.pandcode).exists():
                 raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")
         else:
-            if Location.objects.filter(name=value).exists():
+            if Location.objects.filter(name__iexact=value).exists():
                 raise ValidationError(f"Er bestaat al een locatie met de naam '{value}'.")
         return value

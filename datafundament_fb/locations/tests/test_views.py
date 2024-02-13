@@ -337,8 +337,8 @@ class LocationUpdateViewTest(TestCase):
 
     def test_post_view_validation_error(self):
         """Test posting when a validation error occurs in LocationProcessor"""
-        # Setting the same name as an existing location
-        data = {'naam': 'GGD', 'property': '10'}
+        # Setting the same name as an existing location (case insensitive)
+        data = {'naam': 'ggd', 'property': '10'}
         url = reverse('location-update', args=[self.location.pandcode])
         # Posting the update form
         response = self.client.post(path=url, data=data)

@@ -33,7 +33,7 @@ class LocationDetailView(View):
 
     def get(self, request, *args, **kwargs):
         # Get loction data  depending on user context; include_private_properties == True is all location properties
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
         form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
@@ -93,15 +93,15 @@ class LocationUpdateView(LoginRequiredMixin, View):
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
         form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        form = self.form(request.POST, pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
         # Get loction data  depending on user context; include_private_properties == True is all location properties
-        location_data = LocationProcessor.get(pandcode=self.kwargs['id'], include_private_properties=request.user.is_authenticated)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
             for field in form.cleaned_data:
