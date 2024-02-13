@@ -4,8 +4,8 @@ from locations.views import LocationListView, LocationDetailView, LocationCreate
 urlpatterns = [
     path('', view=LocationListView.as_view(), name='location-list'),
     path('new', view=LocationCreateView.as_view(), name='location-create'),
-    path('<int:id>', view=LocationDetailView.as_view(), name='location-detail'),
-    path('<int:id>/edit', view=LocationUpdateView.as_view(), name='location-update'),
+    path('<int:pandcode>', view=LocationDetailView.as_view(), name='location-detail'),
+    path('<int:pandcode>/edit', view=LocationUpdateView.as_view(), name='location-update'),
     path('import', LocationImportView.as_view(), name='location-import'),
     path('export', view=LocationExportView.as_view(), name='location-export'),
 ]
