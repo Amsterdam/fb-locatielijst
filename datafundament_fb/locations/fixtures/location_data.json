@@ -1186,5 +1186,38 @@
         "value": "486752,0",
         "last_modified": "2024-01-06"
     }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 117,
+    "fields": {
+        "location": 1,
+        "location_property": 34,
+        "property_option": null,
+        "value": "4.89940203",
+        "last_modified": "2024-02-14"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 118,
+    "fields": {
+        "location": 1,
+        "location_property": 35,
+        "property_option": null,
+        "value": "52.36765925",
+        "last_modified": "2024-01-06"
+    }
+},
+{
+    "model": "locations.locationdata",
+    "pk": 119,
+    "fields": {
+        "location": 1,
+        "location_property": 26,
+        "property_option": null,
+        "value": "34632",
+        "last_modified": "2024-01-06"
+    }
 }
 ]

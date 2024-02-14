@@ -30,6 +30,16 @@ def valid_email(value)-> str:
             f"'{value}' is geen geldig e-mail adres.")
     return value
 
+def valid_geolocation(value)-> str:
+    """Validator for Geolocation type location property"""
+    # Resolution is up 1mm (8 decimals)
+    geolocation_regex = '^\d{1,2}\.\d{1,8}$'
+    # Check for geolocation format
+    if re.match(geolocation_regex, value):
+        return value
+    else:
+        raise ValidationError(f"'{value}' is geen geldige geo coördinaat.")
+
 def valid_integer(value)-> str:
     """Validator for Integer type location property"""
     int_regex = r'^-?\d+(,\d+)?$'
@@ -102,6 +112,8 @@ def get_locationdata_validator(location_property, value):
                 return valid_date(value)
             case 'EMAIL':
                 return valid_email(value)
+            case 'GEO':
+                return valid_geolocation(value)
             case 'INT':
                 return valid_integer(value)
             case 'MEMO':

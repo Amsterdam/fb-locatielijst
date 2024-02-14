@@ -453,7 +453,7 @@
         "fields": {
             "short_name": "longitude",
             "label": "Longitude",
-            "property_type": "INT",
+            "property_type": "GEO",
             "required": false,
             "multiple": false,
             "unique": false,
@@ -467,7 +467,7 @@
         "fields": {
             "short_name": "latitude",
             "label": "Latitude",
-            "property_type": "INT",
+            "property_type": "GEO",
             "required": false,
             "multiple": false,
             "unique": false,

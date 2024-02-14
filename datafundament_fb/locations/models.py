@@ -51,6 +51,7 @@ class LocationProperty(models.Model):
         BOOL = 'BOOL', 'Boolean'
         DATE = 'DATE', 'Datum'
         EMAIL = 'EMAIL', 'E-mail'
+        GEO = 'GEO', 'Geolocatie'
         INT = 'INT', 'Numeriek'
         MEMO = 'MEMO', 'Memo'
         POST = 'POST', 'Postcode'

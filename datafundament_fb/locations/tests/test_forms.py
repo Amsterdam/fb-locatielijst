@@ -13,6 +13,8 @@ class TestLocationDataForm(TestCase):
             short_name='date', label='Date', property_type='DATE')
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='Email', property_type='EMAIL')
+        self.geolocation_property = LocationProperty.objects.create(
+            short_name='geo', label='Geolocation', property_type='GEO')
         self.integer_property = LocationProperty.objects.create(
             short_name='int', label='Integer', property_type='INT')
         self.memo_property = LocationProperty.objects.create(
@@ -60,6 +62,11 @@ class TestLocationDataForm(TestCase):
         field = self.location_data_form.fields[self.email_property.short_name] 
         self.assertIsInstance(field, forms.CharField)
         self.assertEqual(field.label, self.email_property.label)
+
+        # Geolocation field
+        field = self.location_data_form.fields[self.geolocation_property.short_name] 
+        self.assertIsInstance(field, forms.CharField)
+        self.assertEqual(field.label, self.geolocation_property.label)
 
         # Integer field
         field = self.location_data_form.fields[self.integer_property.short_name] 
