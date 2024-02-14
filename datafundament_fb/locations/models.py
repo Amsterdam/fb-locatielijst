@@ -29,6 +29,7 @@ class Location(models.Model):
     pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
     name = models.CharField(verbose_name='Naam', max_length=100)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
     is_archived = models.BooleanField(verbose_name="Archief", default=False)
 
     def __str__(self):
@@ -113,7 +114,8 @@ class LocationData(models.Model):
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
     value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
-    last_modified = models.DateField(verbose_name='Laatste wijziging', auto_now=True)
+    last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
 
     class Meta:
         verbose_name = 'Locatie gegeven'
@@ -192,6 +194,8 @@ class LocationExternalService(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
     external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100, blank=True, null=True)
+    last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
 
     class Meta:
         verbose_name = 'Locatie koppeling'
