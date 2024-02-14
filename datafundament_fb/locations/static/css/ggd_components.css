@@ -1,0 +1,31 @@
+
+.alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  border-width: 4px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.alert.alert-info {
+  background-color: var(--color-yellow);
+  color: var(--color-black);
+}
+
+.alert.alert-error {
+  border-color: var(--color-red);
+}
+
+.alert.alert-success {
+  border-color: var(--color-green);
+}
+
+.alert .title {
+  font-weight: 700;
+}
+
+.alert p:last-child {
+  margin: 0;
+}

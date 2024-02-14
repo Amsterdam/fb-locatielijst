@@ -115,6 +115,7 @@ class LocationProcessor():
         setattr(object, 'naam', getattr(object.location_instance, 'name'))
         last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
         setattr(object, 'gewijzigd', last_modified)
+        setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
 
         # Add location properties to the object; filter to include non-public properties
         if object.include_private_properties:
@@ -160,6 +161,7 @@ class LocationProcessor():
         
         # Add last_modified date to the dictionary
         dictionary['gewijzigd'] = getattr(self, 'gewijzigd', None)
+        dictionary['archief'] = getattr(self, 'archief', None)
 
         return dictionary
 

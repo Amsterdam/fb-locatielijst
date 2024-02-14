@@ -1,5 +1,6 @@
 import csv
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -8,6 +9,7 @@ from django.views import View
 from django.views.generic import View, ListView
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from locations.forms import LocationDataForm, LocationImportForm
 from locations.models import Location
 from locations.processors import LocationProcessor
@@ -35,7 +37,21 @@ class LocationDetailView(View):
         form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
-
+    
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        pandcode = self.kwargs['pandcode']
+        
+        # Set is_archived based on _archive value
+        location = Location.objects.get(pandcode=pandcode)
+        if request.POST['_archive'] == 'archive':
+            location.is_archived = True
+        if request.POST['_archive'] == 'dearchive':
+            location.is_archived = False
+        location.save()
+        
+        # return to the location-detail page
+        return HttpResponseRedirect(reverse('location-detail', args=[pandcode]))
 
 class LocationCreateView(LoginRequiredMixin, View):
     form = LocationDataForm

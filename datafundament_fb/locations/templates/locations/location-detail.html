@@ -22,6 +22,12 @@
 {% endif %}
 
 {% block content %}
+{% if location_data.archief %}
+<div class="alert alert-info">
+    <div class="title">Gearchiveerd</div>
+    <p>De locatie is gearchiveerd op {{ location_data.gewijzigd }}.</p>
+</div>
+{% endif %}
 <h2>{{ location_data.pandcode }} - {{ location_data.naam }}</h2>
 <small>
     Locatie gewijzigd op {{ location_data.gewijzigd }}
@@ -39,10 +45,22 @@
     </div>
     {% endfor %}
 </dl>
-
 <div class="btn-container">
     {% if user.is_authenticated %}
-    <a href="{% url 'location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
+        {% if not location_data.archief %}
+        <a href="{% url 'location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
+        {% endif %}
+
+        <form action="." method="POST">
+            {% csrf_token %}
+            {% if location_data.archief %}
+            <input name="_archive" type="hidden" value="dearchive">
+            {% else %}
+            <input name="_archive" type="hidden" value="archive">
+            {% endif %}
+            <button class="btn btn-secundair" type="submit"
+                formaction="{% url 'location-detail' location_data.pandcode %}">{{ location_data.archief|yesno:"Dearchiveren,Archiveren" }}</button>
+        </form>
     {% endif %}
     <a href="{% url 'location-list' %}" class="btn btn-secundair">Terug</a>
 </div>

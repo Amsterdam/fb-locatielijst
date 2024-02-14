@@ -87,6 +87,56 @@ class LocationDetailViewTest(TestCase):
         value = [self.multichoice_option1.option, self.multichoice_option2.option]
         self.assertEqual(response.context['location_data']['multi'], value)
 
+    def test_post_view_to_archive(self):
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Verifiy that the location is not archived
+        location = Location.objects.get(pandcode=self.location.pandcode)
+        self.assertFalse(location.is_archived)
+
+        # Post to the location detail page to archive the location
+        url = reverse('location-detail', args=[self.location.pandcode])
+        data = {'_archive': ['archive'],}
+        response = self.client.post(path=url, data=data)
+
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('location-detail', args=[self.location.pandcode])
+        self.assertEqual(response.url, url)
+
+        # Verify that the location is archived now
+        location.refresh_from_db()
+        self.assertTrue(location.is_archived)
+
+        # Post to the location detail page to de-archive the location
+        url = reverse('location-detail', args=[self.location.pandcode])
+        data = {'_archive': ['dearchive'],}
+        response = self.client.post(path=url, data=data)
+
+        # Verify that the location is archived now
+        location.refresh_from_db()
+        self.assertFalse(location.is_archived)
+
+    def test_post_view_to_archive_anonymous(self):
+        # Log out the user
+        self.client.logout()
+        """Test getting the Location Detail View as an anonymous visitor"""
+        # Verifiy that the location is not archived
+        location = Location.objects.get(pandcode=self.location.pandcode)
+        self.assertFalse(location.is_archived)
+
+        # Post to the location detail page
+        url = reverse('location-detail', args=[self.location.pandcode])
+        data = {'_archive': ['archive'],}
+        response = self.client.post(path=url, data=data)
+
+        # Verify the response
+        self.assertEqual(response.status_code, 302)
+        url = reverse('admin:login') + '?next=' + reverse('location-detail', args=[self.location.pandcode])
+        self.assertEqual(response.url, url)
+
+        # Verify that the location is not archived
+        location.refresh_from_db()
+        self.assertFalse(location.is_archived)
 
 class LocationCreateViewTest(TestCase):
     """
