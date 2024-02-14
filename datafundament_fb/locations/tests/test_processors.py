@@ -304,8 +304,10 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(get_location.type, self.location_data_dict['type'])
         self.assertEqual(get_location.multitype, self.location_data_dict['multitype'])
         self.assertEqual(get_location.geo, self.location_data_dict['geo'])
-        # Verify is attribute 'gewijzigd' is filled
+        # Verify other loccation attributes
+        self.assertIsNotNone(get_location.aangemaakt)
         self.assertIsNotNone(get_location.gewijzigd)
+        self.assertFalse(get_location.archief)
 
     def test_location_get_public_properties(self):
         '''
@@ -332,8 +334,26 @@ class TestLocationProcessor(TestCase):
         self.assertIsNone(getattr(get_location, 'type', None))
         self.assertIsNone(getattr(get_location, 'multitype', None))
         self.assertIsNone(getattr(get_location, 'geo', None))
-        # Verify is attribute 'gewijzigd' is filled
+        # Verify other loccation attributes
+        self.assertIsNotNone(get_location.aangemaakt)
         self.assertIsNotNone(get_location.gewijzigd)
+        self.assertFalse(get_location.archief)
+
+    # TODO HERSCHRIJVEN NET ZOALS HIERBOVEN WAARBIJ JE 2 LIJSTEN VERGELIJKT
+    def test_returned_properties_from_get_dict(self):
+        # First create and save an object
+        LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
+        # Get dictionary of the LocationProcessor object
+        location_dict = LocationProcessor.get(self.location_data_dict['pandcode'], include_private_properties=True).get_dict()
+
+        # Set the sets of expected and returned location properties
+        expected_location_properties = {'pandcode', 'naam', 'occupied', 'build', 'mail', 'floors',
+                                        'note', 'postcode', 'color', 'url', 'type', 'multitype',
+                                        'aangemaakt', 'gewijzigd', 'archief'}
+        returned_location_properties = set(location_dict.keys())
+
+        # Location property sets should be equal
+        self.assertEqual(expected_location_properties, returned_location_properties)
 
     def test_dict_method(self):
         '''
@@ -360,8 +380,10 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_dict['type'], self.location_data_dict['type'])
         self.assertEqual(location_dict['multitype'], self.location_data_dict['multitype'])
         self.assertEqual(location_dict['geo'], self.location_data_dict['geo'])
-        # Verify is attribute 'gewijzigd' is filled
+        # Verify other loccation attributes
+        self.assertIsNotNone(location_dict['aangemaakt'])
         self.assertIsNotNone(location_dict['gewijzigd'])
+        self.assertFalse(location_dict['archief'])
 
     def test_location_update(self):
         '''
