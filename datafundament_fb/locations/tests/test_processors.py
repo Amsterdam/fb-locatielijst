@@ -17,8 +17,8 @@ class TestLocationProcessor(TestCase):
             short_name='build', label='build_year', property_type='DATE', required=True, public=True, order=1)
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='mail_address', property_type='EMAIL', required=True, order=2)
-        self.integer_property = LocationProperty.objects.create(
-            short_name='floors', label='number_of_floors', property_type='INT', required=True, order=3)
+        self.number_property = LocationProperty.objects.create(
+            short_name='floors', label='number_of_floors', property_type='NUM', required=True, order=3)
         self.memo_property = LocationProperty.objects.create(
             short_name='note', label='note', property_type='MEMO', required=True, order=4)
         self.postal_code_property = LocationProperty.objects.create(
@@ -174,7 +174,7 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_data[1].value, self.location_data_dict['build'])
         self.assertEqual(location_data[2].location_property, self.email_property)
         self.assertEqual(location_data[2].value, self.location_data_dict['mail'])
-        self.assertEqual(location_data[3].location_property, self.integer_property)
+        self.assertEqual(location_data[3].location_property, self.number_property)
         self.assertEqual(location_data[3].value, self.location_data_dict['floors'])
         self.assertEqual(location_data[4].location_property, self.memo_property)
         self.assertEqual(location_data[4].value, self.location_data_dict['note'])

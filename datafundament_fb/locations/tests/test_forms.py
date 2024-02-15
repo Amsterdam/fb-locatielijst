@@ -15,8 +15,8 @@ class TestLocationDataForm(TestCase):
             short_name='mail', label='Email', property_type='EMAIL')
         self.geolocation_property = LocationProperty.objects.create(
             short_name='geo', label='Geolocation', property_type='GEO')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='int', label='Integer', property_type='INT')
+        self.number_property = LocationProperty.objects.create(
+            short_name='num', label='number', property_type='NUM')
         self.memo_property = LocationProperty.objects.create(
             short_name='memo', label='Memo', property_type='MEMO')
         self.postal_code_property = LocationProperty.objects.create(
@@ -43,7 +43,7 @@ class TestLocationDataForm(TestCase):
 
     def test_location_property_form_fields(self):
         """
-        Test if a form field is set for each location property type, ie:, BOOL, INT, etc 
+        Test if a form field is set for each location property type, ie:, BOOL, NUM, etc 
         """
         
         # Check for all location property fields
@@ -68,10 +68,10 @@ class TestLocationDataForm(TestCase):
         self.assertIsInstance(field, forms.CharField)
         self.assertEqual(field.label, self.geolocation_property.label)
 
-        # Integer field
-        field = self.location_data_form.fields[self.integer_property.short_name] 
+        # number field
+        field = self.location_data_form.fields[self.number_property.short_name] 
         self.assertIsInstance(field, forms.CharField)
-        self.assertEqual(field.label, self.integer_property.label)
+        self.assertEqual(field.label, self.number_property.label)
 
         # Memo field
         field = self.location_data_form.fields[self.memo_property.short_name] 

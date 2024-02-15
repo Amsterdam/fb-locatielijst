@@ -42,11 +42,11 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
                     validators=[validators.valid_geolocation],
                     widget=forms.NumberInput
                 )
-            case 'INT':
+            case 'NUM':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
                     required=location_property.required,
-                    validators=[validators.valid_integer],
+                    validators=[validators.valid_number],
                     widget=forms.NumberInput
                 )
             case 'MEMO':
