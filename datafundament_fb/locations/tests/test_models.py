@@ -111,6 +111,17 @@ class TestLocationDataValidation(TestCase):
         for value in values:
             self.assertRaises(ValidationError, validators.valid_email, value)
 
+    def test_geolocation_validation(self):
+        # Test valid geolocation value
+        values = ['0.01', '12.12345678']
+        for value in values:
+            self.assertEqual(validators.valid_geolocation(value), value)
+
+        # Test for invalid geolocation values
+        values = ['', '-120.345345','4.1234567890123', '5,2349293', '.3453847']
+        for value in values:
+            self.assertRaises(ValidationError, validators.valid_geolocation, value)
+
     def test_int_validation(self):
         # Test valid integer values
         values = ['1', '0', '-100', '-1,1', '0,5', '16,3635']
@@ -219,6 +230,8 @@ class TestGetLocationDataValidate(TestCase):
             short_name='date', label='Date', property_type='DATE')
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='Email', property_type='EMAIL')
+        self.geolocation_property = LocationProperty.objects.create(
+            short_name='geo', label='Geolocation', property_type='GEO')
         self.integer_property = LocationProperty.objects.create(
             short_name='int', label='Integer', property_type='INT')
         self.memo_property = LocationProperty.objects.create(
@@ -251,6 +264,22 @@ class TestGetLocationDataValidate(TestCase):
         value = '31-12-2000'
         validators.get_locationdata_validator(
             location_property=self.date_property, value=value)
+        self.assertTrue(mock.called)
+
+    @mock.patch('locations.validators.valid_email')
+    def test_clean_email(self, mock):
+        # Test if valid_email is called
+        value = 'mail@example.org'
+        validators.get_locationdata_validator(
+            location_property=self.email_property, value=value)
+        self.assertTrue(mock.called)
+
+    @mock.patch('locations.validators.valid_geolocation')
+    def test_clean_geolocation(self, mock):
+        # Test if valid_geolocation is called
+        value = '2.4345'
+        validators.get_locationdata_validator(
+            location_property=self.geolocation_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.valid_integer')

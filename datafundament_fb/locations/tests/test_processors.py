@@ -41,6 +41,8 @@ class TestLocationProcessor(TestCase):
             location_property=self.multichoice_property, option='Team 2')
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 3')
+        self.geolocation_property = LocationProperty.objects.create(
+            short_name='geo', label='geolocation', property_type='GEO', required=True, order=10)
         
         self.location_data_dict = dict({
             'pandcode': '24000',
@@ -55,6 +57,7 @@ class TestLocationProcessor(TestCase):
             'url': 'https://example.org',
             'type': 'Office',
             'multitype': ['Team 1', 'Team 2'],
+            'geo': '1.32234',
         })
 
     def test_set_location_properties_public(self):
@@ -104,6 +107,7 @@ class TestLocationProcessor(TestCase):
             'url',
             'type',
             'multitype',
+            'geo',
         }
 
         # Location fields and properties filtered by _set_location_properties(); added with fields from location
@@ -139,6 +143,7 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_processor.url, self.location_data_dict['url'])
         self.assertEqual(location_processor.type, self.location_data_dict['type'])
         self.assertEqual(location_processor.multitype, self.location_data_dict['multitype'])
+        self.assertEqual(location_processor.geo, self.location_data_dict['geo'])
 
     def test_location_save(self):
         '''
@@ -185,6 +190,8 @@ class TestLocationProcessor(TestCase):
         self.assertIn(location_data[9].property_option.option, self.location_data_dict['multitype'])
         self.assertEqual(location_data[10].location_property, self.multichoice_property)
         self.assertIn(location_data[10].property_option.option, self.location_data_dict['multitype'])
+        self.assertEqual(location_data[11].location_property, self.geolocation_property)
+        self.assertEqual(location_data[11].value, self.location_data_dict['geo'])
 
     @mock.patch('locations.validators.valid_url')
     def test_location_save_atomic(self, mock):
@@ -296,6 +303,7 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(get_location.url, self.location_data_dict['url'])
         self.assertEqual(get_location.type, self.location_data_dict['type'])
         self.assertEqual(get_location.multitype, self.location_data_dict['multitype'])
+        self.assertEqual(get_location.geo, self.location_data_dict['geo'])
         # Verify is attribute 'gewijzigd' is filled
         self.assertIsNotNone(get_location.gewijzigd)
 
@@ -323,6 +331,7 @@ class TestLocationProcessor(TestCase):
         self.assertIsNone(getattr(get_location, 'url', None))
         self.assertIsNone(getattr(get_location, 'type', None))
         self.assertIsNone(getattr(get_location, 'multitype', None))
+        self.assertIsNone(getattr(get_location, 'geo', None))
         # Verify is attribute 'gewijzigd' is filled
         self.assertIsNotNone(get_location.gewijzigd)
 
@@ -350,6 +359,7 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_dict['url'], self.location_data_dict['url'])
         self.assertEqual(location_dict['type'], self.location_data_dict['type'])
         self.assertEqual(location_dict['multitype'], self.location_data_dict['multitype'])
+        self.assertEqual(location_dict['geo'], self.location_data_dict['geo'])
         # Verify is attribute 'gewijzigd' is filled
         self.assertIsNotNone(location_dict['gewijzigd'])
 
@@ -374,6 +384,7 @@ class TestLocationProcessor(TestCase):
         location.url = 'https://another.example.org'
         location.type = 'Shop'
         location.multitype = ['Team 1','Team 3']
+        location.geo = '1.22345'
 
         # Save the updated location object
         location.save()
@@ -393,3 +404,4 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(updated_location.url, location.url)
         self.assertEqual(updated_location.type, location.type)
         self.assertEqual(updated_location.multitype, location.multitype)
+        self.assertEqual(updated_location.geo, location.geo)

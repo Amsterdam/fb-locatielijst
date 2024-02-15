@@ -35,6 +35,13 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
                     validators=[validators.valid_email],
                     widget=forms.EmailInput
                 )
+            case 'GEO':
+                fields[location_property.short_name] = forms.CharField(
+                    label=location_property.label,
+                    required=location_property.required,
+                    validators=[validators.valid_geolocation],
+                    widget=forms.NumberInput
+                )
             case 'INT':
                 fields[location_property.short_name] = forms.CharField(
                     label=location_property.label,
