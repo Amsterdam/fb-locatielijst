@@ -40,10 +40,10 @@ def valid_geolocation(value)-> str:
     else:
         raise ValidationError(f"'{value}' is geen geldige geo coördinaat.")
 
-def valid_integer(value)-> str:
-    """Validator for Integer type location property"""
-    int_regex = r'^-?\d+(,\d+)?$'
-    if re.match(int_regex, value):
+def valid_number(value)-> str:
+    """Validator for number type location property"""
+    num_regex = r'^-?\d+(,\d+)?$'
+    if re.match(num_regex, value):
         return value
     else:
         raise ValidationError(f"'{value}' is geen geldig getal.")
@@ -114,8 +114,8 @@ def get_locationdata_validator(location_property, value):
                 return valid_email(value)
             case 'GEO':
                 return valid_geolocation(value)
-            case 'INT':
-                return valid_integer(value)
+            case 'NUM':
+                return valid_number(value)
             case 'MEMO':
                 return valid_memo(value)
             case 'POST':

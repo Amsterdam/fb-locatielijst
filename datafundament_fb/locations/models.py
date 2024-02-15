@@ -52,7 +52,7 @@ class LocationProperty(models.Model):
         DATE = 'DATE', 'Datum'
         EMAIL = 'EMAIL', 'E-mail'
         GEO = 'GEO', 'Geolocatie'
-        INT = 'INT', 'Numeriek'
+        NUM = 'NUM', 'Numeriek'
         MEMO = 'MEMO', 'Memo'
         POST = 'POST', 'Postcode'
         STR = 'STR', 'Tekst'

@@ -122,16 +122,16 @@ class TestLocationDataValidation(TestCase):
         for value in values:
             self.assertRaises(ValidationError, validators.valid_geolocation, value)
 
-    def test_int_validation(self):
-        # Test valid integer values
+    def test_num_validation(self):
+        # Test valid numerical values
         values = ['1', '0', '-100', '-1,1', '0,5', '16,3635']
         for value in values:
-            self.assertEqual(validators.valid_integer(value), value)
+            self.assertEqual(validators.valid_number(value), value)
 
-        # Test invalid integer values
+        # Test invalid numerical values
         values = ['0.5', '.5', ',5', '100.239,00']
         for value in values:
-            self.assertRaises(ValidationError, validators.valid_integer, value)
+            self.assertRaises(ValidationError, validators.valid_number, value)
 
     def test_memo_validation(self):
         # Test valid string value; this functions always returns the input, because the value it is already a string
@@ -232,8 +232,8 @@ class TestGetLocationDataValidate(TestCase):
             short_name='mail', label='Email', property_type='EMAIL')
         self.geolocation_property = LocationProperty.objects.create(
             short_name='geo', label='Geolocation', property_type='GEO')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='int', label='Integer', property_type='INT')
+        self.number_property = LocationProperty.objects.create(
+            short_name='num', label='number', property_type='NUM')
         self.memo_property = LocationProperty.objects.create(
             short_name='memo', label='Memo', property_type='MEMO')
         self.postal_code_property = LocationProperty.objects.create(
@@ -282,17 +282,17 @@ class TestGetLocationDataValidate(TestCase):
             location_property=self.geolocation_property, value=value)
         self.assertTrue(mock.called)
 
-    @mock.patch('locations.validators.valid_integer')
-    def test_clean_integer(self, mock):
-        # Test if valid_integer is called
+    @mock.patch('locations.validators.valid_number')
+    def test_clean_number(self, mock):
+        # Test if valid_number is called
         value = '1'
         validators.get_locationdata_validator(
-            location_property=self.integer_property, value=value)
+            location_property=self.number_property, value=value)
         self.assertTrue(mock.called)
 
     @mock.patch('locations.validators.valid_memo')
     def test_clean_memo(self, mock):
-        # Test if valid_integer is called
+        # Test if valid_number is called
         value = 'string'
         validators.get_locationdata_validator(
             location_property=self.memo_property, value=value)

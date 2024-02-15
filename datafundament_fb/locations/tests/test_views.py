@@ -33,9 +33,9 @@ class LocationDetailViewTest(TestCase):
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.private_property = LocationProperty.objects.create(
-            short_name='private', label='Private property', property_type='INT', required=True)
+            short_name='private', label='Private property', property_type='NUM', required=True)
         self.public_property = LocationProperty.objects.create(
-            short_name='public', label='Public property', property_type='INT', required=True, public=True)
+            short_name='public', label='Public property', property_type='NUM', required=True, public=True)
         self.private_data = LocationData.objects.create(
             location=self.location, location_property=self.private_property, value='Private')
         self.public_data = LocationData.objects.create(
@@ -147,10 +147,10 @@ class LocationCreateViewTest(TestCase):
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='property', label='property', property_type='INT', required=True, public=True)
+        self.number_property = LocationProperty.objects.create(
+            short_name='property', label='property', property_type='NUM', required=True, public=True)
         self.location_data = LocationData.objects.create(
-            location=self.location, location_property=self.integer_property, value='10')
+            location=self.location, location_property=self.number_property, value='10')
         self.multichoice_property = LocationProperty.objects.create(
             short_name='multitype', label='teams', property_type='CHOICE', multiple=True)
         self.multichoice_option1 = PropertyOption.objects.create(
@@ -181,7 +181,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-create.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        location_data_names = ['naam', self.multichoice_property.short_name, self.integer_property.short_name, ]
+        location_data_names = ['naam', self.multichoice_property.short_name, self.number_property.short_name, ]
         self.assertListEqual(location_data_names, field_names)
         
     def test_post_view(self):
@@ -264,10 +264,10 @@ class LocationUpdateViewTest(TestCase):
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='property', label='property', property_type='INT', required=True)
+        self.number_property = LocationProperty.objects.create(
+            short_name='property', label='property', property_type='NUM', required=True)
         self.location_data = LocationData.objects.create(
-            location=self.location, location_property=self.integer_property, value='10')
+            location=self.location, location_property=self.number_property, value='10')
         self.multichoice_property = LocationProperty.objects.create(
             short_name='multi', label='teams', property_type='CHOICE', multiple=True)
         self.multichoice_option1 = PropertyOption.objects.create(
@@ -298,7 +298,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-update.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        location_data_names = ['naam', self.multichoice_property.short_name, self.integer_property.short_name, ]
+        location_data_names = ['naam', self.multichoice_property.short_name, self.number_property.short_name, ]
         self.assertListEqual(location_data_names, field_names)
 
     def test_post_view(self):
@@ -383,8 +383,8 @@ class TestLocationImportForm(TestCase):
             short_name='date', label='Date', property_type='DATE')
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='Email', property_type='EMAIL')
-        self.integer_property = LocationProperty.objects.create(
-            short_name='int', label='Integer', property_type='INT')
+        self.number_property = LocationProperty.objects.create(
+            short_name='num', label='number', property_type='NUM')
         self.memo_property = LocationProperty.objects.create(
             short_name='memo', label='Memo', property_type='MEMO')
         self.postal_code_property = LocationProperty.objects.create(
@@ -404,7 +404,7 @@ class TestLocationImportForm(TestCase):
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 2')
         self.csv_content  = [
-            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice;multi',
+            'pandcode;naam;bool;date;mail;num;memo;post;str;url;choice;multi',
             '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Orange;Team 1,Team 2'
         ]
 
@@ -469,7 +469,7 @@ class TestLocationImportForm(TestCase):
         """Post the form with an invalid form value"""
         # CSV data
         csv_content = [
-            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            'pandcode;naam;bool;date;mail;num;memo;post;str;url;choice',
             '25001;Amstel 1;Misschien;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Yellow'
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
@@ -489,7 +489,7 @@ class TestLocationImportForm(TestCase):
     def test_import_csv_wrong_delimiter(self):
         """ Test csv import when the delimiter is not set to semicolin """
         csv_content = [
-            'pandcode,naam,bool,date,mail,int,memo,post,str,url,choice',
+            'pandcode,naam,bool,date,mail,num,memo,post,str,url,choice',
             '25001,Amstel 1,Ja,31-12-2023,mail@example.org,99,Memo tekst,1234AB,Tekst,https://example.org,Orange'
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
@@ -509,7 +509,7 @@ class TestLocationImportForm(TestCase):
     def test_import_csv_with_excess_columns(self):
         """ Test csv import when a data row has more columns than the header; for instance when a value has a semicolon"""
         csv_content = [
-            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            'pandcode;naam;bool;date;mail;num;memo;post;str;url;choice',
             '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;;Yellow'
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
@@ -531,7 +531,7 @@ class TestLocationImportForm(TestCase):
     def test_import_csv_with_missing_columns(self):
         """ Test csv import when a data row has less columns than the header"""
         csv_content = [
-            'pandcode;naam;bool;date;mail;int;memo;post;str;url;choice',
+            'pandcode;naam;bool;date;mail;num;memo;post;str;url;choice',
             '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org'
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
@@ -564,8 +564,8 @@ class TestLocationExportForm(TestCase):
             short_name='build', label='build_year', property_type='DATE', required=True, public=True)
         self.email_property = LocationProperty.objects.create(
             short_name='mail', label='mail_address', property_type='EMAIL', required=True, public=True)
-        self.integer_property = LocationProperty.objects.create(
-            short_name='floors', label='number_of_floors', property_type='INT', required=True)
+        self.number_property = LocationProperty.objects.create(
+            short_name='floors', label='number_of_floors', property_type='NUM', required=True)
         self.memo_property = LocationProperty.objects.create(
             short_name='note', label='note', property_type='MEMO', required=True)
         self.postal_code_property = LocationProperty.objects.create(
@@ -598,7 +598,7 @@ class TestLocationExportForm(TestCase):
             value = 'mail@example.org')
         self.floors = LocationData.objects.create(
             location=self.location,
-            location_property=self.integer_property,
+            location_property=self.number_property,
             value = '10')
         self.note = LocationData.objects.create(
             location=self.location,

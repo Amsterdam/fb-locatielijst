@@ -131,7 +131,7 @@
         "fields": {
             "short_name": "dvk_nr",
             "label": "Gewenste Cat. dienstverlenings kader",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": true,
             "multiple": false,
             "unique": false,
@@ -229,7 +229,7 @@
         "fields": {
             "short_name": "huisnummer",
             "label": "Huisnummer",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": true,
             "multiple": false,
             "unique": false,
@@ -327,7 +327,7 @@
         "fields": {
             "short_name": "bouwjaar",
             "label": "Bouwjaar",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": false,
             "multiple": false,
             "unique": false,
@@ -341,7 +341,7 @@
         "fields": {
             "short_name": "vvo",
             "label": "Vloeroppervlak",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": true,
             "multiple": false,
             "unique": false,
@@ -369,7 +369,7 @@
         "fields": {
             "short_name": "werkplek",
             "label": "Aantal werkplekken",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": false,
             "multiple": false,
             "unique": false,
@@ -481,7 +481,7 @@
         "fields": {
             "short_name": "rd_x",
             "label": "RD-X",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": false,
             "multiple": false,
             "unique": false,
@@ -495,7 +495,7 @@
         "fields": {
             "short_name": "rd_y",
             "label": "RD-Y",
-            "property_type": "INT",
+            "property_type": "NUM",
             "required": false,
             "multiple": false,
             "unique": false,
