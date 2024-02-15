@@ -6,7 +6,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'locations_urls:location-list' %}">{% translate 'Home' %}</a>
     {% if user.is_authenticated %}
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
@@ -33,7 +33,7 @@
     {% csrf_token %}
     <div class="btn-container">
         <button class="default" type="submit" name="_save" value="Download CSV"
-            formaction="{% url 'location-export' %}">Download export</button>
+            formaction="{% url 'locations_urls:location-export' %}">Download export</button>
     </div>
 </form>
 

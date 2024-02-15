@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'locations_urls:location-list' %}">{% translate 'Home' %}</a>
     <span>&rsaquo;</span>
     Beheer
 </div>
@@ -14,7 +14,7 @@
 
 <ul class="data-list">
     <li>
-        <a href="{% url 'location-list' %}">
+        <a href="{% url 'locations_urls:location-list' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -44,7 +44,7 @@
         </a>
     </li>
     <li>
-        <a href="{% url 'location-import' %}">
+        <a href="{% url 'locations_urls:location-import' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -54,7 +54,7 @@
         </a>
     </li>
     <li>
-        <a href="{% url 'location-export' %}">
+        <a href="{% url 'locations_urls:location-export' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>

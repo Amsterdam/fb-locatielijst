@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'locations_urls:location-list' %}">{% translate 'Home' %}</a>
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
@@ -38,8 +38,8 @@
         </div>
         {% endfor %}
         <div class="btn-container">
-            <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'location-create' %}">Aanmaken</button>
-            <a href="{% url 'location-list' %}" class="btn btn-secundair">Annuleren</a>
+            <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'locations_urls:location-create' %}">Aanmaken</button>
+            <a href="{% url 'locations_urls:location-list' %}" class="btn btn-secundair">Annuleren</a>
         </div>
     </div>
 </form>

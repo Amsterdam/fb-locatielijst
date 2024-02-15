@@ -15,7 +15,7 @@
 {% if not is_popup %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-  <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+  <a href="{% url 'locations_urls:location-list' %}">{% translate 'Home' %}</a>
   <span>&rsaquo;</span>
   <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
   <span>&rsaquo;</span>
