@@ -241,7 +241,7 @@ class LocationExportView(View):
 
 
 class LocationAdminView(LoginRequiredMixin, View):
-    template = 'admin/location-admin.html'
+    template = 'locations/location-admin.html'
     
     def get(self, request, *args, **kwargs):
         return render(request, template_name=self.template)
