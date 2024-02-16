@@ -710,7 +710,7 @@ class TestLocationAdminView(TestCase):
         response = self.client.get(reverse('location-admin'))
         self.assertEqual(response.status_code, 200)
         # Verify if the correct template is used
-        self.assertTemplateUsed(response, 'admin/location-admin.html')
+        self.assertTemplateUsed(response, 'locations/location-admin.html')
 
     def test_get_view_anonymous(self):
         """Test getting the location admin page as an anonymous user"""
