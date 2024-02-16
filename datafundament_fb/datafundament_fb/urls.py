@@ -21,7 +21,7 @@ from locations.views import home_page, LocationAdminView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('locaties/', include(('locations.urls', 'locations'), namespace='locations_urls')),
-    path('documentatie/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
+    path('help/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
     path('beheer/', view=LocationAdminView.as_view(), name='location-admin'),
     path('', home_page, name='home'),
 ]
