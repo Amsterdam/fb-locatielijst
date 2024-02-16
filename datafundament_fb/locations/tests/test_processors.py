@@ -339,7 +339,6 @@ class TestLocationProcessor(TestCase):
         self.assertIsNotNone(get_location.gewijzigd)
         self.assertFalse(get_location.archief)
 
-    # TODO HERSCHRIJVEN NET ZOALS HIERBOVEN WAARBIJ JE 2 LIJSTEN VERGELIJKT
     def test_returned_properties_from_get_dict(self):
         # First create and save an object
         LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
