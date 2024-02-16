@@ -347,7 +347,7 @@ class TestLocationProcessor(TestCase):
         location_dict = LocationProcessor.get(self.location_data_dict['pandcode'], include_private_properties=True).get_dict()
 
         # Set the sets of expected and returned location properties
-        expected_location_properties = {'pandcode', 'naam', 'occupied', 'build', 'mail', 'floors',
+        expected_location_properties = {'pandcode', 'naam', 'occupied', 'build', 'mail', 'geo', 'floors',
                                         'note', 'postcode', 'color', 'url', 'type', 'multitype',
                                         'aangemaakt', 'gewijzigd', 'archief'}
         returned_location_properties = set(location_dict.keys())
