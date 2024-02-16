@@ -8,6 +8,7 @@ from help_docs.models import Documentation
 class DocumentationListView(ListView):
     model = Documentation
     template_name = 'help_docs/documentation-list.html'
+    ordering = ['order']
 
     def get_context_data(self, *args, **kwargs):
         context = super(DocumentationListView,
