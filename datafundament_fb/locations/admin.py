@@ -4,7 +4,8 @@ from django.forms.models import BaseInlineFormSet
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 # Register your models here.
-admin.site.register(ExternalService)
+@admin.register(ExternalService)
+class ExternalServiceAdmin(admin.ModelAdmin):...
 
 
 @admin.register(Location)
