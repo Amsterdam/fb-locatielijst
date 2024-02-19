@@ -113,6 +113,8 @@ class LocationProcessor():
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
         setattr(object, 'naam', getattr(object.location_instance, 'name'))
+        created_at = timezone.localtime(getattr(object.location_instance, 'created_at')).strftime('%d-%m-%Y')
+        setattr(object, 'aangemaakt', created_at)
         last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
         setattr(object, 'gewijzigd', last_modified)
         setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
@@ -160,6 +162,7 @@ class LocationProcessor():
         dictionary = {attr: getattr(self, attr) for attr in self.location_properties}
         
         # Add last_modified date to the dictionary
+        dictionary['aangemaakt'] = getattr(self, 'aangemaakt', None)
         dictionary['gewijzigd'] = getattr(self, 'gewijzigd', None)
         dictionary['archief'] = getattr(self, 'archief', None)
 

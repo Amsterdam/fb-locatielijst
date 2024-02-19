@@ -4,10 +4,23 @@ from django.forms.models import BaseInlineFormSet
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
 # Register your models here.
-admin.site.register(Location)
-admin.site.register(LocationData)
-admin.site.register(ExternalService)
-admin.site.register(LocationExternalService)
+@admin.register(ExternalService)
+class ExternalServiceAdmin(admin.ModelAdmin):...
+
+
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    readonly_fields = ['last_modified', 'created_at']
+
+
+@admin.register(LocationData)
+class LocationDataAdmin(admin.ModelAdmin):
+    readonly_fields = ['last_modified', 'created_at']
+
+
+@admin.register(LocationExternalService)
+class LocationExternalServiceAdmin(admin.ModelAdmin):
+    readonly_fields = ['last_modified', 'created_at']
 
 
 @admin.register(PropertyOption)
