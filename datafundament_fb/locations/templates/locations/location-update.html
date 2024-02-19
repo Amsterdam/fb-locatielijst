@@ -47,9 +47,6 @@
         </div>
         {% endfor %}
     </div>
-    <div>
-        Velden met (*) moeten een waarde hebben.
-    </div>
     <div class="btn-container">
         <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'locations_urls:location-update' location_data.pandcode %}">Opslaan</button>
         <a href="{% url 'locations_urls:location-detail' location_data.pandcode %}" class="btn btn-secundair">Annuleren</a>
