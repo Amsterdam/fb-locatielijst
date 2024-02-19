@@ -304,7 +304,7 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(get_location.type, self.location_data_dict['type'])
         self.assertEqual(get_location.multitype, self.location_data_dict['multitype'])
         self.assertEqual(get_location.geo, self.location_data_dict['geo'])
-        # Verify other loccation attributes
+        # Verify other location attributes
         self.assertIsNotNone(get_location.aangemaakt)
         self.assertIsNotNone(get_location.gewijzigd)
         self.assertFalse(get_location.archief)
@@ -334,7 +334,7 @@ class TestLocationProcessor(TestCase):
         self.assertIsNone(getattr(get_location, 'type', None))
         self.assertIsNone(getattr(get_location, 'multitype', None))
         self.assertIsNone(getattr(get_location, 'geo', None))
-        # Verify other loccation attributes
+        # Verify other location attributes
         self.assertIsNotNone(get_location.aangemaakt)
         self.assertIsNotNone(get_location.gewijzigd)
         self.assertFalse(get_location.archief)
@@ -379,7 +379,7 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_dict['type'], self.location_data_dict['type'])
         self.assertEqual(location_dict['multitype'], self.location_data_dict['multitype'])
         self.assertEqual(location_dict['geo'], self.location_data_dict['geo'])
-        # Verify other loccation attributes
+        # Verify other location attributes
         self.assertIsNotNone(location_dict['aangemaakt'])
         self.assertIsNotNone(location_dict['gewijzigd'])
         self.assertFalse(location_dict['archief'])
