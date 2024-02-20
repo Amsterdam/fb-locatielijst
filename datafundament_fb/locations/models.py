@@ -83,7 +83,7 @@ class LocationProperty(models.Model):
     multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
     unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
-    grouped_by = models.ForeignKey(PropertyGroup, verbose_name='Groeperen in', on_delete=models.SET_NULL, blank=True, null=True)
+    group = models.ForeignKey(PropertyGroup, verbose_name='Groeperen in', on_delete=models.SET_NULL, blank=True, null=True)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
 
     class Meta:

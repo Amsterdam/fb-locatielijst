@@ -10,7 +10,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 10
+            "group": 1,
+            "order": 1
         }
     },
     {
@@ -24,7 +25,8 @@
             "multiple": false,
             "unique": true,
             "public": true,
-            "order": 20
+            "group": 1,
+            "order": 2
         }
     },
     {
@@ -38,7 +40,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 30
+            "group": 1,
+            "order": 3
         }
     },
     {
@@ -52,7 +55,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 50
+            "group": 1,
+            "order": 5
         }
     },
     {
@@ -66,7 +70,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 60
+            "group": 1,
+            "order": 6
         }
     },
     {
@@ -80,7 +85,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 70
+            "group": 1,
+            "order": 7
         }
     },
     {
@@ -94,7 +100,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 80
+            "group": 1,
+            "order": 8
         }
     },
     {
@@ -108,7 +115,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 90
+            "group": 1,
+            "order": 9
         }
     },
     {
@@ -122,7 +130,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 100
+            "group": 1,
+            "order": 10
         }
     },
     {
@@ -136,7 +145,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 110
+            "group": 1,
+            "order": 11
         }
     },
     {
@@ -150,7 +160,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 120
+            "group": 1,
+            "order": 12
         }
     },
     {
@@ -164,7 +175,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 130
+            "group": 1,
+            "order": 13
         }
     },
     {
@@ -178,7 +190,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 140
+            "group": 1,
+            "order": 14
         }
     },
     {
@@ -192,7 +205,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 150
+            "group": 2,
+            "order": 1
         }
     },
     {
@@ -206,7 +220,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 160
+            "group": 2,
+            "order": 2
         }
     },
     {
@@ -220,7 +235,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 170
+            "group": 2,
+            "order": 3
         }
     },
     {
@@ -234,7 +250,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 180
+            "group": 2,
+            "order": 4
         }
     },
     {
@@ -248,7 +265,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 190
+            "group": 2,
+            "order": 5
         }
     },
     {
@@ -262,7 +280,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 200
+            "group": 2,
+            "order": 6
         }
     },
     {
@@ -276,7 +295,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 210
+            "group": 2,
+            "order": 7
         }
     },
     {
@@ -290,6 +310,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 220
         }
     },
@@ -304,6 +325,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 230
         }
     },
@@ -318,6 +340,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 240
         }
     },
@@ -332,6 +355,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 250
         }
     },
@@ -346,6 +370,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 260
         }
     },
@@ -360,6 +385,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 270
         }
     },
@@ -374,6 +400,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 280
         }
     },
@@ -388,6 +415,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 290
         }
     },
@@ -402,6 +430,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 300
         }
     },
@@ -416,6 +445,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 310
         }
     },
@@ -430,6 +460,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 320
         }
     },
@@ -444,6 +475,7 @@
             "multiple": false,
             "unique": false,
             "public": true,
+            "group": null,
             "order": 330
         }
     },
@@ -458,6 +490,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 340
         }
     },
@@ -472,6 +505,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 350
         }
     },
@@ -486,6 +520,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 360
         }
     },
@@ -500,6 +535,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 370
         }
     },
@@ -514,6 +550,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 380
         }
     },
@@ -528,6 +565,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 390
         }
     },
@@ -542,6 +580,7 @@
             "multiple": false,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 400
         }
     },
@@ -556,6 +595,7 @@
             "multiple": true,
             "unique": false,
             "public": false,
+            "group": null,
             "order": 410
         }
     },
@@ -570,7 +610,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 40
+            "group": 1,
+            "order": 4
         }
     }
 ]
