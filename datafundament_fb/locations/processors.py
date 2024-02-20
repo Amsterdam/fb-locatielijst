@@ -64,9 +64,9 @@ class LocationProcessor():
         # Get all location properties and add the names to the location properties list
         # List is filtered for private accessibility
         if self.include_private_properties:
-            self.location_property_instances =  [obj for obj in LocationProperty.objects.all().order_by('order', 'short_name')]
+            self.location_property_instances =  [obj for obj in LocationProperty.objects.all().order_by('group__order', 'order', 'short_name')]
         else:
-            self.location_property_instances =  [obj for obj in LocationProperty.objects.filter(public=True).order_by('order', 'short_name')]
+            self.location_property_instances =  [obj for obj in LocationProperty.objects.filter(public=True).order_by('group__order', 'order', 'short_name')]
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links

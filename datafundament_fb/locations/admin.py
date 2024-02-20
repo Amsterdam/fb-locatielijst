@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
-from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
+from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService, PropertyGroup
 
 # Register your models here.
 @admin.register(ExternalService)
@@ -52,7 +52,7 @@ class PropertyOptionInline(admin.TabularInline):
 
 @admin.register(LocationProperty)
 class LocationPropertyAdmin(admin.ModelAdmin):
-    ordering = ['order']
+    ordering = ['group__order', 'order']
     inlines = [PropertyOptionInline]
 
     def get_readonly_fields(self, request, obj=None):
@@ -71,6 +71,11 @@ class LocationPropertyAdmin(admin.ModelAdmin):
             else:
                 return []
         
+
+@admin.register(PropertyGroup)
+class PropertyGroupAdmin(admin.ModelAdmin):
+    ordering = ['order']
+
 # Custom names
 admin.site.site_header = 'Datafundament Facilitair Bureau'
 admin.site.index_title = 'Beheer'

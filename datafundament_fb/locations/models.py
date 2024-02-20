@@ -43,6 +43,21 @@ class Location(models.Model):
         ]
 
 
+class PropertyGroup(models.Model):
+    name = models.CharField(verbose_name='Groepsnaam', max_length=20)
+    order = models.IntegerField(verbose_name='Volgorde', blank=True, null=True) # maak een choice optie om de positie te kiezen; lastig als dit een nieuwe intance is, want dan is het aantal + 1 
+    #TODO validate for positive integer; > 0
+
+    class Meta:
+        verbose_name = 'Eigenschap groep'
+        verbose_name_plural = 'Eigenschap groepen'
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='unique_group_name')
+        ]
+
+    def __str__(self):
+        return f'({self.order}) {self.name}'
+
 class LocationProperty(models.Model):
     '''
     Custom entries for location specific data.
@@ -68,6 +83,7 @@ class LocationProperty(models.Model):
     multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
     unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
+    grouped_by = models.ForeignKey(PropertyGroup, verbose_name='Groeperen in', on_delete=models.SET_NULL, blank=True, null=True)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
 
     class Meta:
@@ -86,7 +102,7 @@ class LocationProperty(models.Model):
             raise ValidationError("Meervoudige invoer is alleen mogelijk bij keuzelijsten.")
 
     def __str__(self):
-        return f'{self.label}'
+        return f'({self.order}) {self.label}'
 
 
 class PropertyOption(models.Model):
