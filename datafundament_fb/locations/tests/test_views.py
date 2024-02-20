@@ -18,7 +18,7 @@ class LocationListViewTest(TestCase):
     def test_get_view(self):
         """Test requesting the LocationListView"""
         # Request the location list page
-        response = self.client.get(reverse('location-list'))
+        response = self.client.get(reverse('locations_urls:location-list'))
         self.assertEqual(response.status_code, 200)
         # Verify if the correct template is used
         self.assertTemplateUsed(response, 'locations/location-list.html')
@@ -56,7 +56,7 @@ class LocationDetailViewTest(TestCase):
         # Log out the user
         self.client.logout()
         # Request location detail page
-        response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
+        response = self.client.get(reverse('locations_urls:location-detail', args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 200)
         # Verify the response values for the location
@@ -73,7 +73,7 @@ class LocationDetailViewTest(TestCase):
         including a multiple choice location property
         """
         # Request location detail page
-        response = self.client.get(reverse('location-detail', args=[self.location.pandcode]))
+        response = self.client.get(reverse('locations_urls:location-detail', args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 200)
         # Verify the response values for the location
@@ -94,13 +94,13 @@ class LocationDetailViewTest(TestCase):
         self.assertFalse(location.is_archived)
 
         # Post to the location detail page to archive the location
-        url = reverse('location-detail', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-detail', args=[self.location.pandcode])
         data = {'_archive': ['archive'],}
         response = self.client.post(path=url, data=data)
 
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('location-detail', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-detail', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
         # Verify that the location is archived now
@@ -108,7 +108,7 @@ class LocationDetailViewTest(TestCase):
         self.assertTrue(location.is_archived)
 
         # Post to the location detail page to de-archive the location
-        url = reverse('location-detail', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-detail', args=[self.location.pandcode])
         data = {'_archive': ['dearchive'],}
         response = self.client.post(path=url, data=data)
 
@@ -125,13 +125,13 @@ class LocationDetailViewTest(TestCase):
         self.assertFalse(location.is_archived)
 
         # Post to the location detail page
-        url = reverse('location-detail', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-detail', args=[self.location.pandcode])
         data = {'_archive': ['archive'],}
         response = self.client.post(path=url, data=data)
 
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('location-detail', args=[self.location.pandcode])
+        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-detail', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
         # Verify that the location is not archived
@@ -167,16 +167,16 @@ class LocationCreateViewTest(TestCase):
         # Log out the user
         self.client.logout()
         # Requesting the page
-        response = self.client.get(reverse('location-create'))
+        response = self.client.get(reverse('locations_urls:location-create'))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('location-create')
+        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-create')
         self.assertEqual(response.url, url)
 
     def test_get_view_authenticated(self):
         """Test getting the location create page"""
         # Requesting the page
-        response = self.client.get(reverse('location-create'))
+        response = self.client.get(reverse('locations_urls:location-create'))
         # Verify the response
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-create.html')
@@ -189,13 +189,13 @@ class LocationCreateViewTest(TestCase):
 
         # Data for the form        
         data = {'naam': 'Amstel 1', 'property': '10', 'multi': ['Team 1', 'Team 2']}
-        url = reverse('location-create')
+        url = reverse('locations_urls:location-create')
         # Request the post for the form
         response = self.client.post(path=url, data=data)
         
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('location-detail', args=[self.location.pandcode + 1]))
+        self.assertEqual(response.url, reverse('locations_urls:location-detail', args=[self.location.pandcode + 1]))
 
         # Verify the redirection from the response
         response = self.client.get(response.url)
@@ -215,7 +215,7 @@ class LocationCreateViewTest(TestCase):
         """Test posting a form with invalid values"""
         # Setting malformed data
         data = {'naam': 'Amstel 1', 'property': 'Fout'}
-        url = reverse('location-create')
+        url = reverse('locations_urls:location-create')
         # Posting the create form
         response = self.client.post(path=url, data=data)
         
@@ -233,7 +233,7 @@ class LocationCreateViewTest(TestCase):
         """Test posting when a validation error occurs in LocationProcessor"""
         # Setting the same name as an existing location
         data = {'naam': 'GGD', 'property': '10'}
-        url = reverse('location-create')
+        url = reverse('locations_urls:location-create')
         # Posting the create form
         response = self.client.post(path=url, data=data)
         
@@ -284,16 +284,16 @@ class LocationUpdateViewTest(TestCase):
         # Log out the user
         self.client.logout()
         # Requesting the page
-        response = self.client.get(reverse('location-update', args=[self.location.pandcode]))
+        response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('location-update', args=[self.location.pandcode])
+        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-update', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
     def test_get_view_authenticated(self):
         """Test getting the location update page as an authenticated user"""
         # Requesting the page
-        response = self.client.get(reverse('location-update', args=[self.location.pandcode]))
+        response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-update.html')
@@ -305,12 +305,12 @@ class LocationUpdateViewTest(TestCase):
         """Test posting the update form"""
         # Data for the form
         data = {'naam': 'Stopera', 'property': '11', 'multi': ['Team 1']}
-        url = reverse('location-update', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-update', args=[self.location.pandcode])
         # Request the post for the form
         response = self.client.post(path=url, data=data)
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('location-detail', args=[self.location.pandcode]))
+        self.assertEqual(response.url, reverse('locations_urls:location-detail', args=[self.location.pandcode]))
 
         # Verify the response values for the location after redirection
         response = self.client.get(response.url)
@@ -329,7 +329,7 @@ class LocationUpdateViewTest(TestCase):
         """Test posting a form with invalid values"""
         # Setting malformed data
         data = {'naam': 'Stopera', 'property': 'Fout'}
-        url = reverse('location-update', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-update', args=[self.location.pandcode])
         # Posting the update form
         response = self.client.post(path=url, data=data)
         
@@ -348,7 +348,7 @@ class LocationUpdateViewTest(TestCase):
         """Test posting when a validation error occurs in LocationProcessor"""
         # Setting the same name as an existing location (case insensitive)
         data = {'naam': 'ggd', 'property': '10'}
-        url = reverse('location-update', args=[self.location.pandcode])
+        url = reverse('locations_urls:location-update', args=[self.location.pandcode])
         # Posting the update form
         response = self.client.post(path=url, data=data)
         
@@ -410,7 +410,7 @@ class TestLocationImportForm(TestCase):
 
     def test_import_csv_get(self):
         """Get the form"""
-        response = self.client.get(reverse('location-import'))
+        response = self.client.get(reverse('locations_urls:location-import'))
 
         # Verify the response
         self.assertEqual(response.status_code, 200)
@@ -421,7 +421,7 @@ class TestLocationImportForm(TestCase):
         """Post the form"""
         csv_file = ContentFile('\n'.join(self.csv_content).encode(), name='import-file.csv')
         data = {'csv_file': csv_file}
-        url = reverse('location-import')
+        url = reverse('locations_urls:location-import')
         response = self.client.post(url, data)
 
         # Verify response
@@ -454,7 +454,7 @@ class TestLocationImportForm(TestCase):
         """Post the form with an invalid file extension"""
         xslx_file = ContentFile('\n'.join(self.csv_content).encode(), name='import-file.xlsx')
         data = {'csv_file': xslx_file}
-        url = reverse('location-import')
+        url = reverse('locations_urls:location-import')
         response = self.client.post(url, data)
 
         # Verify response
@@ -474,7 +474,7 @@ class TestLocationImportForm(TestCase):
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
         data = {'csv_file': csv_file}
-        url = reverse('location-import')
+        url = reverse('locations_urls:location-import')
         response = self.client.post(url, data)
 
         # Verify response
@@ -494,12 +494,12 @@ class TestLocationImportForm(TestCase):
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
         data = {'csv_file': csv_file}
-        url = reverse('location-import')
+        url = reverse('locations_urls:location-import')
         response = self.client.post(url, data)
 
         # Verify response
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers['Location'], reverse('location-import'))  
+        self.assertEqual(response.headers['Location'], reverse('locations_urls:location-import'))  
 
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
@@ -514,7 +514,7 @@ class TestLocationImportForm(TestCase):
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
         data = {'csv_file': csv_file}
-        url = reverse('location-import')
+        url = reverse('locations_urls:location-import')
         response = self.client.post(url, data)
 
         # Verify response
@@ -536,7 +536,7 @@ class TestLocationImportForm(TestCase):
         ]
         csv_file = ContentFile('\n'.join(csv_content).encode(), name='import-file.csv')
         data = {'csv_file': csv_file}
-        url = reverse('location-import')
+        url = reverse('locations_urls:location-import')
         response = self.client.post(url, data)
 
         # Verify response
@@ -632,7 +632,7 @@ class TestLocationExportForm(TestCase):
     def test_get_form(self):
         """ Test requesting the csv export page"""
         # Request the download form
-        response = self.client.get(reverse('location-export'))
+        response = self.client.get(reverse('locations_urls:location-export'))
         
         # Verify the response
         self.assertEqual(response.status_code, 200)
@@ -642,7 +642,7 @@ class TestLocationExportForm(TestCase):
     def test_post_form_anonymous(self):
         """ Test requesting the csv as an anonymous user; less fields should be in the csv"""
         # Request the csv export
-        response = self.client.post(reverse('location-export'), {})
+        response = self.client.post(reverse('locations_urls:location-export'), {})
 
         # Verify the response
         content = response.content
@@ -669,7 +669,7 @@ class TestLocationExportForm(TestCase):
         """ Test requesting the csv as an authenticated user; all fields should be in the csv"""        
         # Request the csv export as an authenticated user
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
-        response = self.client.post(reverse('location-export'), {})
+        response = self.client.post(reverse('locations_urls:location-export'), {})
 
         # Verify the response
         content = response.content

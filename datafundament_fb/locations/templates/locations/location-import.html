@@ -6,7 +6,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
@@ -44,7 +44,7 @@
         {% endfor %}
     </fieldset>
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Import vouchers" formaction="{% url 'location-import' %}">
+        <button class="btn btn-primair" type="submit" name="_save" value="Import vouchers" formaction="{% url 'locations_urls:location-import' %}">
             Importeren
         </button>
     </div>

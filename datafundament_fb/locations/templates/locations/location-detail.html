@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
     {% if user.is_authenticated %}
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
@@ -48,7 +48,7 @@
 <div class="btn-container">
     {% if user.is_authenticated %}
         {% if not location_data.archief %}
-        <a href="{% url 'location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
+        <a href="{% url 'locations_urls:location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
         {% endif %}
 
         <form action="." method="POST">
@@ -59,9 +59,9 @@
             <input name="_archive" type="hidden" value="archive">
             {% endif %}
             <button class="btn btn-secundair" type="submit"
-                formaction="{% url 'location-detail' location_data.pandcode %}">{{ location_data.archief|yesno:"Dearchiveren,Archiveren" }}</button>
+                formaction="{% url 'locations_urls:location-detail' location_data.pandcode %}">{{ location_data.archief|yesno:"Dearchiveren,Archiveren" }}</button>
         </form>
     {% endif %}
-    <a href="{% url 'location-list' %}" class="btn btn-secundair">Terug</a>
+    <a href="{% url 'locations_urls:location-list' %}" class="btn btn-secundair">Terug</a>
 </div>
 {% endblock %}

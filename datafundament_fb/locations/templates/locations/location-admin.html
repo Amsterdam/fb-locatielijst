@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'location-list' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
     <span>&rsaquo;</span>
     Beheer
 </div>
@@ -14,7 +14,7 @@
 
 <ul class="data-list">
     <li>
-        <a href="{% url 'location-list' %}">
+        <a href="{% url 'locations_urls:location-list' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -22,6 +22,7 @@
             </span>
             Locaties
         </a>
+        | Overzicht van alle locaties en het toevoegen, wijzigen van bestaande.
     </li>
     <li>
         <a href="{% url 'admin:locations_locationproperty_changelist' %}">
@@ -32,6 +33,7 @@
             </span>
             Locaties eigenschappen
         </a>
+        | Voor het toevoegen, wijzigen van de locatie eigenschappen.
     </li>
     <li>
         <a href="{% url 'admin:locations_externalservice_changelist' %}">
@@ -42,9 +44,10 @@
             </span>
             Externe koppelingen
         </a>
+        | Voor het toevoegen, wijzigen van externe gegevensbronnen.
     </li>
     <li>
-        <a href="{% url 'location-import' %}">
+        <a href="{% url 'locations_urls:location-import' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -52,9 +55,10 @@
             </span>
             Data importeren
         </a>
+        | Voor het importeren van nieuwe en gewijzigde locaties middels een CSV bestand. 
     </li>
     <li>
-        <a href="{% url 'location-export' %}">
+        <a href="{% url 'locations_urls:location-export' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -62,6 +66,7 @@
             </span>
             Data exporteren
         </a>
+        | Voor het exporteren van de locaties naar een CSV bestand.
     </li>
 </ul>
 {% endblock %}

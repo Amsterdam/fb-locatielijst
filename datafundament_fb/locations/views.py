@@ -16,7 +16,7 @@ from locations.processors import LocationProcessor
 
 # Create your views here.
 def home_page(request):
-    return HttpResponseRedirect(reverse('location-list'))
+    return HttpResponseRedirect(reverse('locations_urls:location-list'))
 
 
 class LocationListView(ListView):
@@ -51,7 +51,7 @@ class LocationDetailView(View):
         location.save()
         
         # return to the location-detail page
-        return HttpResponseRedirect(reverse('location-detail', args=[pandcode]))
+        return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[pandcode]))
 
 class LocationCreateView(LoginRequiredMixin, View):
     form = LocationDataForm
@@ -80,7 +80,7 @@ class LocationCreateView(LoginRequiredMixin, View):
                 
                 return render(request, template_name=self.template, context=context)
 
-            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
+            return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[location_data.pandcode]))
 
         message = f"Niet alle velden zijn juist ingevuld."
         messages.error(request,message)
@@ -120,7 +120,7 @@ class LocationUpdateView(LoginRequiredMixin, View):
                 
                 return render(request, template_name=self.template, context=context)
 
-            return HttpResponseRedirect(reverse('location-detail', args=[location_data.pandcode]))
+            return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[location_data.pandcode]))
 
         message = f"Niet alle velden zijn juist ingevuld."
         messages.error(request, message)
@@ -152,7 +152,7 @@ class LocationImportView(LoginRequiredMixin, View):
                     message = "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken gebruikt."
                     messages.add_message(request, messages.ERROR, message)
                     
-                    return HttpResponseRedirect(reverse('location-import'))
+                    return HttpResponseRedirect(reverse('locations_urls:location-import'))
 
                 csv_dict = csv.DictReader(csv_reader, dialect=csv_dialect, restval='missing', restkey='excess')
 

@@ -1,9 +1,6 @@
 {% extends 'admin/admin_base.html' %}
 {% load i18n admin_urls static admin_modify %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
-
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'locations_urls:location-list' %}">Home</a>
@@ -12,7 +9,7 @@
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     {% endif %}
     <span>&rsaquo;</span>
-    {% translate 'Export Locaties' %}
+    {{ location_data.naam }}
 </div>
 {% endblock %}
 
@@ -25,16 +22,10 @@
 {% endif %}
 
 {% block content %}
-<h2>Exporteer Locaties naar CSV</h2>
-<p>
-    Start een de download van een CSV met alle (actieve) locaties<br>
-</p>
-<form action="." method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="btn-container">
-        <button class="default" type="submit" name="_save" value="Download CSV"
-            formaction="{% url 'locations_urls:location-export' %}">Download export</button>
-    </div>
-</form>
+<div>
+<h2>{{ object.title }}</h2>
+<p>{{ object.body|linebreaks }}</p>
+</div>
+<br />
 
 {% endblock %}

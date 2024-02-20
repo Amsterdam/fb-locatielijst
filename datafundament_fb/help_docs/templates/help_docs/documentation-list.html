@@ -4,37 +4,36 @@
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <span>&rsaquo;</span>
+    Help
+</div>
+{% endblock %}
 
 {% block content %}
-<h2>{% translate 'Locaties' %}</h2>
-
+<h2>Help documentatie</h2>
 <div class="page-content">
     <div class="page-left">
         <ul class="data-list">
             {% for object in object_list %}
             <li>
-                <a href="{% url 'locations_urls:location-detail' object.pandcode %}">
+                <a href="{% url 'help_docs_urls:documentation-detail' object.id %}">
                     <span class="icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true"
+                            focusable="false">
                             <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
                         </svg>
                     </span>
-                    {{object.pandcode}} - {{ object.name }}
+                    {{ object.title }}
                 </a>
+                | {{ object.description }}
             </li>
             {% empty %}
             <li>Geen locaties gevonden</li>
             {% endfor %}
         </ul>
-    </div>
-    <div class="page-right">
-        <div class="btn-container">
-            <a href="export" class="btn btn-primair">Exporteren</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
-            {% endif %}
-        </div>
     </div>
 </div>
 {% endblock %}
