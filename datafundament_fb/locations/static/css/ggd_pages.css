@@ -78,7 +78,15 @@ ul.data-list > li .icon svg {
   line-height: 2rem;
 }
 
-.data-value input,
+.data-value > div {
+  margin: 2px 0 7px 0;
+}
+
+.data-value input[type=text],
+.data-value input[type=email],
+.data-value input[type=number],
+.data-value input[type=tel],
+.data-value input[type=url],
 .data-value textarea,
 .data-value select {
   width: 100%;
