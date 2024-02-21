@@ -38,10 +38,16 @@
         <dt class="data-label">Pandcode</dt>
         <dd class="data-value">{{ location_data.pandcode }}</dd>
     </div>
-    {% for field in form %}
-    <div class="data-view-row">
-        <dt class="data-label">{{ field.label }}</dt>
-        <dd class="data-value">{% if field.value %}{{ field.value }}{% endif %}</dd>
+    {% regroup form by field.group as group_list %}
+    {% for group in group_list %}
+    <div class="group">
+    {% if group.grouper %}<h3>{{ group.grouper }}</h3>{% endif %}
+        {% for field in group.list %}
+        <div class="data-view-row">
+            <dt class="data-label">{{ field.label }}</dt>
+            <dd class="data-value">{% if field.value %}{{ field.value }}{% endif %}</dd>
+        </div>
+        {% endfor %}
     </div>
     {% endfor %}
 </dl>
