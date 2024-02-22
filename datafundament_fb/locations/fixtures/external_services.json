@@ -5,7 +5,8 @@
         "fields": {
             "name": "BAG id",
             "short_name": "bag_id",
-            "public": false
+            "public": false,
+            "order": 1
         }
     },
     {
@@ -14,7 +15,8 @@
         "fields": {
             "name": "1s1p locatie",
             "short_name": "pas_loc",
-            "public": false
+            "public": false,
+            "order": 2
         }
     },
     {
@@ -23,7 +25,8 @@
         "fields": {
             "name": "A-net locatie",
             "short_name": "anet_loc",
-            "public": false
+            "public": false,
+            "order": 3
         }
     },
     {
@@ -32,7 +35,8 @@
         "fields": {
             "name": "GV",
             "short_name": "gv",
-            "public": true
+            "public": true,
+            "order": 4
         }
     },
     {
@@ -41,7 +45,8 @@
         "fields": {
             "name": "Energiemissie object",
             "short_name": "emobj",
-            "public": false
+            "public": false,
+            "order": 5
         }
     },
     {
@@ -50,7 +55,8 @@
         "fields": {
             "name": "P&O locatie code",
             "short_name": "po",
-            "public": false
+            "public": false,
+            "order": 6
         }
     }
 ]

@@ -7,6 +7,7 @@ class TestFixtures(TestCase):
     """
     fixtures = [
         'locations',
+        'property_groups',
         'location_properties',
         'property_options',
         'location_data',

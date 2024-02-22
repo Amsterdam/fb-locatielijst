@@ -51,6 +51,7 @@ class PropertyOptionInline(admin.TabularInline):
     formset = PropertyOptionInlineFormset
     extra = 0
 
+
 @admin.register(LocationProperty)
 class LocationPropertyAdmin(admin.ModelAdmin):
     ordering = ['group__order', 'order']

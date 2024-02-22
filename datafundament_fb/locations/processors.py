@@ -1,9 +1,9 @@
 from typing import Self
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.db.models import F
 from locations.validators import get_locationdata_validator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
@@ -63,7 +63,8 @@ class LocationProcessor():
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
-        property_locations = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order', 'short_name')
+        # Location properties without a 'group' value be put last beforte being sorted on 'order'
+        property_locations = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order')
         # List is filtered for private accessibility
         if self.include_private_properties:
             self.location_property_instances =  [obj for obj in property_locations]
@@ -73,9 +74,9 @@ class LocationProcessor():
 
         # Get all external service links
         if self.include_private_properties:
-            self.external_service_instances = [obj for obj in ExternalService.objects.all().order_by('short_name')]
+            self.external_service_instances = [obj for obj in ExternalService.objects.all().order_by('order')]
         else:
-            self.external_service_instances = [obj for obj in ExternalService.objects.filter(public=True).order_by('short_name')]
+            self.external_service_instances = [obj for obj in ExternalService.objects.filter(public=True).order_by('order')]
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
 
         # Set attributes from all the available location properties
