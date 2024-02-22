@@ -34,14 +34,16 @@
 </small>
 
 <dl class="data-view">
-    <div class="data-view-row">
-        <dt class="data-label">Pandcode</dt>
-        <dd class="data-value">{{ location_data.pandcode }}</dd>
-    </div>
     {% regroup form by field.group as group_list %}
     {% for group in group_list %}
     <div class="group">
     {% if group.grouper %}<h3>{{ group.grouper }}</h3>{% endif %}
+    {% if not group.grouper %} <!-- Add this to the first group with no name -->
+    <div class="data-view-row">
+        <dt class="data-label">Pandcode</dt>
+        <dd class="data-value">{{ location_data.pandcode }}</dd>
+    </div>
+    {% endif %}
         {% for field in group.list %}
         <div class="data-view-row">
             <dt class="data-label">{{ field.label }}</dt>
@@ -52,6 +54,8 @@
                     {% else %}
                         {{ field.value }}
                     {% endif %}
+                {% else %}
+                -
                 {% endif %}
             </dd>
         </div>

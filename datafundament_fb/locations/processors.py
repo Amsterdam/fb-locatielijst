@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.db.models import F
 from locations.validators import get_locationdata_validator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
 
@@ -62,11 +63,12 @@ class LocationProcessor():
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
+        property_locations = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order', 'short_name')
         # List is filtered for private accessibility
         if self.include_private_properties:
-            self.location_property_instances =  [obj for obj in LocationProperty.objects.all().order_by('group__order', 'order', 'short_name')]
+            self.location_property_instances =  [obj for obj in property_locations]
         else:
-            self.location_property_instances =  [obj for obj in LocationProperty.objects.filter(public=True).order_by('group__order', 'order', 'short_name')]
+            self.location_property_instances =  [obj for obj in property_locations.filter(public=True)]
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
