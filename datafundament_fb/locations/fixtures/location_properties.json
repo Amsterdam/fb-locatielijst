@@ -10,7 +10,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 10
+            "group": 1,
+            "order": 1
         }
     },
     {
@@ -24,7 +25,8 @@
             "multiple": false,
             "unique": true,
             "public": true,
-            "order": 20
+            "group": 1,
+            "order": 2
         }
     },
     {
@@ -38,7 +40,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 30
+            "group": 1,
+            "order": 3
         }
     },
     {
@@ -52,7 +55,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 50
+            "group": 1,
+            "order": 5
         }
     },
     {
@@ -66,7 +70,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 60
+            "group": 1,
+            "order": 6
         }
     },
     {
@@ -80,7 +85,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 70
+            "group": 1,
+            "order": 7
         }
     },
     {
@@ -94,7 +100,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 80
+            "group": 1,
+            "order": 8
         }
     },
     {
@@ -108,7 +115,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 90
+            "group": 1,
+            "order": 9
         }
     },
     {
@@ -122,7 +130,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 100
+            "group": 1,
+            "order": 10
         }
     },
     {
@@ -136,7 +145,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 110
+            "group": 1,
+            "order": 11
         }
     },
     {
@@ -150,7 +160,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 120
+            "group": 1,
+            "order": 12
         }
     },
     {
@@ -164,7 +175,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 130
+            "group": 1,
+            "order": 13
         }
     },
     {
@@ -178,7 +190,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 140
+            "group": 1,
+            "order": 14
         }
     },
     {
@@ -192,7 +205,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 150
+            "group": 2,
+            "order": 1
         }
     },
     {
@@ -206,7 +220,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 160
+            "group": 2,
+            "order": 2
         }
     },
     {
@@ -220,7 +235,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 170
+            "group": 2,
+            "order": 3
         }
     },
     {
@@ -234,7 +250,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 180
+            "group": 2,
+            "order": 4
         }
     },
     {
@@ -248,7 +265,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 190
+            "group": 2,
+            "order": 5
         }
     },
     {
@@ -262,7 +280,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 200
+            "group": 2,
+            "order": 6
         }
     },
     {
@@ -276,7 +295,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 210
+            "group": 2,
+            "order": 7
         }
     },
     {
@@ -290,7 +310,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 220
+            "group": null,
+            "order": 1
         }
     },
     {
@@ -304,7 +325,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 230
+            "group": null,
+            "order": 2
         }
     },
     {
@@ -318,7 +340,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 240
+            "group": null,
+            "order": 3
         }
     },
     {
@@ -332,7 +355,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 250
+            "group": null,
+            "order": 4
         }
     },
     {
@@ -346,7 +370,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 260
+            "group": null,
+            "order": 5
         }
     },
     {
@@ -360,7 +385,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 270
+            "group": null,
+            "order": 6
         }
     },
     {
@@ -374,7 +400,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 280
+            "group": null,
+            "order": 7
         }
     },
     {
@@ -388,7 +415,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 290
+            "group": null,
+            "order": 8
         }
     },
     {
@@ -402,7 +430,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 300
+            "group": null,
+            "order": 9
         }
     },
     {
@@ -416,7 +445,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 310
+            "group": null,
+            "order": 10
         }
     },
     {
@@ -430,7 +460,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 320
+            "group": null,
+            "order": 11
         }
     },
     {
@@ -444,7 +475,8 @@
             "multiple": false,
             "unique": false,
             "public": true,
-            "order": 330
+            "group": null,
+            "order": 12
         }
     },
     {
@@ -458,7 +490,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 340
+            "group": null,
+            "order": 13
         }
     },
     {
@@ -472,7 +505,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 350
+            "group": null,
+            "order": 14
         }
     },
     {
@@ -486,7 +520,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 360
+            "group": null,
+            "order": 15
         }
     },
     {
@@ -500,7 +535,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 370
+            "group": null,
+            "order": 16
         }
     },
     {
@@ -514,7 +550,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 380
+            "group": null,
+            "order": 17
         }
     },
     {
@@ -528,7 +565,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 390
+            "group": null,
+            "order": 18
         }
     },
     {
@@ -542,7 +580,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 400
+            "group": null,
+            "order": 19
         }
     },
     {
@@ -556,7 +595,8 @@
             "multiple": true,
             "unique": false,
             "public": false,
-            "order": 410
+            "group": null,
+            "order": 20
         }
     },
     {
@@ -570,7 +610,8 @@
             "multiple": false,
             "unique": false,
             "public": false,
-            "order": 40
+            "group": 1,
+            "order": 4
         }
     }
 ]

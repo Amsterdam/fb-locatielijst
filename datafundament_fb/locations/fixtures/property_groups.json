@@ -1,0 +1,18 @@
+[
+    {
+        "model": "locations.propertygroup",
+        "pk": 1,
+        "fields": {
+            "name": "Algemeen",
+            "order": 1
+        }
+    },
+    {
+        "model": "locations.propertygroup",
+        "pk": 2,
+        "fields": {
+            "name": "Adresgegevens",
+            "order": 2
+        }
+    }
+]

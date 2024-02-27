@@ -102,7 +102,10 @@ def set_location_property_fields(include_private_properties: bool=False)-> dict:
             case _:
                 # If there is no match an exception will be raised
                 raise ValueError(f"Er bestaat geen formulierveld voor '{location_property.property_type}'.")
-    
+
+        # Add the property group to the field
+        fields[location_property.short_name].group = getattr(location_property.group, 'name', 'Overig')
+
     return fields
 
 def set_external_services_fields(include_private_properties: bool=False) -> dict:
@@ -119,7 +122,8 @@ def set_external_services_fields(include_private_properties: bool=False) -> dict
             validators=[validators.valid_string],
             widget=forms.TextInput
         )
-    
+        fields[service.short_name].group = 'Externe koppelingen'
+        
     return fields
 
 

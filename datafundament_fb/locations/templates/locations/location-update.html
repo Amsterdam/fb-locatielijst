@@ -34,16 +34,22 @@
             <div class="data-label">Pandcode</div>
             <div class="data-value">{{ location_data.pandcode }}</div>
         </div>
-        {% for field in form %}
-        <div class="data-view-row">
-            <div class="data-label">
-                <label for="{{ field.auto_id }}">{{ field.label }}</label>
-                {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+        {% regroup form by field.group as group_list %}
+        {% for group in group_list %}
+        <div class="group">
+            {% if group.grouper %}<h3>{{ group.grouper }}</h3>{% endif %}
+            {% for field in group.list %}
+            <div class="data-view-row">
+                <div class="data-label">
+                    <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                    {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                </div>
+                <div class="data-value">
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
             </div>
-            <div class="data-value">
-                {{ field }}
-                {{ field.errors }}
-            </div>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>

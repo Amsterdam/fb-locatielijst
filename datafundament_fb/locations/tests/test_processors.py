@@ -12,29 +12,29 @@ class TestLocationProcessor(TestCase):
 
     def setUp(self) -> None:
         self.boolean_property = LocationProperty.objects.create(
-            short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True, order=0)
+            short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True, order=1)
         self.date_property = LocationProperty.objects.create(
-            short_name='build', label='build_year', property_type='DATE', required=True, public=True, order=1)
+            short_name='build', label='build_year', property_type='DATE', required=True, public=True, order=2)
         self.email_property = LocationProperty.objects.create(
-            short_name='mail', label='mail_address', property_type='EMAIL', required=True, order=2)
+            short_name='mail', label='mail_address', property_type='EMAIL', required=True, order=3)
         self.number_property = LocationProperty.objects.create(
-            short_name='floors', label='number_of_floors', property_type='NUM', required=True, order=3)
+            short_name='floors', label='number_of_floors', property_type='NUM', required=True, order=4)
         self.memo_property = LocationProperty.objects.create(
-            short_name='note', label='note', property_type='MEMO', required=True, order=4)
+            short_name='note', label='note', property_type='MEMO', required=True, order=5)
         self.postal_code_property = LocationProperty.objects.create(
-            short_name='postcode', label='postal_code', property_type='POST', required=True, order=5)
+            short_name='postcode', label='postal_code', property_type='POST', required=True, order=6)
         self.string_property = LocationProperty.objects.create(
-            short_name='color', label='building_color', property_type='STR', order=6)
+            short_name='color', label='building_color', property_type='STR', order=7)
         self.url_property = LocationProperty.objects.create(
-            short_name='url', label='web_address', property_type='URL', order=7)
+            short_name='url', label='web_address', property_type='URL', order=8)
         self.choice_property = LocationProperty.objects.create(
-            short_name='type', label='building_type', property_type='CHOICE', required=True, order=8)
+            short_name='type', label='building_type', property_type='CHOICE', required=True, order=9)
         self.choice_option = PropertyOption.objects.create(
             location_property=self.choice_property, option='Office')
         self.choice_option_other = PropertyOption.objects.create(
             location_property=self.choice_property, option='Shop')
         self.multichoice_property = LocationProperty.objects.create(
-            short_name='multitype', label='teams', property_type='CHOICE', required=True, multiple=True, order=9)
+            short_name='multitype', label='teams', property_type='CHOICE', required=True, multiple=True, order=10)
         self.multichoice_option1 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 1')
         self.multichoice_option2 = PropertyOption.objects.create(
@@ -42,7 +42,7 @@ class TestLocationProcessor(TestCase):
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 3')
         self.geolocation_property = LocationProperty.objects.create(
-            short_name='geo', label='geolocation', property_type='GEO', required=True, order=10)
+            short_name='geo', label='geolocation', property_type='GEO', required=True, order=11)
         
         self.location_data_dict = dict({
             'pandcode': '24000',

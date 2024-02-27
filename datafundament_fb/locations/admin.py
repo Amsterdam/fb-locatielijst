@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
-from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
+from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService, PropertyGroup
 
 # Register your models here.
 @admin.register(ExternalService)
-class ExternalServiceAdmin(admin.ModelAdmin):...
+class ExternalServiceAdmin(admin.ModelAdmin):
+    ordering = ['order']
+    list_display = ['name', 'public', 'order']
 
 
 @admin.register(Location)
@@ -52,8 +54,9 @@ class PropertyOptionInline(admin.TabularInline):
 
 @admin.register(LocationProperty)
 class LocationPropertyAdmin(admin.ModelAdmin):
-    ordering = ['order']
+    ordering = ['group__order', 'order']
     inlines = [PropertyOptionInline]
+    list_display = ['label', 'property_type', 'public', 'group', 'order']
 
     def get_readonly_fields(self, request, obj=None):
         # Prevent the user from modifying an existing property_type 
@@ -71,6 +74,12 @@ class LocationPropertyAdmin(admin.ModelAdmin):
             else:
                 return []
         
+
+@admin.register(PropertyGroup)
+class PropertyGroupAdmin(admin.ModelAdmin):
+    ordering = ['order']
+    list_display = ['name', 'order']
+
 # Custom names
 admin.site.site_header = 'Datafundament Facilitair Bureau'
 admin.site.index_title = 'Beheer'

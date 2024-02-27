@@ -181,7 +181,7 @@ class LocationCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-create.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        location_data_names = ['naam', self.multichoice_property.short_name, self.number_property.short_name, ]
+        location_data_names = ['naam', self.number_property.short_name, self.multichoice_property.short_name, ]
         self.assertListEqual(location_data_names, field_names)
         
     def test_post_view(self):
@@ -298,7 +298,7 @@ class LocationUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'locations/location-update.html')
         field_names = [item for item in response.context['form'].fields.keys()]
-        location_data_names = ['naam', self.multichoice_property.short_name, self.number_property.short_name, ]
+        location_data_names = ['naam',  self.number_property.short_name, self.multichoice_property.short_name, ]
         self.assertListEqual(location_data_names, field_names)
 
     def test_post_view(self):

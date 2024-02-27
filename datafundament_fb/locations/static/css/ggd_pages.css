@@ -1,4 +1,10 @@
 
+
+#container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
 body #content {
   padding: 1.125rem 2rem;
 }
@@ -17,6 +23,11 @@ body #content {
   margin-bottom: 1rem;
 }
 
+/*******************************************/
+
+#container div.breadcrumbs {
+  padding: 1.125rem 2rem;
+}
 
 /*******************************************/
 
@@ -48,13 +59,23 @@ ul.data-list > li .icon svg {
 /*******************************************/
 
 .data-view {
-  display: flex;
-  flex-direction: column;
+  display: block;
+}
+
+.data-view .group {
+  display: inline-block;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.data-view .group h3:first-child{
+  margin-top: 0;
 }
 
 .data-view-row {
   display: flex;
   flex-direction: row;
+  column-gap: 1rem;
 }
 
 .data-label {
@@ -115,7 +136,7 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-@media screen and (max-width: 839px) {
+@media screen and (max-width: 750px) {
   .page-content {
     flex-direction: column-reverse;
   }
@@ -125,4 +146,10 @@ input[type=number] {
     flex-direction: column;
   }
 
+}
+
+@media screen and (min-width: 1024px) {
+  .data-view {
+    columns: 2;
+  }  
 }

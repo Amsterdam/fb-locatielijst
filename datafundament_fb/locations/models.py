@@ -2,9 +2,8 @@ import re
 from django.db import models
 from django.db.models import Max, Q
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
-from locations.validators import get_locationdata_validator
-
 # Create your models here.
 
 # Auto generate a new pandcode based on the current highest in the database
@@ -43,6 +42,20 @@ class Location(models.Model):
         ]
 
 
+class PropertyGroup(models.Model):
+    name = models.CharField(verbose_name='Groepsnaam', max_length=20)
+    order = models.IntegerField(verbose_name='Volgorde', blank=True, null=True, validators=[MinValueValidator(1)])
+
+    class Meta:
+        verbose_name = 'Eigenschap groep'
+        verbose_name_plural = 'Eigenschap groepen'
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='unique_group_name')
+        ]
+
+    def __str__(self):
+        return f'{self.name}'
+
 class LocationProperty(models.Model):
     '''
     Custom entries for location specific data.
@@ -68,7 +81,8 @@ class LocationProperty(models.Model):
     multiple = models.BooleanField(verbose_name='Meervoudige invoer', default=False)
     unique = models.BooleanField(verbose_name='Waarde moet uniek zijn', default=False)
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
-    order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True)
+    group = models.ForeignKey(PropertyGroup, verbose_name='Groeperen in', on_delete=models.SET_NULL, blank=True, null=True)
+    order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True, validators=[MinValueValidator(1)])
 
     class Meta:
         verbose_name = 'Locatie eigenschap'
@@ -174,6 +188,7 @@ class ExternalService(models.Model):
     name = models.CharField(verbose_name='Externe API', max_length=100)
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
+    order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True, validators=[MinValueValidator(1)])
 
     class Meta:
         verbose_name = 'Externe koppeling'
