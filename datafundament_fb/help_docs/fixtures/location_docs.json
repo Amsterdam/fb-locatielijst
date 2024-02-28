@@ -6,7 +6,7 @@
             "title": "Locaties",
             "description": "Overzichtslijst van locaties en voor het aanpassen, wijzigen van bestaande.",
             "body": "Het overzicht van alle locaties in de database. Klik op een locatie om daarvan alle eigenschappen te zien. Op een later moment zal het ook mogelijk zijn om deze lijst te filteren op zoektermen.\r\n\r\nMet 'Exporteren' kan je een CSV  downloaden van alle locaties.\r\n\r\nMet 'Aanmaken' kan je een nieuwe locatie aanmaken.",
-            "order": 10
+            "order": 1
         }
     },
     {
@@ -16,7 +16,7 @@
             "title": "Locatie details",
             "description": "Overzicht van een specifieke locatie en alle eigenschappen van die locatie.",
             "body": "Als je op een locatie klikt uit de overzichts lijst, dan kom je op de detail pagina van de desbetreffende locatie.\r\n\r\nOp deze pagina kan je alle gegevens van de locatie bekijken.\r\n\r\nKlik op 'Wijzigen' om de locatie gegevens aan te passen.\r\n\r\nKlik op 'Archiveren' om de locatie te archiveren. Is de locatie gearchiveerd, dan verschijnt de knop 'Dearchiveren' en kan je de locatie weer beschikbaar maken.\r\n\r\nKlik op 'Terug' om terug te gaan naar de Locatie lijst.",
-            "order": 40
+            "order": 5
         }
     },
     {
@@ -26,7 +26,7 @@
             "title": "Locatie wijzigen",
             "description": "Wijzigingspagina voor een locatie om locatiegegevens aan te passen.",
             "body": "In dit formulier kan je van een locatie de gegevens aanpassen. Elke veld heeft hierbij z'n eigen format. Bij het opslaan van het formulier wordt gecontroleerd of je dat format gevolgd hebt, anders verschijnt een foutmelding en wordt de locatie niet aangepast. Ook als je een verplicht (*) veld leegmaakt dan verschijnt hiervoor een foutmelding.\r\n\r\nAls je de wijzigingen die je in het formulier hebt gemaakt wilt opslaan, klik dan op 'Opslaan'. Als je deze toch niet wilt opslaan, klik dan op 'Annuleren'.\r\n\r\nNa het opslaan/annuleren wordt je teruggebracht naar de locatie detail pagina.",
-            "order": 60
+            "order": 7
         }
     },
     {
@@ -36,7 +36,7 @@
             "title": "Locatie aanmaken",
             "description": "Maak een nieuwe locatie aan.",
             "body": "Met dit formulier kan je een nieuwe locatie aanmaken.\r\n\r\nDe pandcode kan je niet zelf bepalen, deze krijg je te zien pas nadat je de nieuwe locatie hebt toegevoegd.\r\n\r\nVul minimaal alle velden in die verplicht zijn, en gebruik hierbij de juiste format voor dat veld.\r\n\r\nAls je klaar bent met het invullen, kan je de nieuwe locatie toevoegen door op 'Aanmaken' te klikken. Je wordt dan teruggebracht naar de detail pagina van deze nieuwe locatie.\r\n\r\nMocht je de locatie toch niet willen toevoegen, klik dan op 'Annuleren'. Je wordt dan weer teruggebracht naar het locatie overzicht.",
-            "order": 50
+            "order": 6
         }
     },
     {
@@ -45,8 +45,8 @@
         "fields": {
             "title": "Locatie eigenschappen",
             "description": "Voor het toevoegen, aanpassen en verwijderen van locatie velden.",
-            "body": "Het opslaan van locatiegegevens op deze website is zo ontworpen dat je, behalve de naam, pandcode en archief, zelf kan bepalen welke gegevens (of velden) gekoppeld moeten worden aan een locatie. Zo kunnen in de loop der tijd overbodige velden worden verwijderd uit de database, en nieuwe velden worden toegevoegd.\r\n\r\nEerst krijg je een lijst met locaties te zien. Je kan een bestaande locatie-eigenschap wijzigen door op de naam daarvan te klikken, of een nieuwe toevoegen door op de knop 'locatie eigenschap toevogen te klikken'.\r\n\r\nDe locatie eigenschap bestaat uit de volgende velden:\r\n- Korte naam: dit veld wordt gebruikt in de programmacode zelf en als kolomnaam voor imports en exports. Deze mag daarom enkel uit maximaal 10 kleine letters en een liggend streepje '_' bestaan.\r\n\r\n- Omschrijving: Hier kan je een langere beschrijvende naam toevoegen. Deze naam wordt ook als weergave naam in formuliern op de website gebruikt.\r\n\r\n- Gegevens type: Het soort data dat je wilt opslaan. Keuzes bestaan uit:\r\nBoolean: Ja/Nee\r\nDatum: Een datum volgens de notatie JJJJ-MM-DD\r\nEmail: Een e-mail adres\r\nGeolocatie: Latitude/longitude coördinaten. Punt gescheiden en maximaal 8 decimalen.\r\nNumeriek: Een komma decimaal gescheiden getal\r\nMemo: Een notitie veld\r\nPostcode: Notatie in 1234AA of 1234 AA\r\nTekst: Vrije tekst veld\r\nUrl: Eeen internet adres, notatie miet inclusief http/https\r\nKeuzelijst: Een voorgedefinieerde lijst van opties. Onderaan het formulier kan je deze optie toevoegen/verwijderen.\r\n\r\n- Verplicht veld: Dit geeft aan dat deze eigenschap geen lege waarde mag hebbn.\r\n\r\n- Meervoudige invoer: Enkel voor eigenschappen van het type Keuzelijst. Dit geeft aan dat je meerdere opties mag opgeven voor deze eigenschap. In de import/export worden meervoudige opties gescheiden door een komma.\r\n\r\n- Waarde moet uniek zijn: Elke opgegeven waarde van deze eigenschap mag maar 1 keer voorkomen de tabel van deze eigenschap.\r\n\r\n- Zichtbaar voor niet ingelogde gebruikers: Als je deze optie aanvinkt, dan kunnen publieke bezoekers (dat zijn dus andere medewerkers van de gemeente), dit locatiegegeven inzien.\r\n\r\n- Volgorde: Met dit getal kan je een ordening aanbrengen in de volgorde hoe locatie eigenschappen getoond worden op de website en in de CSV export. De initiële ordening is gebasseerd op de originele Excel bron. Een hoger getal betekent hoger in de volgorde.\r\n\r\nOpties: Bij een keuzeveld heb je de mogelijkheid om opties toe te voegen waaruit gekozen kan worden bij het aanmaken of wijzigen van een locatie. Let op: bestaande opties kunnen niet verwijderd worden als ze nog gekoppeld zijn aan een locatie.",
-            "order": 20
+            "body": "Het opslaan van locatiegegevens op deze website is zo ontworpen dat je, behalve de naam, pandcode en archief, zelf kan bepalen welke gegevens (of velden) gekoppeld moeten worden aan een locatie. Zo kunnen in de loop der tijd overbodige velden worden verwijderd uit de database, en nieuwe velden worden toegevoegd.\r\n\r\nEerst krijg je een lijst met locaties te zien. Je kan een bestaande locatie-eigenschap wijzigen door op de naam daarvan te klikken, of een nieuwe toevoegen door op de knop 'locatie eigenschap toevogen te klikken'.\r\n\r\nDe locatie eigenschap bestaat uit de volgende velden:\r\n- Korte naam:\r\nDit veld wordt gebruikt in de programmacode zelf en als kolomnaam voor imports en exports. Deze mag daarom enkel uit maximaal 10 kleine letters en een liggend streepje '_' bestaan.\r\n\r\n- Omschrijving: \r\nHier kan je een langere beschrijvende naam toevoegen. Deze naam wordt ook als weergave naam in formuliern op de website gebruikt.\r\n\r\n- Gegevens type: \r\nHet soort data dat je wilt opslaan. Keuzes bestaan uit:\r\n* Boolean: Ja/Nee\r\n* Datum: Een datum volgens de notatie JJJJ-MM-DD\r\n* Email: Een e-mail adres\r\n* Geolocatie: Latitude/longitude coördinaten. Punt gescheiden en maximaal 8 decimalen.\r\n* Numeriek: Een komma decimaal gescheiden getal\r\n* Memo: Een notitie veld\r\n* Postcode: Notatie in 1234AA of 1234 AA\r\n* Tekst: Vrije tekst veld\r\n* Url: Eeen internet adres, notatie miet inclusief http/https\r\n* Keuzelijst: Een voorgedefinieerde lijst van opties. Onderaan het formulier kan je deze optie toevoegen/verwijderen.\r\n\r\n- Verplicht veld:\r\nDit geeft aan dat deze eigenschap geen lege waarde mag hebbn.\r\n\r\n- Meervoudige invoer:\r\nEnkel voor eigenschappen van het type Keuzelijst. Dit geeft aan dat je meerdere opties mag opgeven voor deze eigenschap. In de import/export worden meervoudige opties gescheiden door een komma.\r\n\r\n- Waarde moet uniek zijn:\r\nElke opgegeven waarde van deze eigenschap mag maar 1 keer voorkomen de tabel van deze eigenschap.\r\n\r\n- Zichtbaar voor niet ingelogde gebruikers:\r\nAls je deze optie aanvinkt, dan kunnen publieke bezoekers (dat zijn dus andere medewerkers van de gemeente), dit locatiegegeven inzien.\r\n\r\n- Groeperen in:\r\nHiermee kan je deze locatie eigenschap in een groep zetten waarmee de eigenschap dan gegroepeerd wordt met de andere velden in de groep en als zodanig ook getoond wordt op een locatie pagina. Als je geen groep opgeeft wordt de eigenschap automatisch gegroepeerd in de categorie Overig.\r\n\r\n- Volgorde:\r\nMet dit getal kan je een ordening aanbrengen in de volgorde hoe locatie eigenschappen getoond worden op de website en in de CSV export. De initiële ordening is gebasseerd op de originele Excel bron. Een hoger getal betekent hoger in de volgorde.\r\n\r\nOpties:\r\nBij een keuzeveld heb je de mogelijkheid om opties toe te voegen waaruit gekozen kan worden bij het aanmaken of wijzigen van een locatie. Let op: bestaande opties kunnen niet verwijderd worden als ze nog gekoppeld zijn aan een locatie.",
+            "order": 2
         }
     },
     {
@@ -56,7 +56,7 @@
             "title": "Externe koppelingen",
             "description": "Veld voor het koppelen met een externe data bron.",
             "body": "Om het ophalen van gegevens uit externe bronnen te faciliteren kan je een Externe koppeling toevoegen. In een locatie kan je dan de naam opslaan die de locatie heeft in die externe bron.\r\n\r\nVanuit de lijst van externe koppelingen kan je een nieuwe externe bron toevoegen of een bestaande wijzigen.\r\n\r\nExterne API is de naam van de externe gegevens bron.\r\n\r\nHet veld korte naam wordt intern in de website gebruikt en als kolomnaam in de import en export.\r\n\r\nDoor een vinkje te zetten voor Zichtbaar voor niet ingelogde gebruikers maak je dit veld van een locatie zichtbaar voor publieke bezoekers van de website (dat zullen dus enkel medewerkers van de gemeente kunnen zijn).",
-            "order": 30
+            "order": 4
         }
     },
     {
@@ -66,7 +66,7 @@
             "title": "Data importeren",
             "description": "Voor het importeren van bestaande locatie.",
             "body": "Met de functie kan je een CSV bestand met bestaande locaties uploaden en op de website opslaan. De kolomnamen worden gegeven door de 'Korte naam' die je elke locatie eigenschap/externe koppeling hebt gegeven. Voor een voorbeeld van alle kolommen kan je eerst een export downloaden.\r\n\r\nTijdens het importeren gebeurd het volgende:\r\n\r\n- Er wordt gekeken welke kolommen in de CSV zitten die in de website bekent zijn. Enkel die kolommen worden geselecteerd voor de import.\r\n\r\n- Per rij wordt getracht de data uit die rij te verwerken. Als er een fout in de notatie van een kolom staat wordt dit gemeld en wordt de locatie niet opgeslagen in de website.\r\n\r\n- Als de locatie niet bestaat in de website dan wordt deze aangemaakt, met de pandcode die in het bron bestand staat. Als de locatie al wel bestaat (dit wordt gecontroleerd op pandcode), dan wordt de bestaande locatie in de website overschreven.\r\n\r\n- Kolommen met meervoudige data (en welke dus ook het vinkje daarvoor aan hebben staan in de locatie eigenschap daarvan) moet komma ',' gescheiden aangeboden worden.\r\n\r\nDe kolommen in het CSV bestand moeten punt-komma ';' gescheiden zijn.",
-            "order": 70
+            "order": 8
         }
     },
     {
@@ -76,7 +76,17 @@
             "title": "Data exporteren",
             "description": "Voor het maken van een export van de locaties.",
             "body": "Klik op de knop 'Download export' om een volledige export van alle locaties in de database te downloaden.\r\n\r\nDit kan handig zijn als backup of als bron voor andere gegevens systemen.\r\n\r\nDe kolomnamen zijn die zoals opgegeven als 'Korte naam' onder Locatie eigenschappen en Externe koppelingen.\r\n\r\nPublieke gebruikers van de website krijgen enkel de kolommen te zien in het bestand die het vinkje 'Zichtbaar voor niet ingelogde gebruikers' hebben.",
-            "order": 80
+            "order": 9
+        }
+    },
+    {
+        "model": "help_docs.documentation",
+        "pk": 9,
+        "fields": {
+            "title": "Locatie eigenschap groepen",
+            "description": "Voor het groeperen van locatie eigenschappen",
+            "body": "Je kan elke locatie categoriseren aan de hand van een zelf gedefiniëerde groepen.\r\n\r\nGeef de naam op van een nieuwe groep, en geef aan op welke plaats in de volgorde van groepen deze komt. Deze volgorde wordt aangehouden bij locaties; zowel voor het bekijken als toevoegen en wijzigen van locaties.\r\n\r\nOverig:\r\nWanneer een locatie eigenschap niet gegroepeerd is krijgt deze standaard de naam 'Overig' en komt op het einde van de lijst met eigenschappen.\r\n\r\nExterne koppelingen:\r\nAlle externe koppelingen zijn vast gegroepeerd onder de naam 'Externe koppelingen' deze is niet aanpasbaar en volgt altijd op als laatste op de locatie eigenschappen.",
+            "order": 3
         }
     }
 ]
