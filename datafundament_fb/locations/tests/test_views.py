@@ -504,7 +504,7 @@ class TestLocationImportForm(TestCase):
         # Verify response message
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken gebruikt.")
+        self.assertEqual(messages[0].message, "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt.")
 
     def test_import_csv_with_excess_columns(self):
         """ Test csv import when a data row has more columns than the header; for instance when a value has a semicolon"""
