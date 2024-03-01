@@ -231,7 +231,11 @@ class LocationExportView(View):
         response.write('\ufeff'.encode('utf-8'))
 
         # Setup a csv dictwriter and write the location data to the response object
-        headers = location_data[0].keys()
+        if location_data:
+            headers = location_data[0].keys()
+        else:
+            headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
+
         writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
         writer.writeheader()
         writer.writerows(location_data)

@@ -696,6 +696,36 @@ class TestLocationExportForm(TestCase):
         self.assertEqual(row['url'], self.url.value)
         self.assertEqual(row['type'], self.type.property_option.option)
 
+    def test_csv_with_headers_only(self):
+        """ Test requesting an empty csv, with only headers, when there are no locations in the database"""        
+        # Empty the database firts
+        Location.objects.all().delete()
+
+        # Request the csv export as an authenticated user
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+        response = self.client.post(reverse('locations_urls:location-export'), {})
+
+        # Verify the response
+        content = response.content
+        
+        # Create a csv dictionary from the list and read the first row 
+        data = content.decode('utf-8-sig').splitlines()
+        # Set the dialect for the csv by sniffing the first line
+        csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
+        csv_dict = csv.DictReader(data, dialect=csv_dialect)
+        
+        # Verify the headers
+        headers = set(csv_dict.fieldnames)
+        properties = {'color', 'url', 'multi', 'build', 'postcode', 'pandcode', 'note', 'type', 'mail', 'occupied', 'floors', 'naam'}
+        self.assertEqual(headers, properties)
+
+        # Verify that there are no rows in the csv
+        i = 0
+        for row in csv_dict:
+            i += 1
+
+        self.assertEqual(i, 0)
+
 
 class TestLocationAdminView(TestCase):
     """
