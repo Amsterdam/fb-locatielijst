@@ -43,3 +43,31 @@ class TestDocumentation(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers['Location'], '/admin/login/?next=' + url)
     
+
+class TestReorderObjects(TestCase):
+    def setUp(self) -> None:
+        self.documentation_one = Documentation(
+            title='one', description='One', body='Content', order=1)
+        self.documentation_two = Documentation(
+            title='two', description='Two', body='Content', order=1)
+        self.documentation_three = Documentation(
+            title='three', description='Three', body='Content', order=2)
+
+    def test_post_save_reordening(self):
+        # Save the first documentation
+        self.documentation_one.save()
+        # Order should be at 1
+        self.assertEqual(Documentation.objects.filter(title='one').first().order, 1)
+
+        # Save the second documentation
+        self.documentation_two.save()
+        # Order should be at 1
+        self.assertEqual(Documentation.objects.filter(title='two').first().order, 1)
+        # Order of the first documentation should be at two
+        self.assertEqual(Documentation.objects.filter(title='one').first().order, 2)
+
+        # Save the thid documentation without any order
+        self.documentation_three.save()
+        # The property should be last in order
+        self.assertEqual(Documentation.objects.all().order_by('order').last().order, 3)
+

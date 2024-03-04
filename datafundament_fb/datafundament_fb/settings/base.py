@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     # project app
     'locations',
     'help_docs',
+    'shared',
 ]
 
 MIDDLEWARE = [
