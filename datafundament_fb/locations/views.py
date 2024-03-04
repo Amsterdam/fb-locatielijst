@@ -144,12 +144,13 @@ class LocationImportView(LoginRequiredMixin, View):
         if form.is_valid():
             csv_file = form.cleaned_data.get('csv_file')
             if csv_file.name.endswith('.csv'):
-                csv_reader = csv_file.read().decode('utf-8-sig').splitlines()
-                # Set the correct format for the csv by 'sniffing' the first line of the csv data and setting the delimiter
                 try:
+                    # Read the file as an utf-8 file
+                    csv_reader = csv_file.read().decode('utf-8-sig').splitlines()
+                    # Set the correct format for the csv by 'sniffing' the first line of the csv data and setting the delimiter
                     csv_dialect = csv.Sniffer().sniff(sample=csv_reader[0], delimiters=';')
                 except:
-                    message = "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken gebruikt."
+                    message = "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt."
                     messages.add_message(request, messages.ERROR, message)
                     
                     return HttpResponseRedirect(reverse('locations_urls:location-import'))
@@ -231,7 +232,11 @@ class LocationExportView(View):
         response.write('\ufeff'.encode('utf-8'))
 
         # Setup a csv dictwriter and write the location data to the response object
-        headers = location_data[0].keys()
+        if location_data:
+            headers = location_data[0].keys()
+        else:
+            headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
+
         writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
         writer.writeheader()
         writer.writerows(location_data)
