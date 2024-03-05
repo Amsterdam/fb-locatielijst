@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
@@ -10,8 +11,8 @@ from django.views.generic import View, ListView
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from locations.forms import LocationDataForm, LocationImportForm
-from locations.models import Location
+from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
+from locations.models import Location, LocationProperty
 from locations.processors import LocationProcessor
 
 # Create your views here.
@@ -22,10 +23,58 @@ def home_page(request):
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
+
+    def get_queryset(self):
+        location_property = self.request.GET.get('property', '')
+        location_properties = LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_properties
+
+        qfilter = ''
+        # TODO trims spaces?
+        # Check if valid location property, set query variable accordingly
+        if location_property in location_properties:
+            # Filter LocationProperty on short_name value
+            qfilter = Q(locationdata__location_property__short_name=location_property)
+            if LocationProperty.objects.filter(short_name=location_property,property_type='CHOICE').exists():
+                query = self.request.GET.get(location_property, '')
+                # Filter PropertyOption on option value
+                qfilter = qfilter & Q(locationdata__property_option__option=query)
+            else:
+                query = self.request.GET.get('search', '')
+                # Filter LocationData on value
+                qfilter = qfilter & Q(locationdata__value__icontains=query)
+        else:
+            query = self.request.GET.get('search', '')
+            # Filter for value on LocationData.value, LocationExternalService.external_location_code, PropertyOption.option
+            qfilter = (
+                Q(locationdata__value__icontains=query) |
+                Q(locationexternalservice__external_location_code__icontains=query) |
+                Q(locationdata__property_option__option__icontains=query)
+            )
+
+        if not self.request.user.is_authenticated:
+            # Filter for private or public 
+            qfilter = qfilter & (
+                Q(locationdata__location_property__public=True) &
+                Q(locationexternalservice__external_service__public=True)
+            )
+
+        return Location.objects.filter(qfilter).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        initial_data = self.request.GET
+        # WISH super lachen; geef mee in welke eigenschap de zoekterm voorkomt en geef die mee (alleen in alle zoekvelden)
+        context['form'] = LocationListForm(initial=initial_data, include_private_properties=self.request.user.is_authenticated)
+        
+        property_list = ['id_search']
+        location_properties = (LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_property_instances)
+        for location_property in location_properties:
+            if location_property.property_type == 'CHOICE':
+                property_list.append('id_' + location_property.short_name)
+        context['property_list'] = property_list
+        return context
     
-    def get(self, request, *args, **kwargs):
-        return super(LocationListView, self).get(request, *args, **kwargs)
-    
+        
 
 class LocationDetailView(View):  
     form = LocationDataForm

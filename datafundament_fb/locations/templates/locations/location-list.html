@@ -9,6 +9,20 @@
 {% block content %}
 <h2>{% translate 'Locaties' %}</h2>
 
+{{ property_list|json_script:"property-list" }}
+<script type="text/javascript" src="{% static 'js/location-list.js' %}"></script>
+
+<div class="page-top">
+    <form action="." method="GET" novalidate>
+        {% for field in form %}
+        {{ field }}
+        {% endfor %}
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" formaction="{% url 'locations_urls:location-list' %}">Zoek</button>
+    </div>
+    </form>
+</div>
+
 <div class="page-content">
     <div class="page-left">
         <ul class="data-list">

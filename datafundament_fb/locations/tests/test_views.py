@@ -12,6 +12,10 @@ class LocationListViewTest(TestCase):
     Tests for requesting a list of locations
     """
 
+    # distict resultaten (een hit op een locatie mag niet meer dan 1 keer voorkomen)
+    # private gefilterde resulten, mag geen hits hebben op velden die niet zichtbaar zijn
+    # 
+
     def setUp(self) -> None:
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
     

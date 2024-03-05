@@ -1,7 +1,8 @@
 from django import forms
 from django.utils.safestring import mark_safe
-from locations.processors import LocationProcessor
 from locations import validators
+from locations.models import LocationProperty
+from locations.processors import LocationProcessor
 
 
 def set_location_property_fields(include_private_properties: bool=False)-> dict:
@@ -160,3 +161,38 @@ class LocationImportForm(forms.Form):
         required=True, label='CSV bestand',
         help_text=mark_safe('Kies het locatie bronbestand dat je wilt uploaden.')
     )
+
+
+class LocationListForm(forms.Form):
+    
+    def __init__(self, *args, **kwargs):
+        include_private_properties = kwargs.pop('include_private_properties', None)
+        super().__init__(*args, **kwargs)
+   
+        # loop door alle eigenschappen heen (private aware) en maak daar een choice veld van
+        location_properties = (LocationProcessor(include_private_properties=include_private_properties).location_property_instances)
+        external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
+        choice_list = [('','Alle tekstvelden')]
+        choice_list.extend([(property.short_name, property.label) for property in location_properties])
+        choice_list.extend([(property.short_name, property.name) for property in external_services])
+        self.fields['property'] = forms.ChoiceField(
+            label='Eigenschap',
+            choices=choice_list,
+            widget=forms.Select(attrs={'onchange': 'setSearchField();'}),
+        )
+
+        self.fields['search'] = forms.CharField(
+            label='Zoekterm',
+        )
+
+        location_properties_options = LocationProperty.objects.filter(property_type='CHOICE')
+        for location_property in location_properties_options:
+            # filter for private fields
+            if location_property in location_properties:
+                options = location_property.propertyoption_set.values_list('option', flat=True)
+                options_list = [(option, option) for option in options]
+                if options_list:
+                    self.fields[location_property.short_name] = forms.ChoiceField(
+                        label='Optie',
+                        choices=options_list
+                    )            

@@ -119,3 +119,7 @@ class TestLocationDataForm(TestCase):
             f"Er bestaat geen formulierveld voor '{undefined_property.property_type}'.",
             value_error.exception.__str__()
         )
+
+
+# TEST locationlistform
+# rekening houden met private voor tonen van doorzoekbare velden
