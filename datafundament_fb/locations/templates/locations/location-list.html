@@ -1,54 +1,70 @@
 {% extends 'admin/admin_base.html' %}
 {% load i18n static admin_urls admin_modify %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
-
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
 <h2>{% translate 'Locaties' %}</h2>
 
-{{ property_list|json_script:"property-list" }}
-<script type="text/javascript" src="{% static 'js/location-list.js' %}"></script>
+<div class="page-filter">
+    {{ property_list|json_script:"property-list" }}
+    <script type="text/javascript" src="{% static 'js/location-list.js' %}"></script>
 
-<div class="page-top">
     <form action="." method="GET" novalidate>
         {% for field in form %}
-        {{ field }}
+            <div class="filter-option filter-hide">
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                {{ field }}
+            </div>
         {% endfor %}
-    <div class="btn-container">
+
+        {% if user.is_authenticated %}
+        <div class="filter-option">
+            <label for="id_gearchiveerd">Archief</label>
+            <select id="id_gearchiveerd" name="geachiveerd">
+                <option>Niet gearchiveerd</option>
+                <option>Gearchiveerd</option>
+                <option>Beide</option>
+            </select>
+        </div>
+        {% endif %}
+        
         <button class="btn btn-primair" type="submit" formaction="{% url 'locations_urls:location-list' %}">Zoek</button>
-    </div>
     </form>
 </div>
 
 <div class="page-content">
-    <div class="page-left">
-        <ul class="data-list">
-            {% for object in object_list %}
-            <li>
-                <a href="{% url 'locations_urls:location-detail' object.pandcode %}">
-                    <span class="icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-                            <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
-                        </svg>
-                    </span>
-                    {{object.pandcode}} - {{ object.name }}
-                </a>
-            </li>
-            {% empty %}
-            <li>Geen locaties gevonden</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="page-right">
-        <div class="btn-container">
-            <a href="export" class="btn btn-primair">Exporteren</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
-            {% endif %}
-        </div>
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col" class="column-pancode">Pandcode</th>
+                <th scope="col">Naam</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    {{object.pandcode}}
+                </td>
+                <td>
+                    <a href="{% url 'locations_urls:location-detail' object.pandcode %}">
+                        {{ object.name }}
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td>Geen locaties gevonden</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="h5">{{ object_list|length }} {% if filter_active %}van de {{ locations_all_count }} {% endif %}locaties gevonden</div>
+
+    <div class="btn-container">
+        <a href="export" class="btn btn-primair">Exporteren</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

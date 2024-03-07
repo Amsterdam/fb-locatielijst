@@ -176,13 +176,13 @@ class LocationListForm(forms.Form):
         choice_list.extend([(property.short_name, property.label) for property in location_properties])
         choice_list.extend([(property.short_name, property.name) for property in external_services])
         self.fields['property'] = forms.ChoiceField(
-            label='Eigenschap',
+            label='Waar wil je zoeken',
             choices=choice_list,
             widget=forms.Select(attrs={'onchange': 'setSearchField();'}),
         )
 
         self.fields['search'] = forms.CharField(
-            label='Zoekterm',
+            label='Wat wil je zoeken',
         )
 
         location_properties_options = LocationProperty.objects.filter(property_type='CHOICE')
@@ -193,6 +193,6 @@ class LocationListForm(forms.Form):
                 options_list = [(option, option) for option in options]
                 if options_list:
                     self.fields[location_property.short_name] = forms.ChoiceField(
-                        label='Optie',
+                        label='Wat wil je zoeken',
                         choices=options_list
                     )            

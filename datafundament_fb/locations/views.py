@@ -51,6 +51,7 @@ class LocationListView(ListView):
                 Q(locationdata__property_option__option__icontains=query)
             )
 
+        # MENTAL THEO NOTE: Filter foor gearchiveerd of niet
         if not self.request.user.is_authenticated:
             # Filter for private or public 
             qfilter = qfilter & (
@@ -72,6 +73,8 @@ class LocationListView(ListView):
             if location_property.property_type == 'CHOICE':
                 property_list.append('id_' + location_property.short_name)
         context['property_list'] = property_list
+        context['locations_all_count'] = Location.objects.all().count()
+        context['filter_active'] = len(context['object_list']) < context['locations_all_count'] 
         return context
     
         

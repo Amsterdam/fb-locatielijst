@@ -1,30 +1,25 @@
 const propertyList = JSON.parse(document.getElementById('property-list').textContent);
 
 function setSearchField(){
-    var searchField = document.getElementById("id_search");
-    var activeProperty = document.getElementById("id_property");
-    var activePropertyId = 'id_' + activeProperty.value
+    var propertyField = document.getElementById("id_property");
+    var activePropertyId = 'id_' + propertyField.value
 
+    propertyField.parentElement.classList.remove("filter-hide");
     for (property of propertyList) {
         var element = document.getElementById(property);
         if(element) {
-            console.log(property);
-            element.style.visibility = "hidden";
+            element.parentElement.classList.add("filter-hide");
             element.disabled = true;
-            element.style.display = "none";
         }
     }
 
-    if(propertyList.includes(activePropertyId)) {
-        var selectField = document.getElementById(activePropertyId);
-        selectField.style.visibility = "visible";
-        selectField.style.display = "inline";
-        selectField.disabled = false;
+    if (propertyList.includes(activePropertyId)) {
+        var activeField = document.getElementById(activePropertyId);
     } else {
-        searchField.style.visibility = "visible";       
-        searchField.style.display = "inline";
-        searchField.disabled = false;
+        var activeField = document.getElementById("id_search");
     }
+    activeField.parentElement.classList.remove("filter-hide");
+    activeField.disabled = false;
 }
 
 window.onload = function () {

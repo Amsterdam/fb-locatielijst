@@ -11,16 +11,7 @@ body #content {
 
 .page-content {
   display: flex;
-  flex-direction: row;
-}
-
-.page-left {
-  flex: 1 1 65%;
-  margin-bottom: 1rem;
-}
-.page-right {
-  flex: 1 1 35%;
-  margin-bottom: 1rem;
+  flex-direction: column;
 }
 
 /*******************************************/
@@ -28,6 +19,7 @@ body #content {
 #container div.breadcrumbs {
   padding: 1.125rem 2rem;
 }
+
 
 /*******************************************/
 
@@ -56,6 +48,9 @@ ul.data-list > li .icon svg {
   fill: var(--color-blue)
 }
 
+table.table-adam { margin-bottom: 1rem; }
+table.table-adam .column-pancode { width: 100px; }
+
 /*******************************************/
 
 .data-view {
@@ -76,6 +71,7 @@ ul.data-list > li .icon svg {
   display: flex;
   flex-direction: row;
   column-gap: 1rem;
+  margin-bottom: 2px;
 }
 
 .data-label {
@@ -91,8 +87,6 @@ ul.data-list > li .icon svg {
   color: var(--body-loud-color);
 }
 
-/*******************************************/
-
 .data-label label {
   color: var(--body-quiet-color);
   font-size: 1rem;
@@ -103,44 +97,15 @@ ul.data-list > li .icon svg {
   margin: 2px 0 7px 0;
 }
 
-.data-value input[type=text],
-.data-value input[type=email],
-.data-value input[type=number],
-.data-value input[type=tel],
-.data-value input[type=url],
+.data-value input:not([type=radio],[type=checkbox]),
 .data-value textarea,
 .data-value select {
   width: 100%;
   max-width: 350px;
-  box-sizing: border-box;
   height: auto;
 }
 
-input, textarea, select, .form-row p, form .button {
-  font-size: 1rem;
-}
-
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button,
-input::-webkit-outer-spin-button:hover,
-input::-webkit-inner-spin-button:hover,
-input::-webkit-outer-spin-button:focus,
-input::-webkit-inner-spin-button:focus {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
 @media screen and (max-width: 750px) {
-  .page-content {
-    flex-direction: column-reverse;
-  }
-  
   .data-view-row {
     display: flex;
     flex-direction: column;

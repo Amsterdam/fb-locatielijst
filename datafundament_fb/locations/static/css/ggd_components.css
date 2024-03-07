@@ -1,4 +1,79 @@
 
+/********** FORM ELEMENTS **********/
+
+input, textarea, select, option {
+  font-size: 1rem;
+  min-height: 2.2rem;
+  margin: 0;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+input[type=radio],
+input[type=checkbox] {
+  min-height: auto;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button:hover,
+input::-webkit-inner-spin-button:hover,
+input::-webkit-outer-spin-button:focus,
+input::-webkit-inner-spin-button:focus {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+/********** FILTER **********/
+
+.page-filter {
+  background-color: var(--color-greyLight);
+  padding: 20px;
+  margin-bottom: 1rem;
+}
+
+.page-filter form {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-option {
+  display: inline-flex;
+  flex-direction: column;
+  row-gap: 5px;
+  flex: 1 1 33%;
+  max-width: 400px;
+}
+
+.filter-hide {
+  display: none !important;
+}
+
+.page-filter input,
+.page-filter select {
+  margin: 0;
+}
+
+.page-filter .btn {
+  height: 2.2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+
+/********** ALERTS **********/
+
 .alert {
   padding: 0.5rem 1rem;
   margin-bottom: 1rem;
