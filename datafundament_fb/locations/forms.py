@@ -166,33 +166,49 @@ class LocationImportForm(forms.Form):
 class LocationListForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
+        # Set and remove include_private_properties argument before calling init
         include_private_properties = kwargs.pop('include_private_properties', None)
         super().__init__(*args, **kwargs)
    
-        # loop door alle eigenschappen heen (private aware) en maak daar een choice veld van
-        location_properties = (LocationProcessor(include_private_properties=include_private_properties).location_property_instances)
+        # Get all LocationProperty and ExternalService objects 
+        location_properties = LocationProcessor(include_private_properties=include_private_properties).location_property_instances
         external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
-        choice_list = [('','Alle tekstvelden')]
-        choice_list.extend([(property.short_name, property.label) for property in location_properties])
-        choice_list.extend([(property.short_name, property.name) for property in external_services])
+        
+        # Create a list of location properties to search in and an option to search in all properties
+        property_list = [('','Alle tekstvelden')]
+        property_list.extend([(property.short_name, property.label) for property in location_properties])
+        property_list.extend([(property.short_name, property.name) for property in external_services])
+        # Create the select field with the property choices
         self.fields['property'] = forms.ChoiceField(
             label='Waar wil je zoeken',
-            choices=choice_list,
+            choices=property_list,
             widget=forms.Select(attrs={'onchange': 'setSearchField();'}),
         )
 
+        # Create a search textfield 
         self.fields['search'] = forms.CharField(
             label='Wat wil je zoeken',
         )
 
-        location_properties_options = LocationProperty.objects.filter(property_type='CHOICE')
-        for location_property in location_properties_options:
-            # filter for private fields
+        # Create selection lists for any LocationProperty which has the property_type 'CHOICE'
+        for location_property in LocationProperty.objects.filter(property_type='CHOICE'):
+            # Only process properties from the location_properties list; because this is list is filtered for access permission 
             if location_property in location_properties:
+                # Get all options for the location property
                 options = location_property.propertyoption_set.values_list('option', flat=True)
+                # Create a choice list from the options
                 options_list = [(option, option) for option in options]
                 if options_list:
+                    # Add the selection field to the form
                     self.fields[location_property.short_name] = forms.ChoiceField(
                         label='Wat wil je zoeken',
                         choices=options_list
                     )            
+
+        # Add a selection field to the form to filter on archived locations
+        archive_list = [('not_archived', 'Niet gearchiveerd'),('archived', 'Gearchiveerd'),('all', 'Alle')]
+        self.fields['archive'] = forms.ChoiceField(
+            label='Archief',
+            choices=archive_list,
+        )
+

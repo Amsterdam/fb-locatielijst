@@ -12,23 +12,20 @@
 
     <form action="." method="GET" novalidate>
         {% for field in form %}
-            <div class="filter-option filter-hide">
-                <label for="{{ field.auto_id }}">{{ field.label }}</label>
-                {{ field }}
-            </div>
-        {% endfor %}
-
+        {% if field.name != 'archive' %}
+        <div class="filter-option filter-hide">
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {{ field }}
+        </div>
+        {% else %}
         {% if user.is_authenticated %}
         <div class="filter-option">
-            <label for="id_gearchiveerd">Archief</label>
-            <select id="id_gearchiveerd" name="geachiveerd">
-                <option>Niet gearchiveerd</option>
-                <option>Gearchiveerd</option>
-                <option>Beide</option>
-            </select>
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {{ field }}
         </div>
         {% endif %}
-        
+        {% endif %}
+        {% endfor %}        
         <button class="btn btn-primair" type="submit" formaction="{% url 'locations_urls:location-list' %}">Zoek</button>
     </form>
 </div>
@@ -58,10 +55,10 @@
         {% endfor %}
         </tbody>
     </table>
-    <div class="h5">{{ object_list|length }} {% if filter_active %}van de {{ locations_all_count }} {% endif %}locaties gevonden</div>
+    <div class="h5">{{ object_list|length }} locaties gevonden</div>
 
     <div class="btn-container">
-        <a href="export" class="btn btn-primair">Exporteren</a>
+        <a href="{% url 'locations_urls:location-export' %}?={{ export_query }}" class="btn btn-primair">Exporteren</a>
         {% if user.is_authenticated %}
         <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
         {% endif %}

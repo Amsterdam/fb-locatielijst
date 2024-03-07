@@ -1,9 +1,11 @@
 import csv
+import urllib.parse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
@@ -19,64 +21,126 @@ from locations.processors import LocationProcessor
 def home_page(request):
     return HttpResponseRedirect(reverse('locations_urls:location-list'))
 
+def get_filtered_locations(request)->QuerySet:
+    """
+    Returns a QuerySet of Locations filtered by a Q filter query
+    The query is build from the params in the request 
+    """
+    # Get request parameters
+    location_property = request.GET.get('property', '')
+    query = request.GET.get('search', '').strip()
+    archive = request.GET.get('archive', '')
+
+    # Get existing location and external service properties, filtered by access permission
+    location_properties = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
+
+    # Build a Q filter for querying the database 
+    qfilter = ''
+
+    # Only add a filter if the provided location property exists
+    if location_property in location_properties:
+        # Filter LocationProperty by short_name value
+        qfilter = Q(locationdata__location_property__short_name=location_property)
+        # If the property is of the CHOICE type 
+        if LocationProperty.objects.filter(short_name=location_property,property_type='CHOICE').exists():
+            # Get search value for proprerty options to searh by
+            query = request.GET.get(location_property, '').strip()
+            # Filter PropertyOption on option value
+            qfilter = qfilter & Q(locationdata__property_option__option=query)
+        else:
+            # Filter LocationData on value
+            qfilter = qfilter & Q(locationdata__value__icontains=query)
+    else:
+        # Filter for value on LocationData.value, LocationExternalService.external_location_code, PropertyOption.option
+        qfilter = (
+            Q(locationdata__value__icontains=query) |
+            Q(locationexternalservice__external_location_code__icontains=query) |
+            Q(locationdata__property_option__option__icontains=query)
+        )
+
+    # Filter properties on the access permission of the user
+    if request.user.is_authenticated:
+        # Filter on archive attribute
+        match archive:
+            case 'not_archived':
+                qfilter = qfilter & Q(is_archived=False)
+            case 'archived':
+                qfilter = qfilter & Q(is_archived=True)
+            case 'all':...
+            case _:
+                qfilter = qfilter & Q(is_archived=False)       
+    else:
+        # Filter only non archied public location data
+        qfilter = qfilter & (
+            Q(locationdata__location_property__public=True) &
+            Q(locationexternalservice__external_service__public=True) &
+            Q(is_archived=False)
+        )
+    # Return the filtered list of Locations
+    return Location.objects.filter(qfilter).distinct()
+
+def get_csv_file_response(request, locations)-> HttpResponse:
+    """
+    Method for returning a csv file within an http response object.
+    Takes a list of Location objects as it input
+    """
+    # Set all location data to a LocationProcessor
+    location_data = []
+    for location in locations:
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data.append(
+            LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
+        )
+
+    # Setup the http response with the 
+    date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
+    response = HttpResponse(
+        content_type='text/csv, charset=utf-8',
+        headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
+    )
+
+    # Add BOM to the file; because otherwise Excel won't know what's happening
+    response.write('\ufeff'.encode('utf-8'))
+
+    # Based on Locations presently in the database return the headers for the CSV file
+    if location_data:
+        headers = location_data[0].keys()
+    else:
+        headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
+
+    # Setup a csv dictwriter and write the location data to the response object
+    writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
+    writer.writeheader()
+    writer.writerows(location_data)
+
+    return response
+
 
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
 
     def get_queryset(self):
-        location_property = self.request.GET.get('property', '')
-        location_properties = LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_properties
-
-        qfilter = ''
-        # TODO trims spaces?
-        # Check if valid location property, set query variable accordingly
-        if location_property in location_properties:
-            # Filter LocationProperty on short_name value
-            qfilter = Q(locationdata__location_property__short_name=location_property)
-            if LocationProperty.objects.filter(short_name=location_property,property_type='CHOICE').exists():
-                query = self.request.GET.get(location_property, '')
-                # Filter PropertyOption on option value
-                qfilter = qfilter & Q(locationdata__property_option__option=query)
-            else:
-                query = self.request.GET.get('search', '')
-                # Filter LocationData on value
-                qfilter = qfilter & Q(locationdata__value__icontains=query)
-        else:
-            query = self.request.GET.get('search', '')
-            # Filter for value on LocationData.value, LocationExternalService.external_location_code, PropertyOption.option
-            qfilter = (
-                Q(locationdata__value__icontains=query) |
-                Q(locationexternalservice__external_location_code__icontains=query) |
-                Q(locationdata__property_option__option__icontains=query)
-            )
-
-        # MENTAL THEO NOTE: Filter foor gearchiveerd of niet
-        if not self.request.user.is_authenticated:
-            # Filter for private or public 
-            qfilter = qfilter & (
-                Q(locationdata__location_property__public=True) &
-                Q(locationexternalservice__external_service__public=True)
-            )
-
-        return Location.objects.filter(qfilter).distinct()
+        # Get a QuerySet of filtered locations 
+        locations = get_filtered_locations(self.request)
+        return locations
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         initial_data = self.request.GET
-        # WISH super lachen; geef mee in welke eigenschap de zoekterm voorkomt en geef die mee (alleen in alle zoekvelden)
+        # Render the search form
         context['form'] = LocationListForm(initial=initial_data, include_private_properties=self.request.user.is_authenticated)
-        
+        # Create at list of search input elements to be used in a JS function
+        # This functions hides/unhides these elements depending on the selection of the id_property field 
         property_list = ['id_search']
         location_properties = (LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_property_instances)
         for location_property in location_properties:
             if location_property.property_type == 'CHOICE':
                 property_list.append('id_' + location_property.short_name)
         context['property_list'] = property_list
-        context['locations_all_count'] = Location.objects.all().count()
-        context['filter_active'] = len(context['object_list']) < context['locations_all_count'] 
+        # Pass the url query to the url for exporting the search result as csv file
+        context['export_query'] = urllib.parse.urlencode(self.request.GET)
         return context
-    
         
 
 class LocationDetailView(View):  
@@ -259,41 +323,21 @@ class LocationExportView(View):
     template = 'locations/location-export.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request=request, template_name=self.template)
+        # when a query is given, return the csv file not the webpage
+        if self.request.GET:
+            # Get a QuerySet of filtered locations 
+            locations = get_filtered_locations(self.request)
+            # Set the response with the csv file
+            response = get_csv_file_response(request, locations)
+        else:
+            response = render(request=request, template_name=self.template)
+        return response
 
     def post(self, request, *args, **kwargs):
         # Get all Location instances()
         locations = Location.objects.all()
-
-        # Set all location data to a LocationProcessor
-        location_data = []
-        for location in locations:
-            # Get loction data  depending on user context; include_private_properties == True is all location properties
-            location_data.append(
-                LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
-            )
-
-        # Setup the http response with the 
-        date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
-        response = HttpResponse(
-            content_type='text/csv, charset=utf-8',
-            headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
-        )
-
-        # Add BOM to the file; because otherwise Excel won't know what's happening
-        response.write('\ufeff'.encode('utf-8'))
-
-        # Setup a csv dictwriter and write the location data to the response object
-        if location_data:
-            headers = location_data[0].keys()
-        else:
-            headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
-
-        writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
-        writer.writeheader()
-        writer.writerows(location_data)
-
-        # Return the response
+        # Set the response with the csv file
+        response = get_csv_file_response(request, locations)
         return response
 
 
