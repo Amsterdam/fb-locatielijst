@@ -64,7 +64,7 @@ class LocationListView(TestCase):
             ('private', '', False, '', []),
             ('code', '', False, '', [24001, 24002]),
             ('private', '', True, '', [24001, 24002]),
-            # Search name 
+            # Search name
             ('adhuis', 'naam', False, '', [24001]),
             ('wonin', 'naam', False, '', []),
             ('opera', 'naam', True, '', [24002]),
