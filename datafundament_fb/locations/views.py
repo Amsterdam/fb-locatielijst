@@ -28,54 +28,73 @@ def get_filtered_locations(request)->QuerySet:
     """
     # Get request parameters
     location_property = request.GET.get('property', '')
-    query = request.GET.get('search', '').strip()
+    search = request.GET.get('search', '').strip()
     archive = request.GET.get('archive', '')
 
     # Get existing location and external service properties, filtered by access permission
     location_properties = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
 
-    # Build a Q filter for querying the database 
-    qfilter = ''
+    # Build a Q filter when querying for a specific property; defaults to full text search when no existing property is queried
+    match location_property:
+        # Filter on Location.name
+        case 'naam':
+            qfilter = Q(name__icontains=search)
+        # Filter on Location.pandcode
+        case 'pandcode':
+            if search.isdigit():
+                qfilter = Q(pandcode=search)
+        # Filter LocationProperty or ExternalService by short_name
+        case location_property if location_property in location_properties:
+            # For LocationProperty by access permission
+            qfilter = (
+                Q(locationdata__location_property__short_name=location_property) &
+                Q(locationdata__location_property__short_name__in=location_properties))
+            # For ExternalService by access permission
+            qfilter |= (
+                Q(locationexternalservice__external_service__short_name=location_property) &
+                Q(locationexternalservice__external_service__short_name__in=location_properties))
 
-    # Only add a filter if the provided location property exists
-    if location_property in location_properties:
-        # Filter LocationProperty by short_name value
-        qfilter = Q(locationdata__location_property__short_name=location_property)
-        # If the property is of the CHOICE type 
-        if LocationProperty.objects.filter(short_name=location_property,property_type='CHOICE').exists():
-            # Get search value for proprerty options to searh by
-            query = request.GET.get(location_property, '').strip()
-            # Filter PropertyOption on option value
-            qfilter = qfilter & Q(locationdata__property_option__option=query)
-        else:
-            # Filter LocationData on value
-            qfilter = qfilter & Q(locationdata__value__icontains=query)
-    else:
-        # Filter for value on LocationData.value, LocationExternalService.external_location_code, PropertyOption.option
-        qfilter = (
-            Q(locationdata__value__icontains=query) |
-            Q(locationexternalservice__external_location_code__icontains=query) |
-            Q(locationdata__property_option__option__icontains=query)
-        )
+            # If the property is of the CHOICE type
+            if LocationProperty.objects.filter(short_name=location_property,property_type='CHOICE').exists():
+                # Filter PropertyOption on option value
+                qfilter &= Q(locationdata__property_option__option=search)
+            else:
+                # Filter on LocationData or LocationExternalService value
+                qfilter &= (
+                    Q(locationdata__value__icontains=search) |
+                    Q(locationexternalservice__external_location_code__icontains=search))
+        # Do a full search on all tables containing location data
+        case _:
+            # Filter on Location name
+            qfilter = Q(name__icontains=search)
+            # For LocationData by LocationProperty access permission
+            qfilter |= (
+                Q(locationdata__value__icontains=search) &
+                Q(locationdata__location_property__short_name__in=location_properties))
+            # For PropertyOptions by access permission
+            qfilter |= (
+                Q(locationdata__property_option__option__icontains=search) &
+                Q(locationdata__location_property__short_name__in=location_properties))
+            # For ExternalService by access permission
+            qfilter |= (
+                Q(locationexternalservice__external_location_code__icontains=search) &
+                Q(locationexternalservice__external_service__short_name__in=location_properties))
+ 
+    # Filter on location archive attribute; default is only active locations
+    match archive:
+        case 'active':
+            qfilter &= Q(is_archived=False)
+        case 'archived':
+            qfilter &= Q(is_archived=True)
+        case 'all':...
+        case _:
+            qfilter &= Q(is_archived=False)       
 
-    # Filter properties on the access permission of the user
-    if request.user.is_authenticated:
-        # Filter on archive attribute
-        match archive:
-            case 'not_archived':
-                qfilter = qfilter & Q(is_archived=False)
-            case 'archived':
-                qfilter = qfilter & Q(is_archived=True)
-            case 'all':...
-            case _:
-                qfilter = qfilter & Q(is_archived=False)       
-    else:
-        # Filter only non archied public location data
-        qfilter = qfilter & (
-            Q(locationdata__location_property__public=True) &
-            Q(locationexternalservice__external_service__public=True) &
-            Q(is_archived=False)
-        )
+    # If a user is not authenticated, filter for active locations and public properties only
+    if not request.user.is_authenticated:
+        # Always filter only on active locations
+        qfilter &= Q(is_archived=False)
+
     # Return the filtered list of Locations
     return Location.objects.filter(qfilter).distinct()
 

@@ -175,7 +175,7 @@ class LocationListForm(forms.Form):
         external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
         
         # Create a list of location properties to search in and an option to search in all properties
-        property_list = [('','Alle tekstvelden')]
+        property_list = [('','Alle tekstvelden'),('naam','Naam'),('pandcode','Pandcode')]
         property_list.extend([(property.short_name, property.label) for property in location_properties])
         property_list.extend([(property.short_name, property.name) for property in external_services])
         # Create the select field with the property choices
@@ -206,7 +206,7 @@ class LocationListForm(forms.Form):
                     )            
 
         # Add a selection field to the form to filter on archived locations
-        archive_list = [('not_archived', 'Niet gearchiveerd'),('archived', 'Gearchiveerd'),('all', 'Alle')]
+        archive_list = [('active', 'Actief'),('archived', 'Gearchiveerd'),('all', 'Alle')]
         self.fields['archive'] = forms.ChoiceField(
             label='Archief',
             choices=archive_list,

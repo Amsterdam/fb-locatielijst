@@ -12,19 +12,19 @@
 
     <form action="." method="GET" novalidate>
         {% for field in form %}
-        {% if field.name != 'archive' %}
-        <div class="filter-option filter-hide">
-            <label for="{{ field.auto_id }}">{{ field.label }}</label>
-            {{ field }}
-        </div>
-        {% else %}
-        {% if user.is_authenticated %}
-        <div class="filter-option">
-            <label for="{{ field.auto_id }}">{{ field.label }}</label>
-            {{ field }}
-        </div>
-        {% endif %}
-        {% endif %}
+            {% if field.name != 'archive' %}
+            <div class="filter-option filter-hide">
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% else %}
+                {% if user.is_authenticated %}
+                <div class="filter-option">
+                    <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+                {% endif %}
+            {% endif %}
         {% endfor %}        
         <button class="btn btn-primair" type="submit" formaction="{% url 'locations_urls:location-list' %}">Zoek</button>
     </form>
@@ -51,7 +51,6 @@
                 </td>
             </tr>
         {% empty %}
-            <tr><td>Geen locaties gevonden</td></tr>
         {% endfor %}
         </tbody>
     </table>
