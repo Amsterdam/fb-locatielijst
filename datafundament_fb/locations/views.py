@@ -26,17 +26,21 @@ def get_filtered_locations(request)->QuerySet:
     Returns a QuerySet of Locations filtered by a Q filter query
     The query is build from the params in the request 
     """
-    # Get request parameters
-    property_value = request.GET.get('property', '')
-    search_value = request.GET.get('search', '').strip()
-    archive_value = request.GET.get('archive', '')
-
     # Get existing location and external service properties, filtered by access permission
     location_properties = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
-    # Build a Q filter for querying the database 
-    qfilter = None
+    # Get request parameters
+    property_value = request.GET.get('property', '')
+    # Set the correct search name when filtering on location property with a choice list
+    if property_value in location_properties:
+        search_name = property_value
+    else:
+        search_name = 'search'   
+    search_value = request.GET.get(search_name, '').strip()
+    archive_value = request.GET.get('archive', '')
 
-    # Filter when querying for a specific property; default full text search when no existing property is queried
+    # Build a Q filter for querying the database 
+    # Filter when querying for a specific property
+    # Default is full text search when no existing property is queried
     match property_value:
         # Filter on Location.name
         case 'naam':
@@ -81,18 +85,11 @@ def get_filtered_locations(request)->QuerySet:
 
     # If a user is not authenticated, filter for active locations and public properties only
     if not request.user.is_authenticated:
-        # Filter only on active locations
-        qfilter &= Q(is_archived=False)
+        qfilter &= (
+            Q(is_archived=False) &
+            Q(locationdata__location_property__short_name__in=location_properties) &
+            Q(locationexternalservice__external_service__short_name__in=location_properties))
 
-        # Set filter to public properties, but not for naam and pandcode,
-        # they are always public and not part of LocationData and/or ExternalServices
-        if property_value not in ['naam','pandcode']:
-            qfilter &= (
-                Q(locationdata__location_property__short_name__in=location_properties) &
-                Q(locationexternalservice__external_service__short_name__in=location_properties)
-            )
-
-    # Return the filtered list of Locations
     return Location.objects.filter(qfilter).distinct()
 
 def get_csv_file_response(request, locations)-> HttpResponse:

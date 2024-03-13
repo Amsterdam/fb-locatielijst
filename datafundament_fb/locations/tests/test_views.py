@@ -16,21 +16,21 @@ class LocationListView(TestCase):
     """
 
     def setUp(self) -> None:
-        public_property = LocationProperty.objects.create(
+        LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)
-        private_property = LocationProperty.objects.create(
+        LocationProperty.objects.create(
             short_name='private', label='Private property', property_type='STR', public=False)
         choice_property = LocationProperty.objects.create(
             short_name='choice', label='choice property', property_type='CHOICE', public=True)
-        option = PropertyOption.objects.create(
+        PropertyOption.objects.create(
             location_property=choice_property, option='Keuze optie')
-        external_service = ExternalService.objects.create(
+        ExternalService.objects.create(
             name='External service', short_name='external', public=True)
-        location_1 = Location.objects.create(
+        Location.objects.create(
             pandcode=24001, name='Stadhuis', is_archived=False)
-        location_2 = Location.objects.create(
+        Location.objects.create(
             pandcode=24002, name='Stopera', is_archived=False)
-        location_3 = Location.objects.create(
+        Location.objects.create(
             pandcode=24003, name='Ambtswoning', is_archived=True )
         LocationProcessor(include_private_properties=True, data={
             'pandcode': '24001',
@@ -117,8 +117,15 @@ class LocationListView(TestCase):
         # Set the url query parameters
         if not request.GET._mutable:
             request.GET._mutable = True
-        request.GET['search'] = search
+        
+        # Set location_property
         request.GET['property'] = location_property
+        location_properties = LocationProcessor(include_private_properties=is_authenticated).location_properties
+        # Set search value based on existing location property
+        if location_property in location_properties:
+            request.GET[location_property] = search
+        else:
+            request.GET['search'] = search
         request.GET['archive'] = archive
 
         # Call the filter for the request
