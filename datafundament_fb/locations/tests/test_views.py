@@ -12,9 +12,8 @@ from locations.views import get_csv_file_response, get_filtered_locations
 
 class LocationListView(TestCase):
     """
-    Tests for requesting a list of locations
+    Tests for searching in the list of locations
     """
-
     def setUp(self) -> None:
         LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)

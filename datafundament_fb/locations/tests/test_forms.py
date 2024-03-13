@@ -1,8 +1,8 @@
 from django import forms
 from django.test import TestCase
-from locations.forms import LocationDataForm
+from locations.forms import LocationDataForm, LocationListForm
 from locations.models import Location, LocationProperty, PropertyOption, ExternalService
-
+from locations.processors import LocationProcessor
 
 class TestLocationDataForm(TestCase):
     def setUp(self) -> None:
@@ -120,6 +120,101 @@ class TestLocationDataForm(TestCase):
             value_error.exception.__str__()
         )
 
+class TestLocationListForm(TestCase):
+    def setUp(self) -> None:
+        self.public_property = LocationProperty.objects.create(
+            short_name='public', label='Public property', property_type='STR', public=True)
+        self.private_property = LocationProperty.objects.create(
+            short_name='private', label='Private property', property_type='STR', public=False)
+        self.choice_property = LocationProperty.objects.create(
+            short_name='choice', label='choice property', property_type='CHOICE', public=False)
+        self.property_option = PropertyOption.objects.create(
+            location_property=self.choice_property, option='Keuze optie')
+        self.external_service = ExternalService.objects.create(
+            name='External service', short_name='external', public=True)
+        Location.objects.create(
+            pandcode=24001, name='Stadhuis', is_archived=False)
+        Location.objects.create(
+            pandcode=24002, name='Stopera', is_archived=False)
+        Location.objects.create(
+            pandcode=24003, name='Ambtswoning', is_archived=True )
+        LocationProcessor(include_private_properties=True, data={
+            'pandcode': '24001',
+            'naam': 'Stadhuis',
+            'public': 'Publieke info',
+            'private': 'Private info',
+            'choice': 'Keuze optie',
+            'external': 'Externe code 24001',
+        }).save()
+        LocationProcessor(include_private_properties=True, data={
+            'pandcode': '24002',
+            'naam': 'Stopera',
+            'public': 'Publieke info',
+            'private': 'Private info',
+            'choice': 'Keuze optie',
+            'external': 'Externe code 24002',
+        }).save()
+        LocationProcessor(include_private_properties=True, data={
+            'pandcode': '24003',
+            'naam': 'Ambtswoning',
+            'public': 'Publieke info',
+            'private': 'Private info',
+            'choice': 'Keuze optie',
+            'external': 'Externe code 24003',
+        }).save()
 
-# TEST locationlistform
-# rekening houden met private voor tonen van doorzoekbare velden
+    def test_search_form_fields_authenticated(self):
+        # Render the form as an authenticated user
+        location_list_form = LocationListForm(include_private_properties=True)
+
+        # Verify the form fields
+        # Property field
+        field = location_list_form.fields['property'] 
+        self.assertIsInstance(field, forms.ChoiceField)
+        # Verify the choices in the properties list
+        expected_choice_list = [
+            ('','Alle tekstvelden'),
+            ('naam','Naam'),
+            ('pandcode','Pandcode'),
+            (self.public_property.short_name, self.public_property.label),
+            (self.private_property.short_name, self.private_property.label),
+            (self.choice_property.short_name, self.choice_property.label),
+            (self.external_service.short_name, self.external_service.name),
+        ]
+        self.assertEqual(set(field._choices), set(expected_choice_list))
+
+        # Search field
+        field = location_list_form.fields['search'] 
+        self.assertIsInstance(field, forms.CharField)
+
+        # Select field for the choice property
+        field = location_list_form.fields[self.choice_property.short_name]
+        self.assertIsInstance(field, forms.ChoiceField)
+        # Verify if the choice is in the list of choices
+        self.assertIn(self.property_option.option, field._choices[0])
+
+    def test_search_form_field_anonymous(self):
+        # Render the form as an anonymous user
+        location_list_form = LocationListForm(include_private_properties=False)
+
+        # Verify the form fields
+        # Property field
+        field = location_list_form.fields['property'] 
+        self.assertIsInstance(field, forms.ChoiceField)
+        # Verify the choices in the properties list
+        expected_choice_list = [
+            ('','Alle tekstvelden'),
+            ('naam','Naam'),
+            ('pandcode','Pandcode'),
+            (self.public_property.short_name, self.public_property.label),
+            (self.external_service.short_name, self.external_service.name),
+        ]
+        self.assertEqual(set(field._choices), set(expected_choice_list))
+
+        # Search field
+        field = location_list_form.fields['search'] 
+        self.assertIsInstance(field, forms.CharField)
+
+        # The choice property should not have a select field
+        field = location_list_form.fields.get(self.choice_property.short_name, None)
+        self.assertIsNone(field)
