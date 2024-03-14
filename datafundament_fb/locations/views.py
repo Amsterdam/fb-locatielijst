@@ -4,8 +4,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
@@ -14,83 +12,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
-from locations.models import Location, LocationProperty
+from locations.models import Location
 from locations.processors import LocationProcessor
 
 # Create your views here.
 def home_page(request):
     return HttpResponseRedirect(reverse('locations_urls:location-list'))
-
-def get_filtered_locations(request)->QuerySet:
-    """
-    Returns a QuerySet of Locations filtered by a Q filter query
-    The query is build from the params in the request 
-    """
-    # Get existing location and external service properties, filtered by access permission
-    location_properties = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
-    # Get request parameters
-    property_value = request.GET.get('property', '')
-    # Set the correct search name when filtering on location property with a choice list
-    if property_value in location_properties:
-        search_name = property_value
-    else:
-        search_name = 'search'   
-    search_value = request.GET.get(search_name, '').strip()
-    archive_value = request.GET.get('archive', '')
-
-    # Build a Q filter for querying the database 
-    # Filter when querying for a specific property
-    # Default is full text search when no existing property is queried
-    match property_value:
-        # Filter on Location.name
-        case 'naam':
-            qfilter = Q(name__icontains=search_value)
-        # Filter on Location.pandcode
-        case 'pandcode':
-            if search_value.isdigit():
-                qfilter = Q(pandcode=search_value)
-        case property_value if property_value:
-            # Filter LocationProperty or ExternalService by short_name
-            qfilter = (
-                Q(locationdata__location_property__short_name=property_value) |
-                Q(locationexternalservice__external_service__short_name=property_value))
-
-            # If the property is of the CHOICE type
-            if LocationProperty.objects.filter(short_name=property_value,property_type='CHOICE').exists():
-                # Filter PropertyOption on option value
-                qfilter &= Q(locationdata__property_option__option=search_value)
-            else:
-                # Filter on LocationData or LocationExternalService value
-                qfilter &= (
-                    Q(locationdata__value__icontains=search_value) |
-                    Q(locationexternalservice__external_location_code__icontains=search_value))
-        case _:
-            # Do a full search on all tables containing location data
-            qfilter = (
-                Q(name__icontains=search_value) |
-                Q(locationdata__value__icontains=search_value) |
-                Q(locationexternalservice__external_location_code__icontains=search_value) |
-                Q(locationdata__property_option__option__icontains=search_value)
-            )
- 
-    # Filter on location archive attribute; default is only active locations
-    match archive_value:
-        case 'active':
-            qfilter &= Q(is_archived=False)
-        case 'archived':
-            qfilter &= Q(is_archived=True)
-        case 'all':...
-        case _:
-            qfilter &= Q(is_archived=False)       
-
-    # If a user is not authenticated, filter for active locations and public properties only
-    if not request.user.is_authenticated:
-        qfilter &= (
-            Q(is_archived=False) &
-            Q(locationdata__location_property__short_name__in=location_properties) &
-            Q(locationexternalservice__external_service__short_name__in=location_properties))
-
-    return Location.objects.filter(qfilter).distinct()
 
 def get_csv_file_response(request, locations)-> HttpResponse:
     """
@@ -135,7 +62,9 @@ class LocationListView(ListView):
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations 
-        locations = get_filtered_locations(self.request)
+        params = self.request.GET.dict()
+        is_authenticated = self.request.user.is_authenticated
+        locations = Location.objects.search_filter(params, is_authenticated)
         return locations
 
     def get_context_data(self, **kwargs):
@@ -337,9 +266,11 @@ class LocationExportView(View):
 
     def get(self, request, *args, **kwargs):
         # when a query is given, return the csv file not the webpage
-        if self.request.GET:
-            # Get a QuerySet of filtered locations 
-            locations = get_filtered_locations(self.request)
+        if request.GET:
+            # Get a QuerySet of filtered locations
+            params = self.request.GET.dict()
+            is_authenticated = self.request.user.is_authenticated
+            locations = Location.objects.search_filter(params, is_authenticated)
             # Set the response with the csv file
             response = get_csv_file_response(request, locations)
         else:

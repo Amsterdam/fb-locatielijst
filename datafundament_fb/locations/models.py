@@ -4,6 +4,7 @@ from django.db.models import Max, Q
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
+from locations.managers import LocationManager
 # Create your models here.
 
 # Auto generate a new pandcode based on the current highest in the database
@@ -30,6 +31,7 @@ class Location(models.Model):
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
     is_archived = models.BooleanField(verbose_name="Archief", default=False)
+    objects = LocationManager()
 
     def __str__(self):
         return f'{self.pandcode}, {self.name}'
@@ -40,8 +42,8 @@ class Location(models.Model):
             models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
             models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
-
-
+        
+    
 class PropertyGroup(models.Model):
     name = models.CharField(verbose_name='Groepsnaam', max_length=20)
     order = models.IntegerField(verbose_name='Volgorde', blank=True, null=True, validators=[MinValueValidator(1)])

@@ -6,9 +6,9 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 from parameterized import parameterized
-from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService, LocationExternalService
+from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
-from locations.views import get_csv_file_response, get_filtered_locations
+from locations.views import get_csv_file_response
 
 class LocationListView(TestCase):
     """
@@ -22,7 +22,9 @@ class LocationListView(TestCase):
         choice_property = LocationProperty.objects.create(
             short_name='choice', label='choice property', property_type='CHOICE', public=True)
         PropertyOption.objects.create(
-            location_property=choice_property, option='Keuze optie')
+            location_property=choice_property, option='KeuzeOptie1')
+        PropertyOption.objects.create(
+            location_property=choice_property, option='KeuzeOptie2')
         ExternalService.objects.create(
             name='External service', short_name='external', public=True)
         Location.objects.create(
@@ -34,35 +36,36 @@ class LocationListView(TestCase):
         LocationProcessor(include_private_properties=True, data={
             'pandcode': '24001',
             'naam': 'Stadhuis',
-            'public': 'Publieke info',
-            'private': 'Private info',
-            'choice': 'Keuze optie',
-            'external': 'Externe code 24001',
+            'public': 'Publiek',
+            'private': 'Prive',
+            'choice': 'KeuzeOptie1',
+            'external': '10042',
         }).save()
         LocationProcessor(include_private_properties=True, data={
             'pandcode': '24002',
             'naam': 'Stopera',
-            'public': 'Publieke info',
-            'private': 'Private info',
-            'choice': 'Keuze optie',
-            'external': 'Externe code 24002',
+            'public': 'Publiek',
+            'private': 'Geheim',
+            'choice': 'KeuzeOptie2',
+            'external': '20042',
         }).save()
         LocationProcessor(include_private_properties=True, data={
             'pandcode': '24003',
             'naam': 'Ambtswoning',
-            'public': 'Publieke info',
-            'private': 'Private info',
-            'choice': 'Keuze optie',
-            'external': 'Externe code 24003',
+            'public': 'Burgemeester',
+            'private': 'Prive',
+            'choice': 'KeuzeOptie1',
+            'external': '30042',
         }).save()
 
     @parameterized.expand([
             # Search all fields
             ('', '', False, '', [24001, 24002]),
             ('keuze', '', False, '', [24001, 24002]),
-            ('private', '', False, '', []),
-            ('code', '', False, '', [24001, 24002]),
-            ('private', '', True, '', [24001, 24002]),
+            ('prive', '', False, '', []),
+            ('0042', '', False, '', [24001, 24002]),
+            ('10042', '', False, '', [24001]),
+            ('prive', '', True, '', [24001]),
             # Search name
             ('adhuis', 'naam', False, '', [24001]),
             ('wonin', 'naam', False, '', []),
@@ -73,18 +76,20 @@ class LocationListView(TestCase):
             ('24003', 'pandcode', True, 'all', [24003]),
             # Search public property
             ('publiek', 'public', False, '', [24001, 24002]),
-            ('publiek', 'public', True, 'all', [24001, 24002, 24003]),
+            ('meester', 'public', True, 'all', [24003]),
             # Search private property
-            ('private', 'private', False, '', []),
-            ('private', 'private', True, 'all', [24001, 24002, 24003]),
+            ('prive', 'private', False, '', []),
+            ('prive', 'private', True, 'all', [24001, 24003]),
             # Search choice property
-            ('Keuze optie', 'choice', False, '', [24001, 24002]),
+            ('KeuzeOptie1', 'choice', False, '', [24001]),
+            ('KeuzeOptie1', 'choice', True, 'all', [24001, 24003]),
+            ('KeuzeOptie2', 'choice', False, '', [24002]),
             ('optie', 'choice', False, '', []),
             ('', 'choice', True, 'all', []),
             # Search external service location code
-            ('24001', 'external', False, '', [24001]),
-            ('24003', 'external', False, '', []),
-            ('24003', 'external', True, 'all', [24003]),
+            ('10042', 'external', False, '', [24001]),
+            ('30042', 'external', False, '', []),
+            ('30042', 'external', True, 'all', [24003]),
             # Archive property for (non)authenticated users
             ('', '', False, '', [24001, 24002]),
             ('', '', False, 'active', [24001, 24002]),
@@ -105,30 +110,23 @@ class LocationListView(TestCase):
         Search in private location properties
         Search in fixed choice list properties
         """
-        # Create a request object
-        request = HttpRequest()
-        if is_authenticated:
-            user, created = User.objects.get_or_create(username='testuser', is_superuser=False, is_staff=True)
-        else:
-            user = AnonymousUser()
-        request.user = user
+      
+        # Set params for the locations search filter 
+        params = { 
+            'property': location_property,
+            'archive': archive,
+        }
 
-        # Set the url query parameters
-        if not request.GET._mutable:
-            request.GET._mutable = True
-        
-        # Set location_property
-        request.GET['property'] = location_property
+        # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
         location_properties = LocationProcessor(include_private_properties=is_authenticated).location_properties
-        # Set search value based on existing location property
-        if location_property in location_properties:
-            request.GET[location_property] = search
+        is_choice_property = LocationProperty.objects.filter(short_name=location_property, property_type='CHOICE').exists()
+        if location_property in location_properties and is_choice_property:
+            params[location_property] = search
         else:
-            request.GET['search'] = search
-        request.GET['archive'] = archive
+            params['search'] = search
 
         # Call the filter for the request
-        locations = get_filtered_locations(request=request)
+        locations = Location.objects.search_filter(params, is_authenticated)
         pandcodes = set(locations.values_list('pandcode', flat=True))
         # Compare the filtered locations against expected locations
         self.assertEqual(pandcodes, set(expected))
@@ -748,6 +746,7 @@ class TestLocationExport(TestCase):
             location=self.location,
             location_property=self.multichoice_property,
             property_option=self.multichoice_option2)
+        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
 
     def test_get_form(self):
         """ Test requesting the csv export page"""
@@ -811,8 +810,7 @@ class TestLocationExport(TestCase):
         """ Test getting the csv http response as an authenticated user; all fields should be in the csv"""        
         # Request the csv file http response
         request = HttpRequest()
-        user, created = User.objects.get_or_create(username='testuser', is_superuser=False, is_staff=True)
-        request.user = user
+        request.user = self.user
         locations = Location.objects.all()
         # Call the function to get the csv file reponse
         response = get_csv_file_response(request=request, locations=locations)
@@ -849,8 +847,7 @@ class TestLocationExport(TestCase):
 
         # Request the csv file http response
         request = HttpRequest()
-        user, created = User.objects.get_or_create(username='testuser', is_superuser=False, is_staff=True)
-        request.user = user
+        request.user = self.user
         locations = Location.objects.all()
         # Call the function to get the csv file reponse
         response = get_csv_file_response(request=request, locations=locations)
