@@ -1,19 +1,137 @@
 import csv
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
+from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
-from locations.models import Location, LocationProperty, LocationData, PropertyOption
+from parameterized import parameterized
+from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService
+from locations.processors import LocationProcessor
+from locations.views import get_csv_file_response
 
-
-class LocationListViewTest(TestCase):
+class LocationListView(TestCase):
     """
-    Tests for requesting a list of locations
+    Tests for searching in the list of locations
     """
-
     def setUp(self) -> None:
-        self.location = Location.objects.create(pandcode=25000, name='Stopera')
+        LocationProperty.objects.create(
+            short_name='public', label='Public property', property_type='STR', public=True)
+        LocationProperty.objects.create(
+            short_name='private', label='Private property', property_type='STR', public=False)
+        choice_property = LocationProperty.objects.create(
+            short_name='choice', label='choice property', property_type='CHOICE', public=True)
+        PropertyOption.objects.create(
+            location_property=choice_property, option='KeuzeOptie1')
+        PropertyOption.objects.create(
+            location_property=choice_property, option='KeuzeOptie2')
+        ExternalService.objects.create(
+            name='External service', short_name='external', public=True)
+        Location.objects.create(
+            pandcode=24001, name='Stadhuis', is_archived=False)
+        Location.objects.create(
+            pandcode=24002, name='Stopera', is_archived=False)
+        Location.objects.create(
+            pandcode=24003, name='Ambtswoning', is_archived=True )
+        LocationProcessor(include_private_properties=True, data={
+            'pandcode': '24001',
+            'naam': 'Stadhuis',
+            'public': 'Publiek',
+            'private': 'Prive',
+            'choice': 'KeuzeOptie1',
+            'external': '10042',
+        }).save()
+        LocationProcessor(include_private_properties=True, data={
+            'pandcode': '24002',
+            'naam': 'Stopera',
+            'public': 'Publiek',
+            'private': 'Geheim',
+            'choice': 'KeuzeOptie2',
+            'external': '20042',
+        }).save()
+        LocationProcessor(include_private_properties=True, data={
+            'pandcode': '24003',
+            'naam': 'Ambtswoning',
+            'public': 'Burgemeester',
+            'private': 'Prive',
+            'choice': 'KeuzeOptie1',
+            'external': '30042',
+        }).save()
+
+    @parameterized.expand([
+            # Search all fields
+            ('', '', False, '', [24001, 24002]),
+            ('keuze', '', False, '', [24001, 24002]),
+            ('prive', '', False, '', []),
+            ('0042', '', False, '', [24001, 24002]),
+            ('10042', '', False, '', [24001]),
+            ('prive', '', True, '', [24001]),
+            # Search name
+            ('adhuis', 'naam', False, '', [24001]),
+            ('wonin', 'naam', False, '', []),
+            ('opera', 'naam', True, '', [24002]),
+            # Search pandcode
+            ('24002', 'pandcode', False, '', [24002]),
+            ('24003', 'pandcode', False, '', []),
+            ('24003', 'pandcode', True, 'all', [24003]),
+            # Search public property
+            ('publiek', 'public', False, '', [24001, 24002]),
+            ('meester', 'public', True, 'all', [24003]),
+            # Search private property
+            ('prive', 'private', False, '', []),
+            ('prive', 'private', True, 'all', [24001, 24003]),
+            # Search choice property
+            ('KeuzeOptie1', 'choice', False, '', [24001]),
+            ('KeuzeOptie1', 'choice', True, 'all', [24001, 24003]),
+            ('KeuzeOptie2', 'choice', False, '', [24002]),
+            ('optie', 'choice', False, '', []),
+            ('', 'choice', True, 'all', []),
+            # Search external service location code
+            ('10042', 'external', False, '', [24001]),
+            ('30042', 'external', False, '', []),
+            ('30042', 'external', True, 'all', [24003]),
+            # Archive property for (non)authenticated users
+            ('', '', False, '', [24001, 24002]),
+            ('', '', False, 'active', [24001, 24002]),
+            ('', '', False, 'archived', []),
+            ('', '', False, 'all', [24001, 24002]),
+            ('', '', True, '', [24001, 24002]),
+            ('', '', True, 'active', [24001, 24002]),
+            ('', '', True, 'archived', [24003]),
+            ('', '', True, 'all', [24001, 24002, 24003]),
+    ])
+    def test_search(self, search, location_property, is_authenticated, archive, expected):
+        """
+        Paramaterized test where the following combinations of conditions are tested:
+        Authenticated/Anonymous user
+        Archived/Active/All locations
+        Search in all location properties
+        Search in public location properties
+        Search in private location properties
+        Search in fixed choice list properties
+        """
+      
+        # Set params for the locations search filter 
+        params = { 
+            'property': location_property,
+            'archive': archive,
+        }
+
+        # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
+        location_properties = LocationProcessor(include_private_properties=is_authenticated).location_properties
+        is_choice_property = LocationProperty.objects.filter(short_name=location_property, property_type='CHOICE').exists()
+        if location_property in location_properties and is_choice_property:
+            params[location_property] = search
+        else:
+            params['search'] = search
+
+        # Call the filter for the request
+        locations = Location.objects.search_filter(params, is_authenticated)
+        pandcodes = set(locations.values_list('pandcode', flat=True))
+        # Compare the filtered locations against expected locations
+        self.assertEqual(pandcodes, set(expected))
+        # Check for distinct results
+        self.assertEqual(len(locations), len(expected))
     
     def test_get_view(self):
         """Test requesting the LocationListView"""
@@ -551,7 +669,7 @@ class TestLocationImportForm(TestCase):
         self.assertEqual(Location.objects.all().count(), 1)
 
 
-class TestLocationExportForm(TestCase):
+class TestLocationExport(TestCase):
     """
     Test exporting locations to a csv file for download
     """
@@ -628,6 +746,7 @@ class TestLocationExportForm(TestCase):
             location=self.location,
             location_property=self.multichoice_property,
             property_option=self.multichoice_option2)
+        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
 
     def test_get_form(self):
         """ Test requesting the csv export page"""
@@ -639,10 +758,32 @@ class TestLocationExportForm(TestCase):
         self.assertTemplateUsed(response, 'locations/location-export.html')
         self.assertContains(response, 'Exporteer Locaties naar CSV')
 
-    def test_post_form_anonymous(self):
-        """ Test requesting the csv as an anonymous user; less fields should be in the csv"""
-        # Request the csv export
+    def test_get_form_filtered(self):
+        """ Test requesting the csv export page with query parameters"""
+        # Request the download form with a random query parameter 
+        response = self.client.get(reverse('locations_urls:location-export') + "?param=value")
+
+        # Verify the response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get('Content-Type'), 'text/csv, charset=utf-8')
+
+    def test_post_form(self):
+        """ Test posting to the the csv export page"""
+        # Request the download form with a random query parameter 
         response = self.client.post(reverse('locations_urls:location-export'), {})
+
+        # Verify the response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get('Content-Type'), 'text/csv, charset=utf-8')
+
+    def test_get_csv_file_response_anonymous(self):
+        """ Test getting the csv http response object as an anonymous user"""
+        # Request the csv file http response
+        request = HttpRequest()
+        request.user = AnonymousUser()
+        locations = Location.objects.all()
+        # Call the function to get the csv file reponse
+        response = get_csv_file_response(request=request, locations=locations)
 
         # Verify the response
         content = response.content
@@ -665,11 +806,14 @@ class TestLocationExportForm(TestCase):
         # Verify that floors is not included in the result
         self.assertNotIn('floors', row)
 
-    def test_post_form_authenticated(self):
-        """ Test requesting the csv as an authenticated user; all fields should be in the csv"""        
-        # Request the csv export as an authenticated user
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
-        response = self.client.post(reverse('locations_urls:location-export'), {})
+    def test_get_csv_file_response_authenticated(self):
+        """ Test getting the csv http response as an authenticated user; all fields should be in the csv"""        
+        # Request the csv file http response
+        request = HttpRequest()
+        request.user = self.user
+        locations = Location.objects.all()
+        # Call the function to get the csv file reponse
+        response = get_csv_file_response(request=request, locations=locations)
 
         # Verify the response
         content = response.content
@@ -701,9 +845,12 @@ class TestLocationExportForm(TestCase):
         # Empty the database firts
         Location.objects.all().delete()
 
-        # Request the csv export as an authenticated user
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
-        response = self.client.post(reverse('locations_urls:location-export'), {})
+        # Request the csv file http response
+        request = HttpRequest()
+        request.user = self.user
+        locations = Location.objects.all()
+        # Call the function to get the csv file reponse
+        response = get_csv_file_response(request=request, locations=locations)
 
         # Verify the response
         content = response.content
@@ -723,7 +870,6 @@ class TestLocationExportForm(TestCase):
         i = 0
         for row in csv_dict:
             i += 1
-
         self.assertEqual(i, 0)
 
 

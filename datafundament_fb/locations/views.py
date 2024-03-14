@@ -1,4 +1,5 @@
 import csv
+import urllib.parse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,7 +11,7 @@ from django.views.generic import View, ListView
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from locations.forms import LocationDataForm, LocationImportForm
+from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
 from locations.models import Location
 from locations.processors import LocationProcessor
 
@@ -18,14 +19,71 @@ from locations.processors import LocationProcessor
 def home_page(request):
     return HttpResponseRedirect(reverse('locations_urls:location-list'))
 
+def get_csv_file_response(request, locations)-> HttpResponse:
+    """
+    Method for returning a csv file within an http response object.
+    Takes a list of Location objects as it input
+    """
+    # Set all location data to a LocationProcessor
+    location_data = []
+    for location in locations:
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data.append(
+            LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
+        )
+
+    # Setup the http response with the 
+    date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
+    response = HttpResponse(
+        content_type='text/csv, charset=utf-8',
+        headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
+    )
+
+    # Add BOM to the file; because otherwise Excel won't know what's happening
+    response.write('\ufeff'.encode('utf-8'))
+
+    # Based on Locations presently in the database return the headers for the CSV file
+    if location_data:
+        headers = location_data[0].keys()
+    else:
+        headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
+
+    # Setup a csv dictwriter and write the location data to the response object
+    writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
+    writer.writeheader()
+    writer.writerows(location_data)
+
+    return response
+
 
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
-    
-    def get(self, request, *args, **kwargs):
-        return super(LocationListView, self).get(request, *args, **kwargs)
-    
+
+    def get_queryset(self):
+        # Get a QuerySet of filtered locations 
+        params = self.request.GET.dict()
+        is_authenticated = self.request.user.is_authenticated
+        locations = Location.objects.search_filter(params, is_authenticated)
+        return locations
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        initial_data = self.request.GET
+        # Render the search form
+        context['form'] = LocationListForm(initial=initial_data, include_private_properties=self.request.user.is_authenticated)
+        # Create at list of search input elements to be used in a JS function
+        # This functions hides/unhides these elements depending on the selection of the id_property field 
+        property_list = ['id_search']
+        location_properties = (LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_property_instances)
+        for location_property in location_properties:
+            if location_property.property_type == 'CHOICE':
+                property_list.append('id_' + location_property.short_name)
+        context['property_list'] = property_list
+        # Pass the url query to the url for exporting the search result as csv file
+        context['export_query'] = urllib.parse.urlencode(self.request.GET)
+        return context
+        
 
 class LocationDetailView(View):  
     form = LocationDataForm
@@ -207,41 +265,23 @@ class LocationExportView(View):
     template = 'locations/location-export.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request=request, template_name=self.template)
+        # when a query is given, return the csv file not the webpage
+        if request.GET:
+            # Get a QuerySet of filtered locations
+            params = self.request.GET.dict()
+            is_authenticated = self.request.user.is_authenticated
+            locations = Location.objects.search_filter(params, is_authenticated)
+            # Set the response with the csv file
+            response = get_csv_file_response(request, locations)
+        else:
+            response = render(request=request, template_name=self.template)
+        return response
 
     def post(self, request, *args, **kwargs):
         # Get all Location instances()
         locations = Location.objects.all()
-
-        # Set all location data to a LocationProcessor
-        location_data = []
-        for location in locations:
-            # Get loction data  depending on user context; include_private_properties == True is all location properties
-            location_data.append(
-                LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
-            )
-
-        # Setup the http response with the 
-        date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
-        response = HttpResponse(
-            content_type='text/csv, charset=utf-8',
-            headers={'Content-Disposition': f'attachment; filename="locaties_export_{date}.csv"'},
-        )
-
-        # Add BOM to the file; because otherwise Excel won't know what's happening
-        response.write('\ufeff'.encode('utf-8'))
-
-        # Setup a csv dictwriter and write the location data to the response object
-        if location_data:
-            headers = location_data[0].keys()
-        else:
-            headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
-
-        writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
-        writer.writeheader()
-        writer.writerows(location_data)
-
-        # Return the response
+        # Set the response with the csv file
+        response = get_csv_file_response(request, locations)
         return response
 
 
