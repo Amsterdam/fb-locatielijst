@@ -59,13 +59,14 @@ def get_csv_file_response(request, locations)-> HttpResponse:
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
+    paginate_by = 50
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations 
         params = self.request.GET.dict()
         is_authenticated = self.request.user.is_authenticated
-        locations = Location.objects.search_filter(params, is_authenticated)
-        return locations
+        queryset = Location.objects.search_filter(params, is_authenticated)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,8 +81,11 @@ class LocationListView(ListView):
             if location_property.property_type == 'CHOICE':
                 property_list.append('id_' + location_property.short_name)
         context['property_list'] = property_list
-        # Pass the url query to the url for exporting the search result as csv file
-        context['export_query'] = urllib.parse.urlencode(self.request.GET)
+        # Pass the url query to the url for exporting the search result as csv file; remove page parameter if present
+        query = self.request.GET.dict()
+        # Remove page parameter is present
+        query.pop('page', None)
+        context['query'] = urllib.parse.urlencode(query)
         return context
         
 
