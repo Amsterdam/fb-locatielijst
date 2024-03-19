@@ -129,6 +129,7 @@ a:link,
 a:visited {
   color: var(--color-blue);
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 a:hover,

@@ -81,6 +81,9 @@ class LocationListView(ListView):
             if location_property.property_type == 'CHOICE':
                 property_list.append('id_' + location_property.short_name)
         context['property_list'] = property_list
+        # TODO Deze moet gefilterd worden op gearchiveerd
+        context['locations_all_count'] = Location.objects.all().count()
+        context['filter_active'] = context['page_obj'].paginator.count < context['locations_all_count']
         # Pass the url query to the url for exporting the search result as csv file; remove page parameter if present
         query = self.request.GET.dict()
         # Remove page parameter is present

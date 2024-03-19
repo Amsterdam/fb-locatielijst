@@ -54,28 +54,12 @@
         {% endfor %}
         </tbody>
     </table>
+
     {% if is_paginated %}
-    <div class="h5">Toon {{ object_list|length }} van {{ page_obj.paginator.count }} locaties</div>
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-            <a href="?{% if query %}{{ query }}{% endif %}&page=1">&laquo; Eerste</a>
-            <a href="?{% if query %}{{ query }}{% endif %}&page={{ page_obj.previous_page_number }}">Vorige</a>
-            {% endif %}
-
-            <span class="current">
-                Pagina {{ page_obj.number }} van {{ page_obj.paginator.num_pages }}.
-            </span>
-
-            {% if page_obj.has_next %}
-            <a href="?{% if query %}{{ query }}{% endif %}&page={{ page_obj.next_page_number }}">Volgende</a>
-            <a href="?{% if query %}{{ query }}{% endif %}&page={{ page_obj.paginator.num_pages }}">Laatste &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
-    {% else %}
-    <div class="h5">{{ object_list|length }} locaties gevonden</div>
+        {% include "includes/pagination.html" %}
     {% endif %}
+
+    <div class="h5">{{ page_obj.paginator.count }} {% if filter_active %}van de {{ locations_all_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
 
     <div class="btn-container">
         <a href="{% url 'locations_urls:location-export' %}?{{ query }}" class="btn btn-primair">Exporteren</a>
