@@ -59,7 +59,7 @@
         {% include "includes/pagination.html" %}
     {% endif %}
 
-    <div class="h5">{{ page_obj.paginator.count }} {% if filter_active %}van de {{ locations_all_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
+    <div class="h5">{{ page_obj.paginator.count }} {% if is_filtered_result %}van de {{ location_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
 
     <div class="btn-container">
         <a href="{% url 'locations_urls:location-export' %}?{{ query }}" class="btn btn-primair">Exporteren</a>
