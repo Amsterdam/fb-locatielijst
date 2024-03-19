@@ -362,15 +362,15 @@ class TestLocationDataModel(TestCase):
     def test_for_empty_value_constraint(self):
         # Test when either field is filled, not both
         self.location_data.location_property = self.choice_property
-        self.location_data.property_option = self.choice_option
+        self.location_data._property_option = self.choice_option
         self.assertEqual(self.location_data.clean(), None)
 
-        self.location_data.property_option = None
+        self.location_data._property_option = None
         self.location_data.value = 'Yellow'
         self.assertEqual(self.location_data.clean(), None)
 
         # Integrity error is raised when both fields are filled
-        self.location_data.property_option = self.choice_option
+        self.location_data._property_option = self.choice_option
         self.location_data.value = 'Yellow'
         # Prevent the error from breaking the transaction, atomic is needed
         with transaction.atomic():
@@ -454,10 +454,10 @@ class TestReferencedModelOnDelete(TestCase):
         self.location = Location.objects.create(pandcode=25000, name='Stadhuis')
         self.location_property = LocationProperty.objects.create(
             short_name='property', label='Location property', property_type='CHOICE')
-        self.property_option = PropertyOption.objects.create(
+        self._property_option = PropertyOption.objects.create(
             location_property=self.location_property, option='Optiewaarde 1')
         self.location_data = LocationData.objects.create(
-            location=self.location, location_property=self.location_property, property_option=self.property_option)
+            location=self.location, location_property=self.location_property, _property_option=self._property_option)
         self.external_service = ExternalService.objects.create(
             name='Externe service', short_name='ext_srv')
         self.location_external_service = LocationExternalService.objects.create(
@@ -503,14 +503,14 @@ class TestReferencedModelOnDelete(TestCase):
         self.assertEqual(len(ExternalService.objects.all()), 1)
         self.assertEqual(len(LocationExternalService.objects.all()), 1)
 
-    def test_property_option_restriction(self):
+    def test__property_option_restriction(self):
         """
         When deleting a property option, restriction should be enforced
         if there is a referenced LocationData instance
         """
 
         # Deleting a referenced PropertyOption should result in a restriction exception 
-        self.assertRaises(RestrictedError, self.property_option.delete)
+        self.assertRaises(RestrictedError, self._property_option.delete)
 
         # There should be 1 instances left of the following models
         self.assertEqual(len(PropertyOption.objects.all()), 1)
@@ -526,7 +526,7 @@ class TestReferencedModelOnDelete(TestCase):
         self.assertEqual(len(LocationData.objects.all()), 0)
 
         # Deletion should now be possible
-        self.property_option.delete()
+        self._property_option.delete()
         # Verify that there is no PropertyOption anymore
         self.assertEqual(len(PropertyOption.objects.all()), 0)
 

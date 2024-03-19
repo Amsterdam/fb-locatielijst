@@ -165,9 +165,9 @@ class LocationDetailViewTest(TestCase):
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 2')
         self.location_data_option1 = LocationData.objects.create(
-            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option1)
+            location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option1)
         self.location_data_option2 = LocationData.objects.create(
-            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option2)
+            location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option2)
 
     def test_get_view_anonymous(self):
         """Test getting the Location Detail View as an anonymous visitor"""
@@ -276,9 +276,9 @@ class LocationCreateViewTest(TestCase):
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 2')
         self.location_data_option1 = LocationData.objects.create(
-            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option1)
+            location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option1)
         self.location_data_option2 = LocationData.objects.create(
-            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option2)
+            location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option2)
 
     def test_get_view_anonymous(self):
         """Test getting the location create page"""
@@ -393,9 +393,9 @@ class LocationUpdateViewTest(TestCase):
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 2')
         self.location_data_option1 = LocationData.objects.create(
-            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option1)
+            location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option1)
         self.location_data_option2 = LocationData.objects.create(
-            location=self.location, location_property=self.multichoice_property, property_option=self.multichoice_option2)
+            location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option2)
 
     def test_get_view_anonymous(self):
         """Test getting the location update page as an anonymous user"""
@@ -737,15 +737,15 @@ class TestLocationExport(TestCase):
         self.type = LocationData.objects.create(
             location=self.location,
             location_property=self.choice_property,
-            property_option = self.choice_option)
+            _property_option = self.choice_option)
         self.location_data_option1 = LocationData.objects.create(
             location=self.location,
             location_property=self.multichoice_property,
-            property_option=self.multichoice_option1)
+            _property_option=self.multichoice_option1)
         self.location_data_option2 = LocationData.objects.create(
             location=self.location,
             location_property=self.multichoice_property,
-            property_option=self.multichoice_option2)
+            _property_option=self.multichoice_option2)
         self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
 
     def test_get_form(self):
@@ -838,7 +838,7 @@ class TestLocationExport(TestCase):
         self.assertEqual(row['postcode'], self.postcode.value)
         self.assertEqual(row['color'], self.color.value)
         self.assertEqual(row['url'], self.url.value)
-        self.assertEqual(row['type'], self.type.property_option.option)
+        self.assertEqual(row['type'], self.type._property_option.option)
 
     def test_csv_with_headers_only(self):
         """ Test requesting an empty csv, with only headers, when there are no locations in the database"""        
