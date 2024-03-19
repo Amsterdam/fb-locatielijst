@@ -926,4 +926,6 @@ class TestListViewPaginator(TestCase):
         self.assertEqual(len(response.context['object_list']), 1)
         # Query variable should not contain the parameter page
         self.assertEqual(response.context['query'], '')
+        # Verify that the mock attribute is called
+        self.assertTrue(mock.called)
 

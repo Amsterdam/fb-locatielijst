@@ -59,14 +59,14 @@ def get_csv_file_response(request, locations)-> HttpResponse:
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
-    paginate_by = 1
+    paginate_by = 50
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations 
         params = self.request.GET.dict()
         is_authenticated = self.request.user.is_authenticated
-        queryset = Location.objects.search_filter(params, is_authenticated)
-        return queryset
+        locations = Location.objects.search_filter(params, is_authenticated)
+        return locations
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
