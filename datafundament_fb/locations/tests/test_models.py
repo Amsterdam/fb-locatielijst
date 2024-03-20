@@ -366,12 +366,12 @@ class TestLocationDataModel(TestCase):
         self.assertEqual(self.location_data.clean(), None)
 
         self.location_data._property_option = None
-        self.location_data.value = 'Yellow'
+        self.location_data._value = 'Yellow'
         self.assertEqual(self.location_data.clean(), None)
 
         # Integrity error is raised when both fields are filled
         self.location_data._property_option = self.choice_option
-        self.location_data.value = 'Yellow'
+        self.location_data._value = 'Yellow'
         # Prevent the error from breaking the transaction, atomic is needed
         with transaction.atomic():
             self.assertRaises(IntegrityError, self.location_data.save)

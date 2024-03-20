@@ -1,7 +1,7 @@
 from typing import Self
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import get_locationdata_validator
@@ -11,19 +11,44 @@ class LocationProcessor():
     # Switch to include all properties (including private), or only public properties
     include_private_properties = False
 
-    def _save_location_data(self, location_property, value)-> LocationData:
-        """Helper function to create a LocationData instance"""
-        # Create a LocationData object and add the value
-        location_data, created = LocationData.objects.get_or_create(
-            location = self.location_instance,
-            location_property = location_property,
-        )
-        # Set the value, clean and save the instance
-        location_data.value = value
-        location_data.full_clean()
-        location_data.save()
+    def _save_location_data(self, location_property, value):
+        """Helper function to create or update a LocationData instance"""
 
-        return location_data
+        # If a location_property has multiple, new values must be added and old ones deleted 
+        if location_property.multiple:
+            if value:
+                values = value
+            else:
+                values = []
+            # Cast values to list      
+            if not type(values) == list:
+                values = values.split(',') # Could be a thingy when the list is not comma seperated
+            # Create multiple LocationData objects
+            for value in values:
+                if not LocationData.objects.filter(
+                        location=self.location_instance,
+                        location_property=location_property,
+                        _property_option__option=value                       
+                    ).first():
+                    location_data = LocationData(
+                        location = self.location_instance,
+                        location_property = location_property,
+                    )
+                    # Set the value, clean and save the instance
+                    location_data.value = value
+                    location_data.full_clean()
+                    location_data.save()
+            # Delete multiples not in the values list
+            self.location_instance.locationdata_set.filter(Q(location_property=location_property),~Q(_property_option__option__in=values)).delete()
+        else:
+            location_data, created = LocationData.objects.get_or_create(
+                location = self.location_instance,
+                location_property = location_property,
+            )
+            # Set the value, clean and save the instance
+            location_data.value = value
+            location_data.full_clean()
+            location_data.save()
 
     def _set_location_properties(self)-> None:
         """
@@ -34,19 +59,16 @@ class LocationProcessor():
 
         # Get all location properties and add the names to the location properties list
         # Location properties without a 'group' value be put last beforte being sorted on 'order'
-        property_locations = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order')
+        self.location_property_instances = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order')
         # List is filtered for private accessibility
-        if self.include_private_properties:
-            self.location_property_instances =  [obj for obj in property_locations]
-        else:
-            self.location_property_instances =  [obj for obj in property_locations.filter(public=True)]
+        if not self.include_private_properties:
+            self.location_property_instances =  self.location_property_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
-        if self.include_private_properties:
-            self.external_service_instances = [obj for obj in ExternalService.objects.all().order_by('order')]
-        else:
-            self.external_service_instances = [obj for obj in ExternalService.objects.filter(public=True).order_by('order')]
+        self.external_service_instances = ExternalService.objects.all().order_by('order')
+        if not self.include_private_properties:
+            self.external_service_instances = self.external_service_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
 
         # Set attributes from all the available location properties
@@ -187,27 +209,14 @@ class LocationProcessor():
             # Create for each location property a locationData instance
             for location_property in self.location_property_instances:
                 value = getattr(self, location_property.short_name) if getattr(self, location_property.short_name) else None
-
-                # If multiple choice is enabled for this location property
-                if location_property.multiple:
-                    # Cast the value to a list -> 
-                    # TODO moet er niet iets met validatie gedaan worden in het geval dit leidt tot string met input die hierdoor wordt opgedeeld in meerdere waardes 
-                    values = value
-                    if not type(value) == list:
-                        values = value.split(',') # Could be a thingy when the list is not comma seperated
-                    # Create multiple LocationData objects and add those he list
-                    for value in values:
-                        self._save_location_data(location_property, value)
-                else:
-                    # Create a LocationData object and add it to the list
-                    self._save_location_data(location_property, value)
+                self._save_location_data(location_property, value)
 
             # Add external service data tot the Location object
             for service in self.external_service_instances:
                 value = getattr(self, service.short_name) if getattr(self, service.short_name) else None
                 
                 external_service, create = LocationExternalService.objects.get_or_create(
-                    self.location_instance, service
+                    location=self.location_instance, external_service=service
                 )
                 # Set the external service code, clean and save the instance
                 external_service.external_location_code = value

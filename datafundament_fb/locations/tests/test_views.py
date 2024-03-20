@@ -306,7 +306,7 @@ class LocationCreateViewTest(TestCase):
         """Test posting the create form"""
 
         # Data for the form        
-        data = {'naam': 'Amstel 1', 'property': '10', 'multi': ['Team 1', 'Team 2']}
+        data = {'naam': 'Amstel 1', 'property': '10', 'multitype': ['Team 1', 'Team 2']}
         url = reverse('locations_urls:location-create')
         # Request the post for the form
         response = self.client.post(path=url, data=data)

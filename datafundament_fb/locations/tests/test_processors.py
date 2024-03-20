@@ -1,7 +1,7 @@
 import unittest.mock as mock
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from locations.models import Location, LocationProperty, PropertyOption
+from locations.models import Location, LocationProperty, PropertyOption, LocationData
 from locations.processors import LocationProcessor
 
 
@@ -168,9 +168,30 @@ class TestLocationProcessor(TestCase):
 
         # Check the LocationData() values
         location_data = get_location.locationdata_set.all()
-        *expected_values, = self.location_data_dict.values()
-        for data in location_data:
-            self.assertIn(data.value, expected_values)
+        self.assertEqual(location_data[0].location_property, self.boolean_property)
+        self.assertEqual(location_data[0].value, self.location_data_dict['occupied'])
+        self.assertEqual(location_data[1].location_property, self.date_property)
+        self.assertEqual(location_data[1].value, self.location_data_dict['build'])
+        self.assertEqual(location_data[2].location_property, self.email_property)
+        self.assertEqual(location_data[2].value, self.location_data_dict['mail'])
+        self.assertEqual(location_data[3].location_property, self.number_property)
+        self.assertEqual(location_data[3].value, self.location_data_dict['floors'])
+        self.assertEqual(location_data[4].location_property, self.memo_property)
+        self.assertEqual(location_data[4].value, self.location_data_dict['note'])
+        self.assertEqual(location_data[5].location_property, self.postal_code_property)
+        self.assertEqual(location_data[5].value, self.location_data_dict['postcode'])
+        self.assertEqual(location_data[6].location_property, self.string_property)
+        self.assertEqual(location_data[6].value, self.location_data_dict['color'])
+        self.assertEqual(location_data[7].location_property, self.url_property)
+        self.assertEqual(location_data[7].value, self.location_data_dict['url'])
+        self.assertEqual(location_data[8].location_property, self.choice_property)
+        self.assertEqual(location_data[8]._property_option.option, self.location_data_dict['type'])
+        self.assertEqual(location_data[9].location_property, self.multichoice_property)
+        self.assertIn(location_data[9]._property_option.option, self.location_data_dict['multitype'])
+        self.assertEqual(location_data[10].location_property, self.multichoice_property)
+        self.assertIn(location_data[10]._property_option.option, self.location_data_dict['multitype'])
+        self.assertEqual(location_data[11].location_property, self.geolocation_property)
+        self.assertEqual(location_data[11].value, self.location_data_dict['geo'])
 
     @mock.patch('locations.validators.valid_url')
     def test_location_save_atomic(self, mock):
