@@ -1,0 +1,61 @@
+<nav class="ams-pagination" aria-label="Paginering">
+  <ol class="ams-pagination__list">
+      {% if page_obj.has_previous %}
+          <li><a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="ams-pagination__button" aria-label="Vorige pagina">
+              <span class="icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                      <path fill-rule="evenodd" d="m22.857 32-16-16 16-16 2.9 2.91L12.677 16l13.08 13.09z"></path>
+                  </svg>
+              </span>
+              vorige
+          </a></li>
+      {% endif %}
+
+      <li>
+          {% if page_obj.number == 1 %}
+              <div class="ams-pagination__button ams-pagination__button--current" aria-current="true">1</div>
+          {% else %}
+              <a href="?{% if query %}{{ query }}&{% endif %}page=1" class="ams-pagination__button">1</a>
+          {% endif %}
+      </li>
+
+      {% if page_obj.number|add:'-1' > 2 %}
+          <li aria-hidden="true">&hellip;</li>
+      {% endif %}
+
+      {% for i in page_obj.paginator.page_range %}
+          {% if i > 1 and i < page_obj.paginator.num_pages %}
+          <li>
+              {% if page_obj.number == i %}
+                  <div class="ams-pagination__button ams-pagination__button--current" aria-current="true">{{ i }}</div>
+              {% elif i >= page_obj.number|add:'-1' and i <= page_obj.number|add:'1' %}
+                  <a href="?{% if query %}{{ query }}&{% endif %}page={{ i }}" class="ams-pagination__button" aria-label="Ga naar pagina {{ i }}">{{ i }}</a>
+              {% endif %}
+          </li>
+          {% endif %}
+      {% endfor %}
+
+      {% if page_obj.paginator.num_pages|add:'-1' > page_obj.number|add:'1' %}
+          <li aria-hidden="true">&hellip;</li>
+      {% endif %}
+
+      <li>
+          {% if page_obj.number == page_obj.paginator.num_pages %}
+              <div class="ams-pagination__button ams-pagination__button--current" aria-current="true">{{ page_obj.paginator.num_pages }}</div>
+          {% else %}
+              <a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" class="ams-pagination__button">{{ page_obj.paginator.num_pages }}</a>
+          {% endif %}            
+      </li>
+
+      {% if page_obj.has_next %}
+          <li><a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.next_page_number }}" class="ams-pagination__button" aria-label="Volgende pagina">
+              volgende
+              <span class="icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                      <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
+                  </svg>
+              </span>
+          </a></li>
+      {% endif %}
+  </ol>
+</nav>

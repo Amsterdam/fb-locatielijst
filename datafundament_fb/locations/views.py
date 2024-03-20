@@ -59,6 +59,7 @@ def get_csv_file_response(request, locations)-> HttpResponse:
 class LocationListView(ListView):
     model = Location
     template_name = 'locations/location-list.html'
+    paginate_by = 50
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations 
@@ -72,16 +73,24 @@ class LocationListView(ListView):
         initial_data = self.request.GET
         # Render the search form
         context['form'] = LocationListForm(initial=initial_data, include_private_properties=self.request.user.is_authenticated)
-        # Create at list of search input elements to be used in a JS function
-        # This functions hides/unhides these elements depending on the selection of the id_property field 
+        # Create at list of search input elements to be used in a JS function for hiding/unhiding these elements
         property_list = ['id_search']
         location_properties = (LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_property_instances)
         for location_property in location_properties:
             if location_property.property_type == 'CHOICE':
                 property_list.append('id_' + location_property.short_name)
         context['property_list'] = property_list
-        # Pass the url query to the url for exporting the search result as csv file
-        context['export_query'] = urllib.parse.urlencode(self.request.GET)
+        # Number of locations in the search result, filtered by archive
+        archive = self.request.GET.get('archive', '')
+        location_count = Location.objects.archive_filter(archive).count()       
+        context['result_count'] = location_count
+        # Boolean if the search result if filtered by the search query
+        context['is_filtered_result'] = context['page_obj'].paginator.count < location_count
+        # Pass the url query to the url for exporting the search result as csv file; remove page parameter if present
+        query = self.request.GET.dict()
+        # Remove page parameter is present
+        query.pop('page', None)
+        context['query'] = urllib.parse.urlencode(query)
         return context
         
 

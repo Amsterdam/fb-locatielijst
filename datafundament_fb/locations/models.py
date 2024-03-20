@@ -42,8 +42,9 @@ class Location(models.Model):
             models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
             models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
-        
-    
+        ordering = ['name']
+
+
 class PropertyGroup(models.Model):
     name = models.CharField(verbose_name='Groepsnaam', max_length=20)
     order = models.IntegerField(verbose_name='Volgorde', blank=True, null=True, validators=[MinValueValidator(1)])
