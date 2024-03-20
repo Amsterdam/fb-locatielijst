@@ -39,7 +39,7 @@ class TestLocationProcessor(TestCase):
             location_property=self.multichoice_property, option='Team 1')
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 2')
-        self.multichoice_option2 = PropertyOption.objects.create(
+        self.multichoice_option3 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 3')
         self.geolocation_property = LocationProperty.objects.create(
             short_name='geo', label='geolocation', property_type='GEO', required=True, order=11)

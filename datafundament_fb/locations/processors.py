@@ -25,11 +25,7 @@ class LocationProcessor():
                 values = values.split(',') # Could be a thingy when the list is not comma seperated
             # Create multiple LocationData objects
             for value in values:
-                if not LocationData.objects.filter(
-                        location=self.location_instance,
-                        location_property=location_property,
-                        _property_option__option=value                       
-                    ).first():
+                if not LocationData.objects.filter(location=self.location_instance, location_property=location_property, _property_option__option=value):
                     location_data = LocationData(
                         location = self.location_instance,
                         location_property = location_property,
@@ -49,7 +45,7 @@ class LocationProcessor():
             location_data.value = value
             location_data.full_clean()
             location_data.save()
-
+            
     def _set_location_properties(self)-> None:
         """
         Get location data fields from the Location model and LocationProperties 

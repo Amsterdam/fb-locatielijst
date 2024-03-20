@@ -154,8 +154,6 @@ class LocationData(models.Model):
 
     @value.setter
     def value(self, value):
-        # TODO Overwrite save method when location_data does not exist yet??   
-        # TODO when you set a value before setting the location_property, will it get ugly?
         if self.location_property.property_type == 'CHOICE' and value:
             option = PropertyOption.objects.filter(location_property=self.location_property, option=value).first()
             self._property_option = option
