@@ -1,9 +1,10 @@
-from django.db.models import Q, Case, Value, When, F, CharField
+from django.contrib.auth.models import User
+from django.db.models import Q
 from django.db.models.query import QuerySet
 
 class LocationQuerySet(QuerySet):
 
-    def search_filter(self, params: dict, is_authenticated:bool=False)-> QuerySet:
+    def search_filter(self, params: dict, user: User)-> QuerySet:
         """
         Returns a queryset of locations based on params in a http request.
         """
@@ -14,7 +15,7 @@ class LocationQuerySet(QuerySet):
         # Get request parameters
         property_value = params.get('property', '')
         # Get existing location and external service properties, filtered by access permission
-        location_properties = LocationProcessor(include_private_properties=is_authenticated).location_properties
+        location_properties = LocationProcessor(user=user).location_properties
         # Set the correct search name when filtering on location property with a choice list
         is_choice_property = LocationProperty.objects.filter(short_name=property_value, property_type='CHOICE').exists()
         if property_value in location_properties and is_choice_property:
@@ -67,7 +68,7 @@ class LocationQuerySet(QuerySet):
                 qfilter &= Q(is_archived=False)
 
         # If a user is not authenticated, filter for active locations and public properties only
-        if not is_authenticated:
+        if not user.is_authenticated:
             qfilter &= (
                 Q(is_archived=False) &
                 Q(locationdata__location_property__short_name__in=location_properties) &
