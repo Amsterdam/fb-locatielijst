@@ -1,4 +1,5 @@
 import csv
+from unittest.mock import patch, PropertyMock
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
@@ -906,4 +907,33 @@ class TestLocationAdminView(TestCase):
         self.assertEqual(response.status_code, 302)
         url = reverse('admin:login') + '?next=' + reverse('location-admin')
         self.assertEqual(response.url, url)
+
+
+class TestListViewPaginator(TestCase):
+    fixtures = [
+        'locations',
+        'property_groups',
+        'location_properties',
+        'property_options',
+        'location_data',
+        'external_services',
+        'location_external_services',
+    ]
+
+    @patch('locations.views.LocationListView.paginate_by', new_callable=PropertyMock)
+    def test_page_pop(self, mock):
+        """Test to verify if the page parameter is ommitted from the export url"""
+        # Set pagination to 1 result per page to invoke pagination
+        mock.return_value = '1'
+        # Call the location list view
+
+        response = self.client.get(reverse('locations_urls:location-list') + '?page=2')
+        # Verify the response
+        self.assertEqual(response.status_code, 200)
+        # Assert 1 result per page
+        self.assertEqual(len(response.context['object_list']), 1)
+        # Query variable should not contain the parameter page
+        self.assertEqual(response.context['query'], '')
+        # Verify that the mock attribute is called
+        self.assertTrue(mock.called)
 

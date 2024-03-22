@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from locations.filters import filter_on_archive
 
 class LocationQuerySet(QuerySet):
 
@@ -57,15 +58,8 @@ class LocationQuerySet(QuerySet):
                     Q(locationexternalservice__external_location_code__icontains=search_value) |
                     Q(locationdata___property_option__option__icontains=search_value))
 
-        # Filter on location archive attribute; default is only active locations
-        match archive_value:
-            case 'active':
-                qfilter &= Q(is_archived=False)
-            case 'archived':
-                qfilter &= Q(is_archived=True)
-            case 'all':...
-            case _:
-                qfilter &= Q(is_archived=False)
+        # Filter if archive value
+        qfilter &= filter_on_archive(archive_value)
 
         # If a user is not authenticated, filter for active locations and public properties only
         if not user.is_authenticated:
@@ -75,4 +69,9 @@ class LocationQuerySet(QuerySet):
                 Q(locationexternalservice__external_service__short_name__in=location_properties))
 
         return self.filter(qfilter).distinct()
+
+    def archive_filter(self, archive: str= '')-> QuerySet:
+        # Filter on location archive attribute; default is only active locations
+        qfilter = filter_on_archive(archive)
+        return self.filter(qfilter)
 
