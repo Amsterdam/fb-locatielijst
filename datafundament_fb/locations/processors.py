@@ -30,7 +30,6 @@ class LocationProcessor():
                     location_data = LocationData(
                         location = self.location_instance,
                         location_property = location_property,
-                        last_modified_by = self.user
                     )
                     # Set the value, clean and save the instance
                     location_data.value = value
@@ -42,7 +41,6 @@ class LocationProcessor():
             location_data, created = LocationData.objects.get_or_create(
                 location = self.location_instance,
                 location_property = location_property,
-                last_modified_by = self.user
             )
             # Set the value, clean and save the instance
             location_data.value = value
@@ -198,8 +196,6 @@ class LocationProcessor():
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
 
-        self.location_instance.last_modified_by = self.user
-
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
         with transaction.atomic():
@@ -217,7 +213,7 @@ class LocationProcessor():
                 value = getattr(self, service.short_name) if getattr(self, service.short_name) else None
                 
                 external_service, create = LocationExternalService.objects.get_or_create(
-                    location=self.location_instance, external_service=service, last_modified_by = self.user
+                    location=self.location_instance, external_service=service,
                 )
                 # Set the external service code, clean and save the instance
                 external_service.external_location_code = value
