@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
-from locations.models import Location
+from locations.models import Location, Log
 from locations.processors import LocationProcessor
 
 # Create your views here.
@@ -299,4 +299,22 @@ class LocationAdminView(LoginRequiredMixin, View):
     
     def get(self, request, *args, **kwargs):
         return render(request, template_name=self.template)
+
+
+class LocationLogView(LoginRequiredMixin, ListView):
+    template_name = 'locations/location-log.html'
+
+    def get_queryset(self):
+        # Get a QuerySet of filtered locations
+        if pandcode := self.kwargs.get('pandcode', None):
+            logs = Log.objects.filter(location__pandcode=pandcode)
+        else:
+            logs = Log.objects.filter(location__isnull=True)
+        return logs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if pandcode := self.kwargs.get('pandcode', None):
+            context['location'] = Location.objects.get(pandcode=pandcode)
+        return context
 

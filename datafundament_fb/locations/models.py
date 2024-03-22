@@ -1,8 +1,10 @@
 import re
 from django.db import models
 from django.db.models import Max, Q
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from locations.managers import LocationManager
 # Create your models here.
@@ -29,6 +31,7 @@ class Location(models.Model):
     pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
     name = models.CharField(verbose_name='Naam', max_length=100)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
     is_archived = models.BooleanField(verbose_name="Archief", default=False)
     objects = LocationManager()
@@ -38,6 +41,7 @@ class Location(models.Model):
 
     class Meta:
         verbose_name = 'Locatie'
+        ordering = ['pandcode']
         constraints = [
             models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
             models.UniqueConstraint(fields=['name'], name='unique_name')
@@ -132,6 +136,7 @@ class LocationData(models.Model):
     property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
     value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
 
     class Meta:
@@ -213,6 +218,7 @@ class LocationExternalService(models.Model):
     external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
     external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100, blank=True, null=True)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
 
     class Meta:
@@ -221,3 +227,23 @@ class LocationExternalService(models.Model):
 
     def __str__(self):
         return f'{self.location}, {self.external_service}, {self.external_location_code}'
+
+
+class Log(models.Model):
+    """
+    Log model for keeping a log on system and content changes
+    """
+    timestamp = models.DateTimeField(verbose_name="Tijdstip", auto_now_add=True)
+    user = models.ForeignKey(User, verbose_name="Gebruiker", on_delete=models.PROTECT)
+    location = models.ForeignKey(Location, verbose_name="Locatie", on_delete=models.CASCADE, null=True, blank=True)
+    target = models.CharField(verbose_name="Onderdeel", max_length=100)
+    message = models.CharField(verbose_name="Bericht", max_length=1000)
+
+    class Meta:
+        verbose_name = 'Locatie log'
+        verbose_name_plural = 'Locatie logs'
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f'{self.location}, {self.user}, {self.target}, {self.message}'
+

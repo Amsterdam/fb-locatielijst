@@ -1,8 +1,6 @@
-"""
-Shared utilities for this Django project
-"""
+from locations.models import Log
 
-def reorder_objects(sender, instance, raw, **kwargs):
+def reorder_grouped_objects(sender, instance, raw, **kwargs):
     """
     Function to re-index a bunch of instances on their order field when one instance has been altered on that field
     Usually triggered from a post_save signal
@@ -34,3 +32,5 @@ def reorder_objects(sender, instance, raw, **kwargs):
             sender.objects.filter(id=object.id).update(order=index)
             index += 1    
 
+def add_log(location, user, target, message):
+    Log.objects.create(location = location, user = user, target = target, message = message)

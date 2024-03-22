@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
-from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService, PropertyGroup
+from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService, PropertyGroup, Log
 
 # Register your models here.
 @admin.register(ExternalService)
@@ -79,6 +79,13 @@ class LocationPropertyAdmin(admin.ModelAdmin):
 class PropertyGroupAdmin(admin.ModelAdmin):
     ordering = ['order']
     list_display = ['name', 'order']
+
+
+@admin.register(Log)
+class LogAdmin(admin.ModelAdmin):
+    ordering = ['-timestamp']
+    list_display = ['location', 'timestamp', 'user', 'target', 'message']
+
 
 # Custom names
 admin.site.site_header = 'Datafundament Facilitair Bureau'
