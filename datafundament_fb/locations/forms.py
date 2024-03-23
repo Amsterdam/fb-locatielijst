@@ -5,11 +5,11 @@ from locations.models import LocationProperty
 from locations.processors import LocationProcessor
 
 
-def set_location_property_fields(user: bool=False)-> dict:
+def set_location_property_fields(include_private_properties: bool=False)-> dict:
     fields = dict()
     
     # Get all location properties instances; filter on public attribute
-    location_properties = LocationProcessor(user=user).location_property_instances
+    location_properties = LocationProcessor(include_private_properties=include_private_properties).location_property_instances
     
     for location_property in location_properties:
 
@@ -109,11 +109,11 @@ def set_location_property_fields(user: bool=False)-> dict:
 
     return fields
 
-def set_external_services_fields(user: bool=False) -> dict:
+def set_external_services_fields(include_private_properties: bool=False) -> dict:
     fields = dict()
 
     # Get all external service instances; filter on public attribute
-    external_services = LocationProcessor(user=user).external_service_instances
+    external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
     
     # Define a form field for each external service
     for service in external_services:
@@ -135,9 +135,9 @@ class LocationDataForm(forms.Form):
     # Model fields pandcode and last_modified from the Location model are added in the View
 
     def __init__(self, *args, **kwargs):
-        # Set and remove pandcode and user argument before calling init
+        # Set and remove pandcode and include_private_properties argument before calling init
         pandcode = kwargs.pop('pandcode', None)
-        user = kwargs.pop('user', None)
+        include_private_properties = kwargs.pop('include_private_properties', None)
         super().__init__(*args, **kwargs)
 
         # Add location name field for custom validation
@@ -149,10 +149,10 @@ class LocationDataForm(forms.Form):
         )
 
         # Add the location property fields to this form
-        self.fields.update(set_location_property_fields(user=user))
+        self.fields.update(set_location_property_fields(include_private_properties=include_private_properties))
 
         # Add external services items to this form
-        self.fields.update(set_external_services_fields(user=user))
+        self.fields.update(set_external_services_fields(include_private_properties=include_private_properties))
 
 
 class LocationImportForm(forms.Form):
@@ -166,13 +166,13 @@ class LocationImportForm(forms.Form):
 class LocationListForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
-        # Set and remove user argument before calling init
-        user = kwargs.pop('user', None)
+        # Set and remove include_private_properties argument before calling init
+        include_private_properties = kwargs.pop('include_private_properties', None)
         super().__init__(*args, **kwargs)
    
         # Get all LocationProperty and ExternalService objects 
-        location_properties = LocationProcessor(user=user).location_property_instances
-        external_services = LocationProcessor(user=user).external_service_instances
+        location_properties = LocationProcessor(include_private_properties=include_private_properties).location_property_instances
+        external_services = LocationProcessor(include_private_properties=include_private_properties).external_service_instances
         
         # Create a list of location properties to search in and an option to search in all properties
         property_list = [('','Alle tekstvelden'),('naam','Naam'),('pandcode','Pandcode')]

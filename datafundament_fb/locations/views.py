@@ -27,9 +27,9 @@ def get_csv_file_response(request, locations)-> HttpResponse:
     # Set all location data to a LocationProcessor
     location_data = []
     for location in locations:
-        # Get loction data  depending on user context; user == True is all location properties
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
         location_data.append(
-            LocationProcessor.get(pandcode=location.pandcode, user=request.user).get_dict()
+            LocationProcessor.get(pandcode=location.pandcode, include_private_properties=request.user.is_authenticated).get_dict()
         )
 
     # Setup the http response with the 
@@ -46,7 +46,7 @@ def get_csv_file_response(request, locations)-> HttpResponse:
     if location_data:
         headers = location_data[0].keys()
     else:
-        headers = LocationProcessor(user=request.user).location_properties
+        headers = LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties
 
     # Setup a csv dictwriter and write the location data to the response object
     writer = csv.DictWriter(response, fieldnames=headers, delimiter=';')
@@ -64,19 +64,18 @@ class LocationListView(ListView):
     def get_queryset(self):
         # Get a QuerySet of filtered locations 
         params = self.request.GET.dict()
-        is_authenticated = self.request.user
-        locations = Location.objects.search_filter(params, self.request.user)
+        is_authenticated = self.request.user.is_authenticated
+        locations = Location.objects.search_filter(params, is_authenticated)
         return locations
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         initial_data = self.request.GET
         # Render the search form
-        context['form'] = LocationListForm(initial=initial_data, user=self.request.user)
-        # Create at list of search input elements to be used in a JS function
-        # This functions hides/unhides these elements depending on the selection of the id_property field 
+        context['form'] = LocationListForm(initial=initial_data, include_private_properties=self.request.user.is_authenticated)
+        # Create at list of search input elements to be used in a JS function for hiding/unhiding these elements
         property_list = ['id_search']
-        location_properties = LocationProcessor(user=self.request.user).location_property_instances
+        location_properties = (LocationProcessor(include_private_properties=self.request.user.is_authenticated).location_property_instances)
         for location_property in location_properties:
             if location_property.property_type == 'CHOICE':
                 property_list.append('id_' + location_property.short_name)
@@ -100,9 +99,9 @@ class LocationDetailView(View):
     template = 'locations/location-detail.html'
 
     def get(self, request, *args, **kwargs):
-        # Get loction data  depending on user context; user == True is all location properties
-        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], user=request.user)
-        form = self.form(initial=location_data.get_dict(), user=request.user)
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
+        form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
     
@@ -126,15 +125,15 @@ class LocationCreateView(LoginRequiredMixin, View):
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
-        form = self.form(user=request.user)
+        form = self.form(include_private_properties=request.user.is_authenticated)
         context = {'form': form}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, user=request.user)
+        form = self.form(request.POST, include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
-            location_data = LocationProcessor(data=form.cleaned_data, user=request.user)
+            location_data = LocationProcessor(form.cleaned_data, include_private_properties=request.user.is_authenticated)
             try:
                 # Save the locationprocessor instance
                 location_data.save()
@@ -161,15 +160,15 @@ class LocationUpdateView(LoginRequiredMixin, View):
     template = 'locations/location-update.html'
 
     def get(self, request, *args, **kwargs):
-        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], user=request.user)
-        form = self.form(initial=location_data.get_dict(), user=request.user)
+        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
+        form = self.form(initial=location_data.get_dict(), include_private_properties=request.user.is_authenticated)
         context = {'form': form, 'location_data': location_data.get_dict()}
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form(request.POST, pandcode=self.kwargs['pandcode'], user=request.user)
-        # Get loction data  depending on user context; user == True is all location properties
-        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], user=request.user)
+        form = self.form(request.POST, pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
+        # Get loction data  depending on user context; include_private_properties == True is all location properties
+        location_data = LocationProcessor.get(pandcode=self.kwargs['pandcode'], include_private_properties=request.user.is_authenticated)
 
         if form.is_valid():
             for field in form.cleaned_data:
@@ -226,7 +225,7 @@ class LocationImportView(LoginRequiredMixin, View):
                 csv_dict = csv.DictReader(csv_reader, dialect=csv_dialect, restval='missing', restkey='excess')
 
                 # Report columns that will be processed during import
-                location_properties = set(LocationProcessor(user=request.user).location_properties)
+                location_properties = set(LocationProcessor(include_private_properties=request.user.is_authenticated).location_properties)
                 headers = set(csv_dict.fieldnames)
 
                 used_columns = list(headers & location_properties)
@@ -248,7 +247,7 @@ class LocationImportView(LoginRequiredMixin, View):
                         continue
 
                     # Initiatie a location processor with the row data
-                    location = LocationProcessor(data=row, user=request.user)
+                    location = LocationProcessor(data=row, include_private_properties=request.user.is_authenticated)
                     try:
                         # Save the locationprocessor instance                        
                         location.save()
@@ -279,7 +278,7 @@ class LocationExportView(View):
         if request.GET:
             # Get a QuerySet of filtered locations
             params = self.request.GET.dict()
-            is_authenticated = self.request.user
+            is_authenticated = self.request.user.is_authenticated
             locations = Location.objects.search_filter(params, is_authenticated)
             # Set the response with the csv file
             response = get_csv_file_response(request, locations)

@@ -1,5 +1,4 @@
 from typing import Self
-from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F, Q
@@ -10,7 +9,7 @@ from locations.models import Location, LocationProperty, PropertyOption, Locatio
 
 class LocationProcessor():
     # Switch to include all properties (including private), or only public properties
-    user = AnonymousUser()
+    include_private_properties = False
 
     def _save_location_data(self, location_property, value):
         """Helper function to create or update a LocationData instance"""
@@ -58,13 +57,13 @@ class LocationProcessor():
         # Location properties without a 'group' value be put last beforte being sorted on 'order'
         self.location_property_instances = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order')
         # List is filtered for private accessibility
-        if not self.user.is_authenticated:
+        if not self.include_private_properties:
             self.location_property_instances =  self.location_property_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
         self.external_service_instances = ExternalService.objects.all().order_by('order')
-        if not self.user.is_authenticated:
+        if not self.include_private_properties:
             self.external_service_instances = self.external_service_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
 
@@ -72,17 +71,17 @@ class LocationProcessor():
         for property in self.location_properties:
             setattr(self, property, None)
 
-    def __init__(self, user: User=AnonymousUser(), data: dict=None):
+    def __init__(self, data: dict=None, include_private_properties: bool=False):
         """
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
-        attr: user
-          Properties are filtered on whether a user has permission.
-          Default is an anonymous user
+        attr: include_private_properties
+          Properties are filtered on whether they are publicly or privately visible.
+        Default is false; only the public properties will be set
         """
-        # Set User
-        self.user = user
-    
+        # Set location properties access
+        self.include_private_properties = include_private_properties
+
         # Set an empty Location instance
         self.location_instance = Location()
 
@@ -96,11 +95,11 @@ class LocationProcessor():
                     setattr(self, key, value)
 
     @classmethod
-    def get(cls, pandcode: int, user: User=AnonymousUser())-> Self: 
+    def get(cls, pandcode: int, include_private_properties: bool=False)-> Self: 
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls(user=user)
+        object = cls(include_private_properties=include_private_properties)
         object.location_instance = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
@@ -112,7 +111,7 @@ class LocationProcessor():
         setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
 
         # Add location properties to the object; filter to include non-public properties
-        if object.user.is_authenticated:
+        if object.include_private_properties:
             location_data_set = object.location_instance.locationdata_set.all()
         else:
             location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
@@ -213,7 +212,7 @@ class LocationProcessor():
                 value = getattr(self, service.short_name) if getattr(self, service.short_name) else None
                 
                 external_service, create = LocationExternalService.objects.get_or_create(
-                    location=self.location_instance, external_service=service,
+                    location=self.location_instance, external_service=service
                 )
                 # Set the external service code, clean and save the instance
                 external_service.external_location_code = value
