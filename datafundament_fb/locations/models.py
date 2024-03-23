@@ -234,7 +234,7 @@ class Log(models.Model):
     Log model for keeping a log on system and content changes
     """
     timestamp = models.DateTimeField(verbose_name="Tijdstip", auto_now_add=True)
-    user = models.ForeignKey(User, verbose_name="Gebruiker", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, verbose_name="Gebruiker", on_delete=models.PROTECT, null=True, blank=True)
     location = models.ForeignKey(Location, verbose_name="Locatie", on_delete=models.CASCADE, null=True, blank=True)
     target = models.CharField(verbose_name="Onderdeel", max_length=100)
     message = models.CharField(verbose_name="Bericht", max_length=1000)
