@@ -14,23 +14,25 @@ class LocationProcessor():
     def _save_location_data(self, location_property, value):
         """Helper function to create or update a LocationData instance"""
 
-        # If a location_property has multiple, new values must be added and old ones deleted 
+        # If a location_property has multiple=true, new values must be added and old ones deleted
         if location_property.multiple:
-            if value:
-                values = value
+            if values := value:
+                # Cast values to list
+                if not type(values) == list:
+                    values = values.split(',') # Could be a thingy when the list is not comma seperated
             else:
                 values = []
-            # Cast values to list      
-            if not type(values) == list:
-                values = values.split(',') # Could be a thingy when the list is not comma seperated
+
             # Create multiple LocationData objects
             for value in values:
-                if not LocationData.objects.filter(location=self.location_instance, location_property=location_property, _property_option__option=value):
+                if not LocationData.objects.filter(
+                        location=self.location_instance,
+                        location_property=location_property,
+                        _property_option__option=value):
                     location_data = LocationData(
                         location = self.location_instance,
                         location_property = location_property,
                     )
-                    # Set the value, clean and save the instance
                     location_data.value = value
                     location_data.full_clean()
                     location_data.save()
@@ -41,10 +43,18 @@ class LocationProcessor():
                 location = self.location_instance,
                 location_property = location_property,
             )
-            # Set the value, clean and save the instance
             location_data.value = value
             location_data.full_clean()
             location_data.save()
+
+    def _save_location_external_service(self, external_service, value):
+        external_service, create = LocationExternalService.objects.get_or_create(
+            location=self.location_instance, external_service=external_service
+        )
+        # Set the external service code, clean and save the instance
+        external_service.external_location_code = value
+        external_service.full_clean()
+        external_service.save()
             
     def _set_location_properties(self)-> None:
         """
@@ -54,15 +64,15 @@ class LocationProcessor():
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
-        # Location properties without a 'group' value be put last beforte being sorted on 'order'
-        self.location_property_instances = LocationProperty.objects.all().order_by(F('group__order').asc(nulls_last=True), 'order')
         # List is filtered for private accessibility
+        self.location_property_instances = LocationProperty.objects.all()
         if not self.include_private_properties:
             self.location_property_instances =  self.location_property_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
-        self.external_service_instances = ExternalService.objects.all().order_by('order')
+        # List is filtered for private accessibility
+        self.external_service_instances = ExternalService.objects.all()
         if not self.include_private_properties:
             self.external_service_instances = self.external_service_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
@@ -208,16 +218,9 @@ class LocationProcessor():
                 self._save_location_data(location_property, value)
 
             # Add external service data tot the Location object
-            for service in self.external_service_instances:
-                value = getattr(self, service.short_name) if getattr(self, service.short_name) else None
-                
-                external_service, create = LocationExternalService.objects.get_or_create(
-                    location=self.location_instance, external_service=service
-                )
-                # Set the external service code, clean and save the instance
-                external_service.external_location_code = value
-                external_service.full_clean()
-                external_service.save()
+            for external_service in self.external_service_instances:
+                value = getattr(self, external_service.short_name) if getattr(self, external_service.short_name) else None
+                self._save_location_external_service(external_service, value)
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'

@@ -1,6 +1,6 @@
 import re
 from django.db import models
-from django.db.models import Max, Q
+from django.db.models import Max, Q, F
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
@@ -90,6 +90,7 @@ class LocationProperty(models.Model):
     class Meta:
         verbose_name = 'Locatie eigenschap'
         verbose_name_plural = 'Locatie eigenschappen'
+        ordering = [F('group__order').asc(nulls_last=True), 'order']
         constraints = [
             models.UniqueConstraint(fields=['short_name'], name='unique_location_property_name'),
             models.UniqueConstraint(fields=['label'], name='unique_location_property_label')
@@ -146,6 +147,7 @@ class LocationData(models.Model):
             ),
         ]
 
+    # Property to get/set a value for either _property_option or _value
     @property
     def value(self):
         if self.location_property.property_type == 'CHOICE' and self._property_option:
@@ -211,6 +213,7 @@ class ExternalService(models.Model):
     class Meta:
         verbose_name = 'Externe koppeling'
         verbose_name_plural = 'Externe koppelingen'
+        ordering = ['order']
         constraints = [
             models.UniqueConstraint(fields=['name'], name='unique_service_short_name'),
             models.UniqueConstraint(fields=['short_name'], name='unique_service_name')
