@@ -31,14 +31,15 @@ def property_change_log(sender, instance, raw, **kwargs):
             target = instance.external_service.name
             value_name = 'external_location_code'
 
-    db_instance = sender.objects.get(id=instance.id) if instance.id else sender
     instance_value = getattr(instance, value_name)
-    current_value = getattr(db_instance, value_name)
 
     # Check if existing instance
     if instance.id:
+        db_instance = sender.objects.get(id=instance.id)
+        current_value = getattr(db_instance, value_name, '')
         message = "Waarde was {current_value}, is gewijzigd naar {instance_value}"
     else:
+        current_value = ''
         message = "Waarde {instance_value} gezet"
 
     # naam, archief voor locatie
@@ -72,11 +73,12 @@ def location_change_log(sender, instance, raw, **kwargs):
         message = '{name} is aangemaakt'.format(name=instance.name)
         add_log(None, instance.last_modified_by, target, message)
 
-@receiver(pre_delete, sender=LocationData)
-def locationdata_delete_log(sender, instance, **kwargs):
-    target = instance.location_property.label
-    message = f"Waarde {instance.value} verwijderd"
-    add_log(instance.location, instance.last_modified_by, target, message)
+# AANZETTEN WANNEER LOCATION_DATA UPDATE GEREGELD IS
+# @receiver(pre_delete, sender=LocationData)
+# def locationdata_delete_log(sender, instance, **kwargs):
+#     target = instance.location_property.label
+#     message = f"Waarde {instance.value} verwijderd"
+#     add_log(instance.location, instance.last_modified_by, target, message)
 
 # locatie eigenschappen, externe service toevoegen, opties: aanmken, verwijderen, aanpassen -> applicatielog
     

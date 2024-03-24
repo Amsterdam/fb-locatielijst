@@ -19,6 +19,7 @@ class LocationProcessor():
             location_property = location_property,
             property_option = property_option,
             value = value,
+            last_modified_by = self.user,
         )
         return location_data
 
@@ -244,6 +245,7 @@ class LocationProcessor():
                     location_external = LocationExternalService(location = self.location_instance, external_service = service)
 
                 # Set the external service code and save the instance
+                location_external.last_modified_by = self.user
                 location_external.external_location_code = value
                 location_external.full_clean()
                 location_external.save()
