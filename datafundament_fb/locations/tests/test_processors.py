@@ -1,7 +1,7 @@
 import unittest.mock as mock
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from locations.models import Location, LocationProperty, PropertyOption, LocationData
+from locations.models import Location, LocationProperty, PropertyOption
 from locations.processors import LocationProcessor
 
 
