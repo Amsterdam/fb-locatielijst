@@ -1,6 +1,6 @@
 import re
 from django.db import models
-from django.db.models import Max, Q
+from django.db.models import Max, Q, F
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -46,7 +46,6 @@ class Location(models.Model):
             models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
             models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
-        ordering = ['name']
 
 
 class PropertyGroup(models.Model):
@@ -94,6 +93,7 @@ class LocationProperty(models.Model):
     class Meta:
         verbose_name = 'Locatie eigenschap'
         verbose_name_plural = 'Locatie eigenschappen'
+        ordering = [F('group__order').asc(nulls_last=True), 'order']
         constraints = [
             models.UniqueConstraint(fields=['short_name'], name='unique_location_property_name'),
             models.UniqueConstraint(fields=['label'], name='unique_location_property_label')
@@ -133,8 +133,8 @@ class LocationData(models.Model):
     '''
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
-    property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
-    value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
+    _property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
+    _value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
     last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
@@ -145,14 +145,30 @@ class LocationData(models.Model):
         constraints = [
             # Constraint so that either property_option or value is filled, or empty
             models.CheckConstraint(
-                check=~Q(property_option__isnull=False, value__isnull=False),
+                check=~Q(_property_option__isnull=False, _value__isnull=False),
                 name='either_field_filled',
                 violation_error_message=f'Either option or value must be filled.',
             ),
         ]
 
+    # Property to get/set a value for either _property_option or _value
+    @property
+    def value(self):
+        if self.location_property.property_type == 'CHOICE' and self._property_option:
+            return self._property_option.option
+        else:
+            return self._value
+
+    @value.setter
+    def value(self, value):
+        if self.location_property.property_type == 'CHOICE' and value:
+            option = PropertyOption.objects.filter(location_property=self.location_property, option=value).first()
+            self._property_option = option
+        else:
+            self._value = value
+
     def __str__(self):
-        return f'{self.location}, {self.location_property}, {self.property_option}, {self.value}'
+        return f'{self.location}, {self.location_property}, {self.value}'
 
     def clean(self) -> None:
         # Validate for single instance
@@ -169,19 +185,19 @@ class LocationData(models.Model):
 
         # Validate uniqueness for properties' value
         if self.location_property.unique:
-            if LocationData.objects.filter(location_property=self.location_property,value=self.value).exclude(location=self.location).exists():
+            if LocationData.objects.filter(location_property=self.location_property,_value=self._value).exclude(location=self.location).exists():
                 raise ValidationError(
                     _("Waarde %(value)s bestaat al voor eigenschap %(property)s."),
                     code='unique',
                     params={
-                        'value': self.value,
+                        'value': self._value,
                         'property': self.location_property.label
                     },
                 )
 
         # Ensure location property validation when submitted via a form
         # Validate for required properties
-        if self.location_property.required and not(self.value or self.property_option):
+        if self.location_property.required and not(self.value):
             raise ValidationError(
                 _("Waarde verplicht voor %(property)s"),
                 code='required',
@@ -201,6 +217,7 @@ class ExternalService(models.Model):
     class Meta:
         verbose_name = 'Externe koppeling'
         verbose_name_plural = 'Externe koppelingen'
+        ordering = ['order']
         constraints = [
             models.UniqueConstraint(fields=['name'], name='unique_service_short_name'),
             models.UniqueConstraint(fields=['short_name'], name='unique_service_name')

@@ -257,9 +257,13 @@ class LocationImportView(LoginRequiredMixin, View):
                         messages.add_message(request, messages.SUCCESS, message)
 
                     except ValidationError as err:
-                        error_messages = [error.message for error in err.error_list]
-                        message = f"Fout bij het importeren voor locatie {row['naam']}: {error_messages}"
-                        messages.add_message(request, messages.ERROR, message)
+                        if getattr(err, 'error_list', None):
+                            error_message = [error.message for error in err.error_list]
+                        elif getattr(err, 'error_dict', None):
+                            error_message = []
+                            for error_list in err.error_dict.values():
+                                # Unpredictable fix, because there is a self reference in error_list
+                                error_message.extend([error.messages for error in error_list])
             else:
                 message = f"{csv_file.name} is geen gelding CSV bestand."
                 messages.add_message(request, messages.ERROR, message)
