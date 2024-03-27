@@ -43,19 +43,19 @@ class LocationQuerySet(QuerySet):
                 # If the property is of the CHOICE type
                 if is_choice_property:
                     # Filter PropertyOption on option value
-                    qfilter &= Q(locationdata__property_option__option=search_value)
+                    qfilter &= Q(locationdata___property_option__option=search_value)
                 else:
                     # Filter on LocationData or LocationExternalService value
                     qfilter &= (
-                        Q(locationdata__value__icontains=search_value) |
+                        Q(locationdata___value__icontains=search_value) |
                         Q(locationexternalservice__external_location_code__icontains=search_value))
             case _:
                 # Do a full search on all tables containing location data
                 qfilter = (
                     Q(name__icontains=search_value) |
-                    Q(locationdata__value__icontains=search_value) |
+                    Q(locationdata___value__icontains=search_value) |
                     Q(locationexternalservice__external_location_code__icontains=search_value) |
-                    Q(locationdata__property_option__option__icontains=search_value))
+                    Q(locationdata___property_option__option__icontains=search_value))
 
         # Filter if archive value
         qfilter &= filter_on_archive(archive_value)

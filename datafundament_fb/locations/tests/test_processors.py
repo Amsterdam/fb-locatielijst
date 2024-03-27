@@ -39,7 +39,7 @@ class TestLocationProcessor(TestCase):
             location_property=self.multichoice_property, option='Team 1')
         self.multichoice_option2 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 2')
-        self.multichoice_option2 = PropertyOption.objects.create(
+        self.multichoice_option3 = PropertyOption.objects.create(
             location_property=self.multichoice_property, option='Team 3')
         self.geolocation_property = LocationProperty.objects.create(
             short_name='geo', label='geolocation', property_type='GEO', required=True, order=11)
@@ -185,11 +185,11 @@ class TestLocationProcessor(TestCase):
         self.assertEqual(location_data[7].location_property, self.url_property)
         self.assertEqual(location_data[7].value, self.location_data_dict['url'])
         self.assertEqual(location_data[8].location_property, self.choice_property)
-        self.assertEqual(location_data[8].property_option.option, self.location_data_dict['type'])
+        self.assertEqual(location_data[8]._property_option.option, self.location_data_dict['type'])
         self.assertEqual(location_data[9].location_property, self.multichoice_property)
-        self.assertIn(location_data[9].property_option.option, self.location_data_dict['multitype'])
+        self.assertIn(location_data[9]._property_option.option, self.location_data_dict['multitype'])
         self.assertEqual(location_data[10].location_property, self.multichoice_property)
-        self.assertIn(location_data[10].property_option.option, self.location_data_dict['multitype'])
+        self.assertIn(location_data[10]._property_option.option, self.location_data_dict['multitype'])
         self.assertEqual(location_data[11].location_property, self.geolocation_property)
         self.assertEqual(location_data[11].value, self.location_data_dict['geo'])
 
