@@ -142,6 +142,7 @@ class LocationData(models.Model):
     class Meta:
         verbose_name = 'Locatie gegeven'
         verbose_name_plural = 'Locatie gegevens'
+        ordering = ['id']
         constraints = [
             # Constraint so that either property_option or value is filled, or empty
             models.CheckConstraint(
