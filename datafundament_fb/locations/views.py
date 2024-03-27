@@ -83,7 +83,7 @@ class LocationListView(ListView):
         # Number of locations in the search result, filtered by archive
         archive = self.request.GET.get('archive', '')
         location_count = Location.objects.archive_filter(archive).count()       
-        context['result_count'] = location_count
+        context['location_count'] = location_count
         # Boolean if the search result if filtered by the search query
         context['is_filtered_result'] = context['page_obj'].paginator.count < location_count
         # Pass the url query to the url for exporting the search result as csv file; remove page parameter if present

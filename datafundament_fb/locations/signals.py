@@ -73,12 +73,11 @@ def location_change_log(sender, instance, raw, **kwargs):
         message = '{name} is aangemaakt'.format(name=instance.name)
         add_log(None, instance.last_modified_by, target, message)
 
-# AANZETTEN WANNEER LOCATION_DATA UPDATE GEREGELD IS
-# @receiver(pre_delete, sender=LocationData)
-# def locationdata_delete_log(sender, instance, **kwargs):
-#     target = instance.location_property.label
-#     message = f"Waarde {instance.value} verwijderd"
-#     add_log(instance.location, instance.last_modified_by, target, message)
+@receiver(pre_delete, sender=LocationData)
+def locationdata_delete_log(sender, instance, **kwargs):
+    target = instance.location_property.label
+    message = f"Waarde {instance.value} verwijderd"
+    add_log(instance.location, instance.last_modified_by, target, message)
 
 # locatie eigenschappen, externe service toevoegen, opties: aanmken, verwijderen, aanpassen -> applicatielog
     

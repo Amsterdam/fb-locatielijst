@@ -12,8 +12,31 @@ class LocationProcessor():
     # Switch to include all properties (including private), or only public properties
     user = AnonymousUser()
 
-    def _save_location_data(self, location_property, value):
+    def _create_or_update(self, location_property, value):
         """Helper function to create or update a LocationData instance"""
+        if location_property.multiple:
+            location_data = LocationData.objects.filter(
+                location=self.location_instance,
+                location_property=location_property,
+                _property_option__option=value).first()
+        else:
+            location_data = LocationData.objects.filter(
+                location=self.location_instance,
+                location_property=location_property).first()
+
+        if not location_data:
+            location_data = LocationData(
+                location = self.location_instance,
+                location_property=location_property
+            )
+        if location_data.value != value:
+            location_data.last_modified_by = self.user
+            location_data.value = value
+            location_data.full_clean()
+            location_data.save()
+
+    def _save_location_data(self, location_property, value):
+        """Helper function to save location_processor attributes"""
         # If a location_property has multiple=true, new values must be added and old ones deleted
         if location_property.multiple:
             if values := value:
@@ -25,38 +48,26 @@ class LocationProcessor():
 
             # Create multiple LocationData objects
             for value in values:
-                if not LocationData.objects.filter(
-                            location=self.location_instance,
-                            location_property=location_property,
-                            _property_option__option=value):
-                    location_data = LocationData(
-                        location = self.location_instance,
-                        location_property = location_property,
-                    )
-                    location_data.user = self.user
-                    location_data.value = value
-                    location_data.full_clean()
-                    location_data.save()
+                self._create_or_update(location_property, value)
+
             # Delete multiples not in the values list
             self.location_instance.locationdata_set.filter(Q(location_property=location_property),~Q(_property_option__option__in=values)).delete()
         else:
-            location_data, created = LocationData.objects.get_or_create(
-                location = self.location_instance,
-                location_property = location_property,
-            )
-            location_data.user = self.user
-            location_data.value = value
-            location_data.full_clean()
-            location_data.save()
+            self._create_or_update(location_property, value)
 
     def _save_location_external_service(self, external_service, value):
-        external_service, create = LocationExternalService.objects.get_or_create(
+        external_service = LocationExternalService.objects.filter(
             location=self.location_instance, external_service=external_service
-        )
-        # Set the external service code, clean and save the instance
-        external_service.external_location_code = value
-        external_service.full_clean()
-        external_service.save()
+        ).first()
+        if not external_service:
+            external_service = LocationExternalService(
+                location=self.location_instance, external_service=external_service
+            )
+
+        if external_service.external_location_code != value:
+            external_service.external_location_code = value
+            external_service.full_clean()
+            external_service.save()
             
     def _set_location_properties(self)-> None:
         """

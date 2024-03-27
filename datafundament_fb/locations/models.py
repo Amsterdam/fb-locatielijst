@@ -4,7 +4,6 @@ from django.db.models import Max, Q, F
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.utils import timezone
 from django.utils.translation import gettext as _
 from locations.managers import LocationManager
 # Create your models here.
