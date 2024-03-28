@@ -8,26 +8,35 @@ from locations.models import Location, LocationProperty, PropertyOption, Locatio
 class ExternalServiceAdmin(admin.ModelAdmin):
     ordering = ['order']
     list_display = ['name', 'public', 'order']
+    exclude = ['last_modified_by']
+
+    def save_model(self, request, obj, form, change):
+        obj.last_modified_by = request.user
+        obj.save()
 
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     readonly_fields = ['last_modified', 'created_at']
+    exclude = ['last_modified_by']
+
+    def save_model(self, request, obj, form, change):
+        obj.last_modified_by = request.user
+        obj.save()
 
 
 @admin.register(LocationData)
-class LocationDataAdmin(admin.ModelAdmin):
-    readonly_fields = ['last_modified', 'created_at']
+class LocationDataAdmin(admin.ModelAdmin):...
 
 
 @admin.register(LocationExternalService)
-class LocationExternalServiceAdmin(admin.ModelAdmin):
-    readonly_fields = ['last_modified', 'created_at']
+class LocationExternalServiceAdmin(admin.ModelAdmin):...
 
 
 @admin.register(PropertyOption)
 class PropertyOptionAdmin(admin.ModelAdmin):
     ordering = ['location_property__order']
+    exclude = ['last_modified_by']
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(
@@ -36,6 +45,10 @@ class PropertyOptionAdmin(admin.ModelAdmin):
         form.base_fields['location_property'].queryset = LocationProperty.objects.filter(
             property_type=LocationProperty.LocationPropertyType.CHOICE)
         return form
+
+    def save_model(self, request, obj, form, change):
+        obj.last_modified_by = request.user
+        obj.save()
 
 
 class PropertyOptionInlineFormset(BaseInlineFormSet):
@@ -57,6 +70,7 @@ class LocationPropertyAdmin(admin.ModelAdmin):
     ordering = ['group__order', 'order']
     inlines = [PropertyOptionInline]
     list_display = ['label', 'property_type', 'public', 'group', 'order']
+    exclude = ['last_modified_by']
 
     def get_readonly_fields(self, request, obj=None):
         # Prevent the user from modifying an existing property_type 
@@ -73,6 +87,10 @@ class LocationPropertyAdmin(admin.ModelAdmin):
                 return super().get_inline_instances(request, obj)
             else:
                 return []
+    
+    def save_model(self, request, obj, form, change):
+        obj.last_modified_by = request.user
+        obj.save()
         
 
 @admin.register(PropertyGroup)
@@ -84,7 +102,7 @@ class PropertyGroupAdmin(admin.ModelAdmin):
 @admin.register(Log)
 class LogAdmin(admin.ModelAdmin):
     ordering = ['-timestamp']
-    list_display = ['location', 'timestamp', 'user', 'target', 'message']
+    list_display = ['location', 'location_property', 'property_option', 'external_service', 'timestamp', 'user', 'target', 'message']
 
 
 # Custom names

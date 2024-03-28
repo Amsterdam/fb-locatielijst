@@ -56,18 +56,18 @@ class LocationProcessor():
             self._create_or_update(location_property, value)
 
     def _save_location_external_service(self, external_service, value):
-        external_service = LocationExternalService.objects.filter(
+        location_external_service = LocationExternalService.objects.filter(
             location=self.location_instance, external_service=external_service
         ).first()
-        if not external_service:
-            external_service = LocationExternalService(
+        if not location_external_service:
+            location_external_service = LocationExternalService(
                 location=self.location_instance, external_service=external_service
             )
-
-        if external_service.external_location_code != value:
-            external_service.external_location_code = value
-            external_service.full_clean()
-            external_service.save()
+        if location_external_service.external_location_code != value:
+            location_external_service.last_modified_by = self.user
+            location_external_service.external_location_code = value
+            location_external_service.full_clean()
+            location_external_service.save()
             
     def _set_location_properties(self)-> None:
         """
