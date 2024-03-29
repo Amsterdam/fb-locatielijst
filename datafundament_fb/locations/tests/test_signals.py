@@ -91,7 +91,7 @@ class TestLogging(TestCase):
         self.location_data.save()
         # Check reulsting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location.__class__.__name__)
+        self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.target, self.location_property.label)
         message = 'Waarde ({value}) gezet.'.format(value=self.location_data.value)
@@ -101,7 +101,7 @@ class TestLogging(TestCase):
         self.location_external_service.save()
         # Check reulsting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location.__class__.__name__)
+        self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.target, self.external_service.name)
         message = 'Waarde ({value}) gezet.'.format(value=self.location_external_service.external_location_code)
@@ -124,7 +124,7 @@ class TestLogging(TestCase):
         self.location_data.save()
         # Check reulsting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location.__class__.__name__)
+        self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.target, self.location_property.label)
         message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
@@ -139,7 +139,7 @@ class TestLogging(TestCase):
         self.location_external_service.save()
         # Check reulsting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location.__class__.__name__)
+        self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.target, self.external_service.name)
         message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
@@ -158,7 +158,7 @@ class TestLogging(TestCase):
         self.location_data.delete()
         # Check reulsting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location.__class__.__name__)
+        self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.target, self.location_property.label)
         message = 'Waarde ({value}) verwijderd.'.format(value=self.location_data.value)
@@ -204,7 +204,7 @@ class TestLogging(TestCase):
             
             # Check reulsting log. Should be the first in the queryset
             log = Log.objects.all().first()
-            self.assertEqual(log.model, instance.__class__.__name__)
+            self.assertEqual(log.model, instance)
             self.assertEqual(log.user, self.user)
             self.assertEqual(log.target, instance._meta.get_field(attribute).verbose_name)
             message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."

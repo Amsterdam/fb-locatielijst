@@ -262,13 +262,13 @@ class Log(models.Model):
     def instance(self):
         model = None
         if self.location:
-            model = self.location.__class__.__name__
+            model = self.location
         if self.location_property:
-            model = self.location_property.__class__.__name__
+            model = self.location_property
         if self.property_option:
-            model = self.property_option.__class__.__name__
+            model = self.property_option
         if self.external_service:
-            model = self.external_service.__class__.__name__
+            model = self.external_service
         return model
     
     @instance.setter

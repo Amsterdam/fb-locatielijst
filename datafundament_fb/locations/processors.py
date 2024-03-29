@@ -104,7 +104,7 @@ class LocationProcessor():
         """
         # Set User
         self.user = user
-    
+        
         # Set an empty Location instance
         self.location_instance = Location()
 
