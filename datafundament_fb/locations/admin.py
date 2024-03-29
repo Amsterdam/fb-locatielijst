@@ -46,10 +46,6 @@ class PropertyOptionAdmin(admin.ModelAdmin):
             property_type=LocationProperty.LocationPropertyType.CHOICE)
         return form
 
-    def save_model(self, request, obj, form, change):
-        obj.last_modified_by = request.user
-        obj.save()
-
 
 class PropertyOptionInlineFormset(BaseInlineFormSet):
     def clean(self):
@@ -58,11 +54,30 @@ class PropertyOptionInlineFormset(BaseInlineFormSet):
         if self.instance.property_type != 'CHOICE' and len(self.forms) > 0:
             raise ValidationError("Opties kan je alleen aan een keuzelijst toevoegen.")
 
+    def save_new(self, form, commit=True):
+        obj = super().save_new(form, commit=False)
+        obj.last_modified_by = self.request.user
+        if commit:
+            obj.save()
+        return obj
+
+    def save_existing(self, form, instance, commit=True):
+        obj = super().save_existing(form, instance, commit=False)
+        obj.last_modified_by = self.request.user
+        if commit:
+            obj.save()
+        return obj
+
 
 class PropertyOptionInline(admin.TabularInline):
     model = PropertyOption
     formset = PropertyOptionInlineFormset
     extra = 0
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset.request = request
+        return formset
 
 
 @admin.register(LocationProperty)
