@@ -2,7 +2,8 @@ import unittest.mock as mock
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from locations.models import Location, LocationProperty, PropertyOption, LocationData
+from locations.models import Location, LocationProperty, PropertyOption
+from locations.signals import disconnect_signals
 from locations.processors import LocationProcessor
 
 
@@ -12,6 +13,8 @@ class TestLocationProcessor(TestCase):
     '''
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.boolean_property = LocationProperty.objects.create(
             short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True, order=1)
         self.date_property = LocationProperty.objects.create(

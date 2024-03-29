@@ -5,6 +5,7 @@ from django.db.models.deletion import RestrictedError
 from django.db.utils import IntegrityError
 from django.db import transaction
 from locations.models import compute_pandcode, validate_short_name, Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
+from locations.signals import disconnect_signals
 from locations import validators
 
 
@@ -14,6 +15,8 @@ class TestModelFunctions(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location1 = Location(pandcode='25000', name='Stopera')
         self.location2 = Location(pandcode='24000', name='GGD')
         self.location_property = LocationProperty(
@@ -222,6 +225,8 @@ class TestGetLocationDataValidate(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location1 = Location.objects.create(pandcode='25000', name='Stopera')
         self.location2 = Location.objects.create(pandcode='24000', name='GGD')
         self.boolean_property = LocationProperty.objects.create(
@@ -337,6 +342,8 @@ class TestLocationDataModel(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.location2 = Location.objects.create(pandcode='25001', name='GGD')
         self.string_property = LocationProperty.objects.create(
@@ -451,6 +458,8 @@ class TestReferencedModelOnDelete(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location = Location.objects.create(pandcode=25000, name='Stadhuis')
         self.location_property = LocationProperty.objects.create(
             short_name='property', label='Location property', property_type='CHOICE')

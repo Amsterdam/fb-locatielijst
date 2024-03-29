@@ -9,13 +9,17 @@ from django.urls import reverse
 from parameterized import parameterized
 from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
+from locations.signals import disconnect_signals
 from locations.views import get_csv_file_response
+
 
 class LocationListView(TestCase):
     """
     Tests for searching in the list of locations
     """
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.authenticated_user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
         self.anonymous_user = AnonymousUser()
         LocationProperty.objects.create(
@@ -157,6 +161,8 @@ class LocationDetailViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.private_property = LocationProperty.objects.create(
@@ -271,6 +277,8 @@ class LocationCreateViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
@@ -388,6 +396,8 @@ class LocationUpdateViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
@@ -502,6 +512,8 @@ class TestLocationImportForm(TestCase):
     Test importing / updating locations by uploading a csv file
     """
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
@@ -684,6 +696,8 @@ class TestLocationExport(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
             short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True)
@@ -887,6 +901,8 @@ class TestLocationAdminView(TestCase):
     Tests for the LocationAdminView
     """
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
 
     def test_get_view_authenticated(self):

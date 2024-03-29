@@ -259,18 +259,19 @@ class Log(models.Model):
     message = models.CharField(max_length=1000)
 
     @property
-    def model(self):
+    def instance(self):
+        model = None
         if self.location:
-            model = self.loation.__class__.__name__
+            model = self.location.__class__.__name__
         if self.location_property:
             model = self.location_property.__class__.__name__
         if self.property_option:
             model = self.property_option.__class__.__name__
         if self.external_service:
-            model = self.external_service.__class__.__name__            
+            model = self.external_service.__class__.__name__
         return model
     
-    @model.setter
+    @instance.setter
     def model(self, instance):
         match instance.__class__.__name__:
             case 'Location':

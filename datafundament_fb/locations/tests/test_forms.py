@@ -4,9 +4,13 @@ from django.test import TestCase
 from locations.forms import LocationDataForm, LocationListForm
 from locations.models import Location, LocationProperty, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
+from locations.signals import disconnect_signals
+
 
 class TestLocationDataForm(TestCase):
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
@@ -124,6 +128,8 @@ class TestLocationDataForm(TestCase):
 
 class TestLocationListForm(TestCase):
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.public_property = LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)
         self.private_property = LocationProperty.objects.create(
