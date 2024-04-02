@@ -68,6 +68,7 @@
         {% if not location_data.archief %}
         <a href="{% url 'locations_urls:location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
         {% endif %}
+        <a href="{% url 'location-detail-log' location_data.pandcode %}" class="btn btn-secundair">Logs</a>
 
         <form action="." method="POST">
             {% csrf_token %}

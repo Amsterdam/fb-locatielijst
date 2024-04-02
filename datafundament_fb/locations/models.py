@@ -1,6 +1,7 @@
 import re
 from django.db import models
 from django.db.models import Max, Q, F
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
@@ -29,6 +30,7 @@ class Location(models.Model):
     pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
     name = models.CharField(verbose_name='Naam', max_length=100)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
     is_archived = models.BooleanField(verbose_name="Archief", default=False)
     objects = LocationManager()
@@ -38,11 +40,11 @@ class Location(models.Model):
 
     class Meta:
         verbose_name = 'Locatie'
+        ordering = ['pandcode']
         constraints = [
             models.UniqueConstraint(fields=['pandcode'], name='unique_pandcode'),
             models.UniqueConstraint(fields=['name'], name='unique_name')
         ]
-        ordering = ['name']
 
 
 class PropertyGroup(models.Model):
@@ -86,6 +88,7 @@ class LocationProperty(models.Model):
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
     group = models.ForeignKey(PropertyGroup, verbose_name='Groeperen in', on_delete=models.SET_NULL, blank=True, null=True)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True, validators=[MinValueValidator(1)])
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie eigenschap'
@@ -113,7 +116,8 @@ class PropertyOption(models.Model):
     '''
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     option = models.CharField(verbose_name='Optie', max_length=100)
-
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
+    
     class Meta:
         verbose_name = 'Eigenschap optie'
         verbose_name_plural = 'Eigenschappen opties'
@@ -132,12 +136,12 @@ class LocationData(models.Model):
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     _property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
     _value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
-    last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
-    created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie gegeven'
         verbose_name_plural = 'Locatie gegevens'
+        ordering = ['id']
         constraints = [
             # Constraint so that either property_option or value is filled, or empty
             models.CheckConstraint(
@@ -209,7 +213,8 @@ class ExternalService(models.Model):
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True, validators=[MinValueValidator(1)])
-
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
+    
     class Meta:
         verbose_name = 'Externe koppeling'
         verbose_name_plural = 'Externe koppelingen'
@@ -230,8 +235,7 @@ class LocationExternalService(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
     external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100, blank=True, null=True)
-    last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
-    created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
+    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie koppeling'
@@ -239,3 +243,51 @@ class LocationExternalService(models.Model):
 
     def __str__(self):
         return f'{self.location}, {self.external_service}, {self.external_location_code}'
+
+
+class Log(models.Model):
+    """
+    Log model for keeping a log on system and content changes
+    """
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, null=True, blank=True)
+    property_option = models.ForeignKey(PropertyOption, on_delete=models.CASCADE, null=True, blank=True)
+    external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, null=True, blank=True)
+    target = models.CharField(max_length=100)
+    message = models.CharField(max_length=1000)
+
+    @property
+    def instance(self):
+        model = None
+        if self.location:
+            model = self.location
+        if self.location_property:
+            model = self.location_property
+        if self.property_option:
+            model = self.property_option
+        if self.external_service:
+            model = self.external_service
+        return model
+    
+    @instance.setter
+    def model(self, instance):
+        match instance.__class__.__name__:
+            case 'Location':
+                self.location = instance
+            case 'LocationProperty':
+                self.location_property = instance
+            case 'PropertyOption':
+                self.property_option = instance
+            case 'ExternalService':
+                self.external_service = instance            
+
+    class Meta:
+        verbose_name = 'Datafundament log'
+        verbose_name_plural = 'Datafundament logs'
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f'{self.model}, {self.user}, {self.target}, {self.message}'
+

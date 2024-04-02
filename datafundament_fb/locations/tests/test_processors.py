@@ -1,7 +1,9 @@
 import unittest.mock as mock
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from locations.models import Location, LocationProperty, PropertyOption
+from locations.signals import disconnect_signals
 from locations.processors import LocationProcessor
 
 
@@ -11,6 +13,8 @@ class TestLocationProcessor(TestCase):
     '''
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.boolean_property = LocationProperty.objects.create(
             short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True, order=1)
         self.date_property = LocationProperty.objects.create(
@@ -43,7 +47,7 @@ class TestLocationProcessor(TestCase):
             location_property=self.multichoice_property, option='Team 3')
         self.geolocation_property = LocationProperty.objects.create(
             short_name='geo', label='geolocation', property_type='GEO', required=True, order=11)
-        
+        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
         self.location_data_dict = dict({
             'pandcode': '24000',
             'naam': 'Stopera',
@@ -112,7 +116,7 @@ class TestLocationProcessor(TestCase):
 
         # Location fields and properties filtered by _set_location_properties(); added with fields from location
         # Included properties are private and public
-        processor = LocationProcessor(include_private_properties=True)
+        processor = LocationProcessor(user=self.user)
         location_properties = processor.location_properties
         found_location_properties = set(location_properties)
 
@@ -128,7 +132,7 @@ class TestLocationProcessor(TestCase):
         Test if an instancve of LocationProcessor is created
         and if the attributes have the correct value
         '''
-        location_processor = LocationProcessor(include_private_properties=True, data=self.location_data_dict)
+        location_processor = LocationProcessor(user=self.user, data=self.location_data_dict)
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(location_processor, LocationProcessor)
@@ -153,7 +157,7 @@ class TestLocationProcessor(TestCase):
         # Check that no location exists in the database
         self.assertEqual(Location.objects.all().count(), 0)
         # Create and save a Location
-        LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
+        LocationProcessor(user=self.user, data=self.location_data_dict).save()
 
         # Check if the location has been added to the database
         # Only one location should exist in the database
@@ -200,7 +204,7 @@ class TestLocationProcessor(TestCase):
         if an error occurs during save().
         '''
         # Init location with an invalid attribute type 
-        location = LocationProcessor(self.location_data_dict, include_private_properties=True)
+        location = LocationProcessor(data=self.location_data_dict, user=self.user)
 
         # Mock the validation() so an error is raised
         mock.side_effect = (ValueError)
@@ -217,7 +221,7 @@ class TestLocationProcessor(TestCase):
         Test that an invalid choice value for a Location Property() during save results in a validation error.
         '''
         # Init location with non existing type option
-        location = LocationProcessor(include_private_properties=True, data=self.location_data_dict)
+        location = LocationProcessor(user=self.user, data=self.location_data_dict)
         location.type = 'Tomato'
         
         # When saving the object, a ValidationError should be raised because Tomato is not a valid choice value
@@ -235,7 +239,7 @@ class TestLocationProcessor(TestCase):
         Test that an invalid multiple choice value for a Location Property() during save results in a validation error.
         '''
         # Init location with non existing type option
-        location = LocationProcessor(include_private_properties=True, data=self.location_data_dict)
+        location = LocationProcessor(user=self.user, data=self.location_data_dict)
         location.multitype = ['Team 1', 'Tomato']
         
         # When saving the object, a ValidationError should be raised because Tomato is not a valid choice value
@@ -250,15 +254,15 @@ class TestLocationProcessor(TestCase):
 
     def test_location_save_with_empty_value(self):
         # Test whether a previously filled value will be emptied
-        LocationProcessor(self.location_data_dict, include_private_properties=True).save()
+        LocationProcessor(data=self.location_data_dict, user=self.user).save()
 
         # Get the location and delete a property value
-        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], include_private_properties=True)
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], user=self.user)
         location.url = None
         location.save()
 
         # Verify that the location properties have no value in the db
-        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], include_private_properties=True)
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], user=self.user)
         self.assertEqual(location.url, None)
 
     def test_validation(self):
@@ -266,7 +270,7 @@ class TestLocationProcessor(TestCase):
         Test the validation method
         '''
         # Init a location
-        location = LocationProcessor(include_private_properties=True, data=self.location_data_dict)
+        location = LocationProcessor(user=self.user, data=self.location_data_dict)
 
         # Set occupied to an invalid string
         location.occupied = 'Misschien'
@@ -284,10 +288,10 @@ class TestLocationProcessor(TestCase):
         Test retrieving private location data from the database
         '''
         # First create and save an object
-        LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
+        LocationProcessor(user=self.user, data=self.location_data_dict).save()
 
         # Get the object
-        get_location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], include_private_properties=True)
+        get_location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], user=self.user)
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(get_location, LocationProcessor)
@@ -314,7 +318,7 @@ class TestLocationProcessor(TestCase):
         Test retrieving public location data from the database
         '''
         # First create and save an object
-        LocationProcessor(data=self.location_data_dict).save()
+        LocationProcessor(data=self.location_data_dict, user=self.user).save()
 
         # Get the object
         get_location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])
@@ -341,9 +345,9 @@ class TestLocationProcessor(TestCase):
 
     def test_returned_properties_from_get_dict(self):
         # First create and save an object
-        LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
+        LocationProcessor(user=self.user, data=self.location_data_dict).save()
         # Get dictionary of the LocationProcessor object
-        location_dict = LocationProcessor.get(self.location_data_dict['pandcode'], include_private_properties=True).get_dict()
+        location_dict = LocationProcessor.get(self.location_data_dict['pandcode'], user=self.user).get_dict()
 
         # Set the sets of expected and returned location properties
         expected_location_properties = {'pandcode', 'naam', 'occupied', 'build', 'mail', 'geo', 'floors',
@@ -359,10 +363,10 @@ class TestLocationProcessor(TestCase):
         Test the function for returning a dictionary of the locations' attributes
         '''
         # First create and save an object
-        LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
+        LocationProcessor(user=self.user, data=self.location_data_dict).save()
 
         # Get dictionary of the LocationProcessor object
-        location_dict = LocationProcessor.get(self.location_data_dict['pandcode'], include_private_properties=True).get_dict()
+        location_dict = LocationProcessor.get(self.location_data_dict['pandcode'], user=self.user).get_dict()
 
         # Verifiy the instance and the attribute values
         self.assertIsInstance(location_dict, dict)
@@ -388,10 +392,10 @@ class TestLocationProcessor(TestCase):
         '''
         Test if a LocationProcessor object can be updated through the location processor'''
         # Create and save a Location
-        LocationProcessor(include_private_properties=True, data=self.location_data_dict).save()
+        LocationProcessor(user=self.user, data=self.location_data_dict).save()
 
         # Get the location
-        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], include_private_properties=True)
+        location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], user=self.user)
 
         # Alter some value
         location.naam = 'Amstel 2'
@@ -411,7 +415,7 @@ class TestLocationProcessor(TestCase):
         location.save()
 
         # Get the location from the database
-        updated_location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], include_private_properties=True)
+        updated_location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'], user=self.user)
         
         # Check the attribute values for the updated location
         self.assertEqual(updated_location.naam, location.naam)

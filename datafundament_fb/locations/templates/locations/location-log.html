@@ -1,0 +1,65 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n admin_urls static admin_modify utils %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    {% if location %}
+    <a href="{% url 'location-log' %}">{% translate 'Logs' %}</a>
+    <span>&rsaquo;</span>
+    {{ location.name }}
+    {% else %}
+    Logs
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if location %}
+<h2>Log van {{ location.pandcode }} - {{ location.name }}</h2>
+{% else %}
+<h2>Datafundament logboek</h2>
+{% endif %}
+<div class="page-content">
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col" class="column-pancode">Datum/tijd</th>
+                <th scope="col">Door</th>
+                <th scope="col">Onderdeel</th>
+                <th scope="col">Log bericht</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in object_list %}
+            <tr>
+                <td>
+                    {{object.timestamp}}
+                </td>
+                <td>
+                    {{ object.user }}
+                </td>
+                <td>
+                    {{ object.target }}
+                </td>
+                <td>
+                    {{ object.message }}
+                </td>
+            </tr>
+            {% empty %}
+            Geen wijzigingen gevonden.
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="btn-container">
+    {% if location %}
+    <a href="{% url 'locations_urls:location-detail' location.pandcode %}" class="btn btn-secundair">Terug</a>
+    {% else %}
+    <a href="{% url 'location-admin'%}" class="btn btn-secundair">Terug</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 from typing import Self
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F, Q
@@ -9,11 +10,33 @@ from locations.models import Location, LocationProperty, PropertyOption, Locatio
 
 class LocationProcessor():
     # Switch to include all properties (including private), or only public properties
-    include_private_properties = False
+    user = AnonymousUser()
+
+    def _create_or_update(self, location_property, value):
+        """Helper function to create or update a LocationData instance"""
+        if location_property.multiple:
+            location_data = LocationData.objects.filter(
+                location=self.location_instance,
+                location_property=location_property,
+                _property_option__option=value).first()
+        else:
+            location_data = LocationData.objects.filter(
+                location=self.location_instance,
+                location_property=location_property).first()
+
+        if not location_data:
+            location_data = LocationData(
+                location = self.location_instance,
+                location_property=location_property
+            )
+        if location_data.value != value:
+            location_data.last_modified_by = self.user
+            location_data.value = value
+            location_data.full_clean()
+            location_data.save()
 
     def _save_location_data(self, location_property, value):
-        """Helper function to create or update a LocationData instance"""
-
+        """Helper function to save location_processor attributes"""
         # If a location_property has multiple=true, new values must be added and old ones deleted
         if location_property.multiple:
             if values := value:
@@ -25,36 +48,26 @@ class LocationProcessor():
 
             # Create multiple LocationData objects
             for value in values:
-                if not LocationData.objects.filter(
-                        location=self.location_instance,
-                        location_property=location_property,
-                        _property_option__option=value):
-                    location_data = LocationData(
-                        location = self.location_instance,
-                        location_property = location_property,
-                    )
-                    location_data.value = value
-                    location_data.full_clean()
-                    location_data.save()
+                self._create_or_update(location_property, value)
+
             # Delete multiples not in the values list
             self.location_instance.locationdata_set.filter(Q(location_property=location_property),~Q(_property_option__option__in=values)).delete()
         else:
-            location_data, created = LocationData.objects.get_or_create(
-                location = self.location_instance,
-                location_property = location_property,
-            )
-            location_data.value = value
-            location_data.full_clean()
-            location_data.save()
+            self._create_or_update(location_property, value)
 
     def _save_location_external_service(self, external_service, value):
-        external_service, create = LocationExternalService.objects.get_or_create(
+        location_external_service = LocationExternalService.objects.filter(
             location=self.location_instance, external_service=external_service
-        )
-        # Set the external service code, clean and save the instance
-        external_service.external_location_code = value
-        external_service.full_clean()
-        external_service.save()
+        ).first()
+        if not location_external_service:
+            location_external_service = LocationExternalService(
+                location=self.location_instance, external_service=external_service
+            )
+        if location_external_service.external_location_code != value:
+            location_external_service.last_modified_by = self.user
+            location_external_service.external_location_code = value
+            location_external_service.full_clean()
+            location_external_service.save()
             
     def _set_location_properties(self)-> None:
         """
@@ -66,14 +79,14 @@ class LocationProcessor():
         # Get all location properties and add the names to the location properties list
         # List is filtered for private accessibility
         self.location_property_instances = LocationProperty.objects.all()
-        if not self.include_private_properties:
+        if not self.user.is_authenticated:
             self.location_property_instances =  self.location_property_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
         # List is filtered for private accessibility
         self.external_service_instances = ExternalService.objects.all()
-        if not self.include_private_properties:
+        if not self.user.is_authenticated:
             self.external_service_instances = self.external_service_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
 
@@ -81,17 +94,17 @@ class LocationProcessor():
         for property in self.location_properties:
             setattr(self, property, None)
 
-    def __init__(self, data: dict=None, include_private_properties: bool=False):
+    def __init__(self, user: User=AnonymousUser(), data: dict=None):
         """
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
-        attr: include_private_properties
-          Properties are filtered on whether they are publicly or privately visible.
-        Default is false; only the public properties will be set
+        attr: user
+          Properties are filtered on whether a user has permission.
+          Default is an anonymous user
         """
-        # Set location properties access
-        self.include_private_properties = include_private_properties
-
+        # Set User
+        self.user = user
+        
         # Set an empty Location instance
         self.location_instance = Location()
 
@@ -105,11 +118,11 @@ class LocationProcessor():
                     setattr(self, key, value)
 
     @classmethod
-    def get(cls, pandcode: int, include_private_properties: bool=False)-> Self: 
+    def get(cls, pandcode: int, user: User=AnonymousUser())-> Self: 
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls(include_private_properties=include_private_properties)
+        object = cls(user=user)
         object.location_instance = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
@@ -121,7 +134,7 @@ class LocationProcessor():
         setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
 
         # Add location properties to the object; filter to include non-public properties
-        if object.include_private_properties:
+        if object.user.is_authenticated:
             location_data_set = object.location_instance.locationdata_set.all()
         else:
             location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
@@ -204,6 +217,8 @@ class LocationProcessor():
                 self.location_instance = Location(name=self.naam)
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
+
+        self.location_instance.last_modified_by = self.user
 
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db

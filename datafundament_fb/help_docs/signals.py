@@ -5,5 +5,5 @@ from shared import utils
 
 @receiver(post_save, sender=Documentation)
 def reorder_objects(sender, instance, raw, **kwargs):
-    utils.reorder_objects(sender, instance, raw, **kwargs)
+    utils.reorder_grouped_objects(sender, instance, raw, **kwargs)
 

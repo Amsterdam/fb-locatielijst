@@ -9,13 +9,19 @@ from django.urls import reverse
 from parameterized import parameterized
 from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
+from locations.signals import disconnect_signals
 from locations.views import get_csv_file_response
+
 
 class LocationListView(TestCase):
     """
     Tests for searching in the list of locations
     """
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
+        self.authenticated_user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        self.anonymous_user = AnonymousUser()
         LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)
         LocationProperty.objects.create(
@@ -34,7 +40,7 @@ class LocationListView(TestCase):
             pandcode=24002, name='Stopera', is_archived=False)
         Location.objects.create(
             pandcode=24003, name='Ambtswoning', is_archived=True )
-        LocationProcessor(include_private_properties=True, data={
+        LocationProcessor(user=self.authenticated_user, data={
             'pandcode': '24001',
             'naam': 'Stadhuis',
             'public': 'Publiek',
@@ -42,7 +48,7 @@ class LocationListView(TestCase):
             'choice': 'KeuzeOptie1',
             'external': '10042',
         }).save()
-        LocationProcessor(include_private_properties=True, data={
+        LocationProcessor(user=self.authenticated_user, data={
             'pandcode': '24002',
             'naam': 'Stopera',
             'public': 'Publiek',
@@ -50,7 +56,7 @@ class LocationListView(TestCase):
             'choice': 'KeuzeOptie2',
             'external': '20042',
         }).save()
-        LocationProcessor(include_private_properties=True, data={
+        LocationProcessor(user=self.authenticated_user, data={
             'pandcode': '24003',
             'naam': 'Ambtswoning',
             'public': 'Burgemeester',
@@ -118,8 +124,14 @@ class LocationListView(TestCase):
             'archive': archive,
         }
 
+        # Set the correct user
+        if is_authenticated:
+            user = self.authenticated_user
+        else:
+            user = self.anonymous_user
+
         # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
-        location_properties = LocationProcessor(include_private_properties=is_authenticated).location_properties
+        location_properties = LocationProcessor(user=user).location_properties
         is_choice_property = LocationProperty.objects.filter(short_name=location_property, property_type='CHOICE').exists()
         if location_property in location_properties and is_choice_property:
             params[location_property] = search
@@ -127,7 +139,7 @@ class LocationListView(TestCase):
             params['search'] = search
 
         # Call the filter for the request
-        locations = Location.objects.search_filter(params, is_authenticated)
+        locations = Location.objects.search_filter(params, user)
         pandcodes = set(locations.values_list('pandcode', flat=True))
         # Compare the filtered locations against expected locations
         self.assertEqual(pandcodes, set(expected))
@@ -149,6 +161,8 @@ class LocationDetailViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.private_property = LocationProperty.objects.create(
@@ -263,6 +277,8 @@ class LocationCreateViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
@@ -380,6 +396,8 @@ class LocationUpdateViewTest(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
@@ -494,6 +512,8 @@ class TestLocationImportForm(TestCase):
     Test importing / updating locations by uploading a csv file
     """
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
@@ -676,6 +696,8 @@ class TestLocationExport(TestCase):
     """
 
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
             short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True)
@@ -879,6 +901,8 @@ class TestLocationAdminView(TestCase):
     Tests for the LocationAdminView
     """
     def setUp(self) -> None:
+        # Disable signals called for log events
+        disconnect_signals()
         self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
 
     def test_get_view_authenticated(self):
