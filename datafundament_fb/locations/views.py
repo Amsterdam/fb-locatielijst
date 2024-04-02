@@ -63,9 +63,9 @@ class LocationListView(ListView):
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations 
-        params = self.request.GET.dict()
-        is_authenticated = self.request.user
-        locations = Location.objects.search_filter(params, self.request.user)
+        locations = Location.objects.search_filter(
+            params=self.request.GET.dict(),
+             user=self.request.user)
         return locations
 
     def get_context_data(self, **kwargs):
@@ -285,9 +285,9 @@ class LocationExportView(View):
         # when a query is given, return the csv file not the webpage
         if request.GET:
             # Get a QuerySet of filtered locations
-            params = self.request.GET.dict()
-            is_authenticated = self.request.user
-            locations = Location.objects.search_filter(params, is_authenticated)
+            locations = Location.objects.search_filter(
+                params=self.request.GET.dict(),
+                user=self.request.user)
             # Set the response with the csv file
             response = get_csv_file_response(request, locations)
         else:

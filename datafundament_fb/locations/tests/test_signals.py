@@ -89,7 +89,7 @@ class TestLogging(TestCase):
         
         # Test LocationData
         self.location_data.save()
-        # Check reulsting log. Should be the first in the queryset
+        # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
         self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
@@ -99,7 +99,7 @@ class TestLogging(TestCase):
  
         # LocationExternalService
         self.location_external_service.save()
-        # Check reulsting log. Should be the first in the queryset
+        # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
         self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
@@ -122,7 +122,7 @@ class TestLogging(TestCase):
         new_value = 'Een andere tekst'
         self.location_data.value = new_value
         self.location_data.save()
-        # Check reulsting log. Should be the first in the queryset
+        # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
         self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
@@ -137,7 +137,7 @@ class TestLogging(TestCase):
         new_value = 'Andere code'
         self.location_external_service.external_location_code = new_value
         self.location_external_service.save()
-        # Check reulsting log. Should be the first in the queryset
+        # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
         self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
@@ -156,7 +156,7 @@ class TestLogging(TestCase):
         
         # Delete the LocationData
         self.location_data.delete()
-        # Check reulsting log. Should be the first in the queryset
+        # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
         self.assertEqual(log.model, self.location)
         self.assertEqual(log.user, self.user)
@@ -172,7 +172,7 @@ class TestLogging(TestCase):
         for instance in instances:
             # Save the instance
             instance.save()
-            # Check reulsting log. Should be the first in the queryset
+            # Check resulting log. Should be the first in the queryset
             log = Log.objects.all().first()
             self.assertIsNone(log.model)
             self.assertEqual(log.user, self.user)
@@ -202,7 +202,7 @@ class TestLogging(TestCase):
             # Save the instance
             instance.save()
             
-            # Check reulsting log. Should be the first in the queryset
+            # Check resulting log. Should be the first in the queryset
             log = Log.objects.all().first()
             self.assertEqual(log.model, instance)
             self.assertEqual(log.user, self.user)
@@ -220,7 +220,7 @@ class TestLogging(TestCase):
             instance.save()
             # Delete the instance
             instance.delete()
-            # Check reulsting log. Should be the first in the queryset
+            # Check resulting log. Should be the first in the queryset
             log = Log.objects.all().first()
             self.assertIsNone(log.model)
             self.assertEqual(log.user, self.user)
@@ -233,7 +233,7 @@ class TestLogging(TestCase):
         self.property_option.save()
         # Delete the instance
         self.property_option.delete()
-        # Check reulsting log. Should be the first in the queryset
+        # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
         self.assertIsNone(log.model)
         self.assertEqual(log.user, self.user)

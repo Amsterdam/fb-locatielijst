@@ -26,11 +26,13 @@ class LocationAdmin(admin.ModelAdmin):
 
 
 @admin.register(LocationData)
-class LocationDataAdmin(admin.ModelAdmin):...
+class LocationDataAdmin(admin.ModelAdmin):
+    exclude = ['last_modified_by']
 
 
 @admin.register(LocationExternalService)
-class LocationExternalServiceAdmin(admin.ModelAdmin):...
+class LocationExternalServiceAdmin(admin.ModelAdmin):
+    exclude = ['last_modified_by']
 
 
 @admin.register(PropertyOption)
