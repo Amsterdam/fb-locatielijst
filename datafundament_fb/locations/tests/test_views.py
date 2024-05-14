@@ -586,6 +586,9 @@ class TestLocationImportForm(TestCase):
         # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
+        # Verify import of multiple values in a cel delimited by a |, but not otherwise
+        self.assertEqual(LocationData.objects.filter(location = location, location_property__short_name = 'choice').count(), 1)
+        self.assertEqual(LocationData.objects.filter(location = location, location_property__short_name = 'multi').count(), 2)
         # Including the location from the setup() there should be 2 locations now
         self.assertEqual(Location.objects.all().count(), 2)
 
