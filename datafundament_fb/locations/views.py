@@ -67,13 +67,13 @@ class LocationListView(ListView):
     template_name = 'locations/location-list.html'
     paginate_by = 50
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.location_properties = LocationProcessor(user=self.request.user).location_property_instances
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.location_properties = LocationProcessor(user=request.user).location_property_instances
 
     def get_queryset(self):
         # Get a QuerySet of filtered and ordered locations
-        order_by = self.request.GET['order_by']
+        order_by = self.request.GET.get('order_by')
         order = '-' if self.request.GET.get('order') == 'desc' else ''
         if not order_by in self.location_properties:
             order_by = 'pandcode'
