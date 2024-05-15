@@ -67,11 +67,22 @@ class LocationListView(ListView):
     template_name = 'locations/location-list.html'
     paginate_by = 50
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.location_properties = LocationProcessor(user=self.request.user).location_property_instances
+
     def get_queryset(self):
-        # Get a QuerySet of filtered locations 
+        # Get a QuerySet of filtered and ordered locations
+        order_by = self.request.GET['order_by']
+        order = '-' if self.request.GET.get('order') == 'desc' else ''
+        if not order_by in self.location_properties:
+            order_by = 'pandcode'
+        ordering = order + order_by
+
+        # Get filtered and objects and annotated column
         locations = Location.objects.search_filter(
             params=self.request.GET.dict(),
-             user=self.request.user)
+            user=self.request.user).order_by(ordering)
         return locations
 
     def get_context_data(self, **kwargs):
@@ -92,11 +103,7 @@ class LocationListView(ListView):
         context['location_count'] = location_count
         # Boolean if the search result if filtered by the search query
         context['is_filtered_result'] = context['page_obj'].paginator.count < location_count
-        # Pass the url query to the url for exporting the search result as csv file; remove page parameter if present
-        query = self.request.GET.dict()
-        # Remove page parameter is present
-        query.pop('page', None)
-        context['query'] = urllib.parse.urlencode(query)
+        context['filtered_property'] = self.request.GET.get('property')
         return context
         
 
