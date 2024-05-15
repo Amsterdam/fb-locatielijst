@@ -42,7 +42,7 @@ class LocationProcessor():
             if values := value:
                 # Cast values to list
                 if not type(values) == list:
-                    values = values.split(',') # Could be a thingy when the list is not comma seperated
+                    values = values.split('|')
             else:
                 values = []
 

@@ -535,7 +535,7 @@ class TestLocationImportForm(TestCase):
         self.choice_property = LocationProperty.objects.create(
             short_name='choice', label='Choice', property_type='CHOICE')
         self.choice_option_ = PropertyOption.objects.create(
-            location_property=self.choice_property, option='Orange')
+            location_property=self.choice_property, option='Oranges|Apples')
         self.multichoice_property = LocationProperty.objects.create(
             short_name='multi', label='teams', property_type='CHOICE', multiple=True)
         self.multichoice_option1 = PropertyOption.objects.create(
@@ -544,7 +544,7 @@ class TestLocationImportForm(TestCase):
             location_property=self.multichoice_property, option='Team 2')
         self.csv_content  = [
             'pandcode;naam;bool;date;mail;num;memo;post;str;url;choice;multi',
-            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Orange;Team 1,Team 2'
+            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;"Oranges|Apples";Team 1|Team 2'
         ]
 
     def test_import_csv_get(self):
@@ -586,6 +586,9 @@ class TestLocationImportForm(TestCase):
         # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
         self.assertEqual(location.name, 'Amstel 1')
+        # Verify import of multiple values in a cel delimited by a |, but not otherwise
+        self.assertEqual(LocationData.objects.filter(location = location, location_property__short_name = 'choice').count(), 1)
+        self.assertEqual(LocationData.objects.filter(location = location, location_property__short_name = 'multi').count(), 2)
         # Including the location from the setup() there should be 2 locations now
         self.assertEqual(Location.objects.all().count(), 2)
 
@@ -849,7 +852,7 @@ class TestLocationExport(TestCase):
         csv_dialect = csv.Sniffer().sniff(sample=data[0], delimiters=';')
         csv_dict = csv.DictReader(data, dialect=csv_dialect)
         row = next(csv_dict)
-        
+
         # Verify the row values
         self.assertEqual(row['pandcode'], str(self.location.pandcode))
         self.assertEqual(row['naam'], self.location.name)
@@ -862,6 +865,7 @@ class TestLocationExport(TestCase):
         self.assertEqual(row['color'], self.color.value)
         self.assertEqual(row['url'], self.url.value)
         self.assertEqual(row['type'], self.type._property_option.option)
+        self.assertEqual(row['multi'], str(self.multichoice_option1.option) + '|' + str(self.multichoice_option2.option))
 
     def test_csv_with_headers_only(self):
         """ Test requesting an empty csv, with only headers, when there are no locations in the database"""        

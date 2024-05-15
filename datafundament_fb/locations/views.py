@@ -28,9 +28,15 @@ def get_csv_file_response(request, locations)-> HttpResponse:
     location_data = []
     for location in locations:
         # Get loction data  depending on user context; user == True is all location properties
-        location_data.append(
-            LocationProcessor.get(pandcode=location.pandcode, user=request.user).get_dict()
-        )
+        data = LocationProcessor.get(pandcode=location.pandcode, user=request.user).get_dict()
+        # List values will be joined by the pipe '|' character instead of the default comma ','
+        export_dict = dict()
+        for key,value in data.items():
+            if type(value) == list:
+                export_dict[key] = '|'.join(value)
+            else:
+                export_dict[key] = value
+        location_data.append(export_dict)
 
     # Setup the http response with the 
     date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')

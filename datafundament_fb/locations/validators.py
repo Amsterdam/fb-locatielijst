@@ -89,11 +89,16 @@ class ChoiceValidator:
     def __call__(self, value)-> str:
         # get related choice options, compare value in model with value from field
         # this validation will not work when called from clean() in LocationData because the value should be empty (but this is not enforced in the model)
-        allowed_options = self.location_property.propertyoption_set.values_list('option', flat=True)            
-        if not type(value) == list:
-            values = value.split(',')
+        allowed_options = self.location_property.propertyoption_set.values_list('option', flat=True)
+        # Check for multiple flag, because only those values should be split by a pipe character 
+        if self.location_property.multiple:
+            if not type(value) == list:
+                values = value.split('|')
+            else:
+                values = value
         else:
-            values = value
+            values = [value]
+
         for v in values:
             if v not in allowed_options:
                 raise ValidationError(f"'{v}' is geen geldige invoer voor {self.location_property.label}.")
