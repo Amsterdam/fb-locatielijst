@@ -4,16 +4,16 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 from parameterized import parameterized
 from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
-from locations.views import get_csv_file_response
+from locations.views import get_csv_file_response, LocationListView
 
 
-class LocationListView(TestCase):
+class TestLocationListView(TestCase):
     """
     Tests for searching in the list of locations
     """
@@ -153,6 +153,31 @@ class LocationListView(TestCase):
         self.assertEqual(response.status_code, 200)
         # Verify if the correct template is used
         self.assertTemplateUsed(response, 'locations/location-list.html')
+
+    def test_ordering(self):
+        """Test default ordering on column pandcode"""
+        client = Client()
+        list_view = LocationListView()
+
+        # Test default ordering
+        request = client.get('/').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), 'pandcode')
+
+        # Test ordering descending
+        request = client.get('/?order=desc').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), '-pandcode')
+
+        # Test ordering on name column
+        request = client.get('/?order_by=name').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), 'name')
+
+        # Test ordering on invalid column name
+        request = client.get('/?order_by=straat').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), 'pandcode')
 
 
 class LocationDetailViewTest(TestCase):

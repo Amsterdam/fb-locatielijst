@@ -1,5 +1,4 @@
 import csv
-import urllib.parse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -71,15 +70,18 @@ class LocationListView(ListView):
         super().setup(request, *args, **kwargs)
         self.location_processor = LocationProcessor(user=request.user)
 
-    def get_queryset(self):
-        # Set column to order on
+    def set_ordering(self):
+        # Set column to order on; default is pandcode
         order_by = self.request.GET.get('order_by')
-        # Use pandcode for default sorting if order_by value is not a valid location property
-        if not order_by in self.location_processor.location_properties and order_by != 'name':
+        if not order_by in ['name', 'pandcode']:
             order_by = 'pandcode'
         # Switch ordering
         order = '-' if self.request.GET.get('order') == 'desc' else ''
-        ordering = order + order_by
+        return order + order_by
+
+    def get_queryset(self):
+        # Set ordering
+        ordering = self.set_ordering()
         # Apply search filter
         locations = Location.objects.search_filter(
             params=self.request.GET.dict(),
