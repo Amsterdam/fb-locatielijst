@@ -27,16 +27,12 @@ pip-tools:
 sync: pip-tools                     ## Sync your local venv with expected state as defined in requirements.txt
 	pip-sync requirements.txt requirements_dev.txt
 
-# The --allow-unsafe flag should be used and will become the default behaviour of pip-compile in the future
-# https://stackoverflow.com/questions/58843905
-# The --strip-extras will become the default in v8.0.0: https://github.com/jazzband/pip-tools/issues/1613
 pip_compile = pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet
-
 requirements: pip-tools             ## (Re)compile requirements.txt and requirements_dev.txt
 	$(pip_compile) requirements.in
 	$(pip_compile) requirements_dev.in
 
-upgrade:                            ## Run 'requirements' and upgrade the requirement files
+upgrade:                            ## Upgrade the requirements.txt files, adhering to the constraints in the requirements.in files.
 	$(pip_compile) --upgrade requirements.in
 	$(pip_compile) --upgrade requirements_dev.in
 
