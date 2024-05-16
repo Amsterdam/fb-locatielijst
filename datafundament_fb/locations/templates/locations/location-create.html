@@ -3,9 +3,11 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <a href="/">Home</a>
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'locations_urls:location-list' %}">{% translate 'Locaties' %}</a>
     <span>&rsaquo;</span>
     Locatie toevoegen
 </div>
