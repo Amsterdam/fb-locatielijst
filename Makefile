@@ -2,7 +2,7 @@
 # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 #
 # VERSION = 2020.01.29
-.PHONY: help pip-tools install requirements update test init
+.PHONY: help pip-tools sync requirements upgrade test init
 
 UID:=$(shell id --user)
 GID:=$(shell id --group)
@@ -24,16 +24,21 @@ help:                               ## Show this help.
 pip-tools:
 	pip install pip-tools
 
-install: pip-tools                  ## Install requirements and sync venv with expected state as defined in requirements.txt
-	pip-sync requirements_dev.txt
+sync: pip-tools                     ## Sync your local venv with expected state as defined in requirements.txt
+	pip-sync requirements.txt requirements_dev.txt
 
-requirements: pip-tools             ## Upgrade requirements (in requirements.in) to latest versions and compile requirements.txt
-	## The --allow-unsafe flag should be used and will become the default behaviour of pip-compile in the future
-	## https://stackoverflow.com/questions/58843905
-	pip-compile --upgrade --output-file requirements.txt --allow-unsafe requirements.in --resolver=backtracking
-	pip-compile --upgrade --output-file requirements_dev.txt --allow-unsafe requirements_dev.in --resolver=backtracking
+# The --allow-unsafe flag should be used and will become the default behaviour of pip-compile in the future
+# https://stackoverflow.com/questions/58843905
+# The --strip-extras will become the default in v8.0.0: https://github.com/jazzband/pip-tools/issues/1613
+pip_compile = pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet
 
-upgrade: requirements install       ## Run 'requirements' and 'install' targets
+requirements: pip-tools             ## (Re)compile requirements.txt and requirements_dev.txt
+	$(pip_compile) requirements.in
+	$(pip_compile) requirements_dev.in
+
+upgrade:                            ## Run 'requirements' and upgrade the requirement files
+	$(pip_compile) --upgrade requirements.in
+	$(pip_compile) --upgrade requirements_dev.in
 
 migrations:                         ## Make migrations
 	$(manage) makemigrations $(ARGS)
@@ -57,10 +62,10 @@ app:                                ## Run app
 bash:                               ## Run the container and start bash
 	$(run) dev bash
 
-shell:
+shell:	                            ## Run a Django shell
 	$(manage) shell
 
-dev: 						        ## Run the development app (and run extra migrations first)
+dev: 	                            ## Run the development app (and run extra migrations first)
 	$(run) --service-ports dev
 
 test:                               ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
@@ -84,7 +89,3 @@ dumpdata:                           ## Create a json dump. Optionally use models
 fixtures = locations location_properties property_options location_data external_services location_external_services location_docs property_groups
 loaddata:                           ## Load $fixtures. Multiple fixtures can be loaded (space seperated), i.e. fixtures=fixture1 fixture2; or a json file, i.e. fixtures=dump.json
 	$(manage) loaddata $(fixtures)
-
-trivy:                              ## Detect image vulnerabilities
-	$(dc) build --no-cache app
-	## trivy image --ignore-unfixed ## registry URL
