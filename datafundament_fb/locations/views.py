@@ -69,21 +69,23 @@ class LocationListView(ListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.location_properties = LocationProcessor(user=request.user).location_property_instances
+        self.location_processor = LocationProcessor(user=request.user)
 
     def get_queryset(self):
-        # Get a QuerySet of filtered and ordered locations
+        # Set column to order on
         order_by = self.request.GET.get('order_by')
-        order = '-' if self.request.GET.get('order') == 'desc' else ''
-        if not order_by in self.location_properties:
+        # Use pandcode for default sorting if order_by value is not a valid location property
+        if not order_by in self.location_processor.location_properties and order_by != 'name':
             order_by = 'pandcode'
+        # Switch ordering
+        order = '-' if self.request.GET.get('order') == 'desc' else ''
         ordering = order + order_by
-
-        # Get filtered and objects and annotated column
+        # Apply search filter
         locations = Location.objects.search_filter(
             params=self.request.GET.dict(),
-            user=self.request.user).order_by(ordering)
-        return locations
+            user=self.request.user)
+        # Return ordered queryset
+        return locations.order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,10 +94,9 @@ class LocationListView(ListView):
         context['form'] = LocationListForm(initial=initial_data, user=self.request.user)
         # Create at list of search input elements to be used in a JS function for hiding/unhiding these elements
         property_list = ['id_search']
-        location_properties = LocationProcessor(user=self.request.user).location_property_instances
-        for location_property in location_properties:
-            if location_property.property_type == 'CHOICE':
-                property_list.append('id_' + location_property.short_name)
+        for instance in self.location_processor.location_property_instances:
+            if instance.property_type == 'CHOICE':
+                property_list.append('id_' + instance.short_name)
         context['property_list'] = property_list
         # Number of locations in the search result, filtered by archive
         archive = self.request.GET.get('archive', '')
@@ -103,7 +104,6 @@ class LocationListView(ListView):
         context['location_count'] = location_count
         # Boolean if the search result if filtered by the search query
         context['is_filtered_result'] = context['page_obj'].paginator.count < location_count
-        context['filtered_property'] = self.request.GET.get('property')
         return context
         
 
