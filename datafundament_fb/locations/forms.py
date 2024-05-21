@@ -214,3 +214,13 @@ class LocationListForm(forms.Form):
             choices=archive_list,
         )
 
+
+class LocationPropertyUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['property_type'].disabled = True
+
+    class Meta:
+        model = LocationProperty
+        fields = ['short_name', 'label', 'required', 'multiple', 'unique', 'public', 'group', 'order', 'property_type']
+        disabled = ['property_type']

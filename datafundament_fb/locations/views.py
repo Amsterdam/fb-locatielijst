@@ -11,8 +11,8 @@ from django.views.generic import View, ListView, UpdateView
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
-from locations.models import Location, Log, PropertyGroup, ExternalService
+from locations.forms import LocationDataForm, LocationImportForm, LocationListForm, LocationPropertyUpdateForm
+from locations.models import Location, Log, LocationProperty, PropertyGroup, ExternalService
 from locations.processors import LocationProcessor
 
 # Create your views here.
@@ -333,6 +333,21 @@ class LocationLogView(LoginRequiredMixin, ListView):
         return context
 
 
+class LocationPropertyListView(LoginRequiredMixin, ListView):
+    model = LocationProperty
+    template_name = 'locations/locationproperty-list.html'
+    fields = ['label', 'property_type', 'public', 'group', 'order']
+    ordering = ['group__order', 'order']
+
+class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
+    model = LocationProperty
+    template_name = 'locations/locationproperty-update.html'
+    form_class = LocationPropertyUpdateForm
+    
+    def get_success_url(self):
+        return reverse('locationproperty-list')
+
+
 class PropertyGroupListView(LoginRequiredMixin, ListView):
     model = PropertyGroup
     template_name = 'locations/propertygroup-list.html'
@@ -356,7 +371,7 @@ class ExternalServivceListView(LoginRequiredMixin, ListView):
 
 class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
     model = ExternalService
-    fields = ['name', 'public', 'order']
+    fields = ['name', 'short_name', 'public', 'order']
     template_name = 'locations/externalservice-update.html'
     
     def get_success_url(self):

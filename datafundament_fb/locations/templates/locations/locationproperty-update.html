@@ -10,9 +10,9 @@
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
-    <a href="{% url 'externalservice-list' %}">Externe koppelingen</a>
+    <a href="{% url 'externalservice-list' %}">Locatie eigenschappen</a>
     <span>&rsaquo;</span>
-    {{ object.name }} wijzigen
+    {{ object.label }} wijzigen
 </div>
 {% endblock %}
 
@@ -25,7 +25,7 @@
 {% endif %}
 
 {% block content %}
-<h2>{{ object.name }}</h2>
+<h2>{{ object.label }}</h2>
 
 <form action="." method="POST" novalidate>
     {% csrf_token %}

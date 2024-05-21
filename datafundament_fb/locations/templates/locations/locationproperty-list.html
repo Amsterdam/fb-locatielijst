@@ -1,0 +1,54 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n static admin_urls admin_modify %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    Locatie eigenschappen
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>{% translate 'Locatie eigenschappen' %}</h2>
+
+<div class="page-content">
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col">Omschrijving</th>
+                <th scope="col">Gegevens type</th>
+                <th scope="col">Zichtbaar voor niet ingelogde gebruikers</th>
+                <th scope="col">Groeperen in</th>
+                <th scope="col" class="column-pancode">Volgorde</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'locationproperty-update' object.id %}">
+                    {{object.label}}
+                    </a>
+                </td>
+                <td>
+                    {{ object.get_property_type_display }}
+                </td>
+                <td>
+                {{ object.public|yesno:"☒,☐" }}
+                </td>
+                <td>
+                    {{ object.group|default_if_none:"" }}
+                </td>
+                <td>
+                    {{ object.order }}
+                </td>
+            </tr>
+        {% empty %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
