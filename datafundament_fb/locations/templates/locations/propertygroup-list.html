@@ -18,20 +18,20 @@
     <table class="table-adam">
         <thead>
             <tr>
-                <th scope="col" class="column-pancode">Groep</th>
-                <th scope="col">Volgorde</th>
+                <th scope="col" class="column-pancode">Volgorde</th>
+                <th scope="col">Groep</th>
             </tr>
         </thead>
         <tbody>
         {% for object in object_list %}
             <tr>
                 <td>
-                    <a href="{% url 'property-group-update' object.id %}">
-                    {{object.name}}
-                    </a>
+                {{ object.order }}
                 </td>
                 <td>
-                        {{ object.order }}
+                    <a href="{% url 'propertygroup-update' object.id %}">
+                    {{object.name}}
+                    </a>
                 </td>
             </tr>
         {% empty %}

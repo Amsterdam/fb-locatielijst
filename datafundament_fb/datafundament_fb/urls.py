@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from locations.views import home_page, LocationAdminView, LocationLogView, PropertyGroupListView, PropertyGroupUpdateView
+from locations.views import home_page, LocationAdminView, LocationLogView, PropertyGroupListView, PropertyGroupUpdateView, ExternalServivceListView, ExternalServiceUpdateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,7 +25,9 @@ urlpatterns = [
     path('beheer/', view=LocationAdminView.as_view(), name='location-admin'),
     path('beheer/log/', view=LocationLogView.as_view(), name='location-log'),
     path('beheer/log/<int:pandcode>', view=LocationLogView.as_view(), name='location-detail-log'),
-    path('beheer/eigenschap-groepen/', view=PropertyGroupListView.as_view(), name='property-group-list'),
-    path('beheer/eigenschap-groepen/<int:pk>/edit', view=PropertyGroupUpdateView.as_view(), name='property-group-update'),
+    path('beheer/eigenschap-groepen/', view=PropertyGroupListView.as_view(), name='propertygroup-list'),
+    path('beheer/eigenschap-groepen/<int:pk>/edit', view=PropertyGroupUpdateView.as_view(), name='propertygroup-update'),
+    path('beheer/externe-koppelingen/', view=ExternalServivceListView.as_view(), name='externalservice-list'),
+    path('beheer/externe-koppelingen/<int:pk>/edit', view=ExternalServiceUpdateView.as_view(), name='externalservice-update'),
     path('', home_page, name='home'),
 ]

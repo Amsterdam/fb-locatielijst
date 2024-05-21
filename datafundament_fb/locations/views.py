@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
-from locations.models import Location, Log, PropertyGroup
+from locations.models import Location, Log, PropertyGroup, ExternalService
 from locations.processors import LocationProcessor
 
 # Create your views here.
@@ -335,18 +335,30 @@ class LocationLogView(LoginRequiredMixin, ListView):
 
 class PropertyGroupListView(LoginRequiredMixin, ListView):
     model = PropertyGroup
-    template_name = 'locations/property-group-list.html'
+    template_name = 'locations/propertygroup-list.html'
     ordering = ['order']
 
 
 class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
     model = PropertyGroup
     fields = ['name', 'order']
-    template_name = 'locations/property-group-update.html'
+    template_name = 'locations/propertygroup-update.html'
     
     def get_success_url(self):
-        return reverse('property-group-list')
+        return reverse('propertygroup-list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+
+class ExternalServivceListView(LoginRequiredMixin, ListView):
+    model = ExternalService
+    template_name = 'locations/externalservice-list.html'
+    ordering = ['order']
+
+
+class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
+    model = ExternalService
+    fields = ['name', 'public', 'order']
+    template_name = 'locations/externalservice-update.html'
+    
+    def get_success_url(self):
+        return reverse('externalservice-list')
+

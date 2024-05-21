@@ -10,9 +10,9 @@
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
-    <a href="{% url 'property-group-list' %}">Eigenschap groepen</a>
+    <a href="{% url 'externalservice-list' %}">Externe koppelingen</a>
     <span>&rsaquo;</span>
-    Wijzigen
+    {{ object.name }} wijzigen
 </div>
 {% endblock %}
 
@@ -25,7 +25,7 @@
 {% endif %}
 
 {% block content %}
-<h2>{{ propertygroup.name }}</h2>
+<h2>{{ object.name }}</h2>
 
 <form action="." method="POST" novalidate>
     {% csrf_token %}
@@ -39,8 +39,8 @@
     </div>
     {% endfor %}
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'property-group-update' object.id %}">Opslaan</button>
-        <a href="{% url 'property-group-list' %}" class="btn btn-secundair">Annuleren</a>
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'externalservice-update' object.id %}">Opslaan</button>
+        <a href="{% url 'externalservice-list' %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>
 

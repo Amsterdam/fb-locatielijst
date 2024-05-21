@@ -1,0 +1,46 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n static admin_urls admin_modify %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    Externe koppelingen
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>{% translate 'Externe koppelingen' %}</h2>
+
+<div class="page-content">
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col" class="column-pancode">Volgorde</th>
+                <th scope="col">Externe API</th>
+                <th scope="col">Zichtbaar voor niet ingelogde gebruikers</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    {{ object.order }}
+                </td>
+                <td>
+                    <a href="{% url 'externalservice-update' object.id %}">
+                    {{object.name}}
+                    </a>
+                </td>
+                <td>
+                {{ object.public|yesno:"☒,☐" }}
+                </td>
+            </tr>
+        {% empty %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
