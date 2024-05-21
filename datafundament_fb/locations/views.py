@@ -7,12 +7,12 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
-from django.views.generic import View, ListView
+from django.views.generic import View, ListView, UpdateView
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
-from locations.models import Location, Log
+from locations.models import Location, Log, PropertyGroup
 from locations.processors import LocationProcessor
 
 # Create your views here.
@@ -332,3 +332,21 @@ class LocationLogView(LoginRequiredMixin, ListView):
             context['location'] = Location.objects.get(pandcode=pandcode)
         return context
 
+
+class PropertyGroupListView(LoginRequiredMixin, ListView):
+    model = PropertyGroup
+    template_name = 'locations/property-group-list.html'
+    ordering = ['order']
+
+
+class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
+    model = PropertyGroup
+    fields = ['name', 'order']
+    template_name = 'locations/property-group-update.html'
+    
+    def get_success_url(self):
+        return reverse('property-group-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

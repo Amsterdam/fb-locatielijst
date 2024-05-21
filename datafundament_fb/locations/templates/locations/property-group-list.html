@@ -1,0 +1,42 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n static admin_urls admin_modify %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    Eigenschap groepen
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>{% translate 'Eigenschap groepen' %}</h2>
+
+<div class="page-content">
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col" class="column-pancode">Groep</th>
+                <th scope="col">Volgorde</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'property-group-update' object.id %}">
+                    {{object.name}}
+                    </a>
+                </td>
+                <td>
+                        {{ object.order }}
+                </td>
+            </tr>
+        {% empty %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
