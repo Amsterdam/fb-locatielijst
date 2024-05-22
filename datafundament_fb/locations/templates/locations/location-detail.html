@@ -3,11 +3,13 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <a href="/">Home</a>
     {% if user.is_authenticated %}
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     {% endif %}
+    <span>&rsaquo;</span>
+    <a href="{% url 'locations_urls:location-list' %}">Locaties</a>
     <span>&rsaquo;</span>
     {{ location_data.naam }}
 </div>

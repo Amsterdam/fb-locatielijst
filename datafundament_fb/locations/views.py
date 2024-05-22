@@ -76,6 +76,7 @@ class LocationListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['model'] = self.model
         initial_data = self.request.GET
         # Render the search form
         context['form'] = LocationListForm(initial=initial_data, user=self.request.user)
@@ -127,12 +128,14 @@ class LocationDetailView(View):
         return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[pandcode]))
 
 class LocationCreateView(LoginRequiredMixin, View):
+    model = Location
     form = LocationDataForm
     template = 'locations/location-create.html'
     
     def get(self, request, *args, **kwargs):
         form = self.form(user=request.user)
         context = {'form': form}
+        context['model'] = self.model
         return render(request=request, template_name=self.template, context=context)
 
     def post(self, request, *args, **kwargs):
@@ -150,7 +153,8 @@ class LocationCreateView(LoginRequiredMixin, View):
                 message = f"Fout bij het aanmaken van de locatie: {err}."
                 messages.error(request, message)
                 context = {'form': form}
-                
+                context['model'] = self.model
+
                 return render(request, template_name=self.template, context=context)
 
             return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[location_data.pandcode]))

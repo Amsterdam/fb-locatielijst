@@ -1,7 +1,17 @@
 {% extends 'admin/admin_base.html' %}
 {% load i18n static admin_urls admin_modify %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    {% if user.is_authenticated %}
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    {% endif %}
+    <span>&rsaquo;</span>
+    Locaties
+</div>
+{% endblock %}
 
 {% block content %}
 <h2>{% translate 'Locaties' %}</h2>
