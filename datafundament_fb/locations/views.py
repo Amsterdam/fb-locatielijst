@@ -361,12 +361,22 @@ class LocationPropertyCreateView(LoginRequiredMixin, CreateView):
         context['model'] = self.model
         return context
 
+    def form_valid(self, form):
+        form.instance.last_modified_by = self.request.user
+        messages.success(self.request, f"Locatie eigenschap '{form.instance.name}' is aangemaakt.")
+        return super().form_valid(form)
+
 
 class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
     model = LocationProperty
     template_name = 'locations/locationproperty-update.html'
     form_class = LocationPropertyUpdateForm
     success_url = reverse_lazy('locationproperty-list')
+
+    def form_valid(self, form):
+        self.object.last_modified_by = self.request.user
+        messages.success(self.request, f"Locatie eigenschap '{form.instance.name}' is geupdate.")
+        return super().form_valid(form)
 
 
 class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
@@ -375,6 +385,7 @@ class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('locationproperty-list')
 
     def form_valid(self, form):
+        self.object.last_modified_by = self.request.user
         messages.success(self.request, f"Locatie eigenschap '{self.object.label}' is verwijderd.")
         return super().form_valid(form)
 
@@ -410,6 +421,11 @@ class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
     fields = ['name', 'order']
     template_name = 'locations/generic-update.html'
     success_url = reverse_lazy('propertygroup-list')
+
+    def form_valid(self, form):
+        self.object.last_modified_by = self.request.user
+        messages.success(self.request, f"Eigenschap groep '{form.instance.name}' is geupdate.")
+        return super().form_valid(form)
 
 
 class PropertyGroupDeleteView(LoginRequiredMixin, DeleteView):
@@ -456,6 +472,11 @@ class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'locations/generic-update.html'
     success_url = reverse_lazy('externalservice-list')
 
+    def form_valid(self, form):
+        self.object.last_modified_by = self.request.user
+        messages.success(self.request, f"Externe koppeling '{form.instance.name}' is geupdate.")
+        return super().form_valid(form)
+
 
 class ExternalServiceDeleteView(LoginRequiredMixin, DeleteView):
     model = ExternalService
@@ -463,7 +484,6 @@ class ExternalServiceDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('externalservice-list')
 
     def form_valid(self, form):
-        breakpoint()
         self.object.last_modified_by = self.request.user
         messages.success(self.request, f"Externe koppeling '{self.object.name}' is verwijderd.")
         return super().form_valid(form)
