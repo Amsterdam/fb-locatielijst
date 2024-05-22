@@ -1,8 +1,5 @@
 {% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify %}
-
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+{% load i18n admin_urls static admin_modify utils %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -10,9 +7,11 @@
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
-    <a href="{% url 'externalservice-list' %}">Externe koppelingen</a>
+    <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
     <span>&rsaquo;</span>
-    {{ object.name }} wijzigen
+    {{ object.name }}
+    <span>&rsaquo;</span>
+    Wijzigen
 </div>
 {% endblock %}
 
@@ -42,8 +41,9 @@
     </div>
     {% endfor %}
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'externalservice-update' object.id %}">Opslaan</button>
-        <a href="{% url 'externalservice-list' %}" class="btn btn-secundair">Annuleren</a>
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url object|reverse_url:'update' object.id %}">Opslaan</button>
+        <a href="{% url object|reverse_url:'list' %}" class="btn btn-secundair">Annuleren</a>
+        <a href="{% url object|reverse_url:'delete' object.id %}" class="btn btn-secundair">Verwijderen</a>
     </div>
 </form>
 

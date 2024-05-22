@@ -7,8 +7,8 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
-from django.views.generic import View, ListView, UpdateView
-from django.urls import reverse
+from django.views.generic import View, ListView, UpdateView, CreateView, DeleteView
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm, LocationPropertyUpdateForm
@@ -339,13 +339,40 @@ class LocationPropertyListView(LoginRequiredMixin, ListView):
     fields = ['label', 'property_type', 'public', 'group', 'order']
     ordering = ['group__order', 'order']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = self.model
+        return context
+
+
+class LocationPropertyCreateView(LoginRequiredMixin, CreateView):
+    model = LocationProperty
+    template_name = 'locations/locationproperty-create.html'
+    fields = ['short_name', 'label', 'property_type', 'required', 'multiple', 'unique', 'public', 'group', 'order',]
+    ordering = ['group__order', 'order']
+    success_url = reverse_lazy('locationproperty-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = self.model
+        return context
+
+
 class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
     model = LocationProperty
     template_name = 'locations/locationproperty-update.html'
     form_class = LocationPropertyUpdateForm
-    
-    def get_success_url(self):
-        return reverse('locationproperty-list')
+    success_url = reverse_lazy('locationproperty-list')
+
+
+class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
+    model = LocationProperty
+    template_name = 'locations/locationproperty-delete.html'
+    success_url = reverse_lazy('locationproperty-list')
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Locatie eigenschap '{self.object.label}' is verwijderd.")
+        return super().form_valid(form)
 
 
 class PropertyGroupListView(LoginRequiredMixin, ListView):
@@ -353,14 +380,42 @@ class PropertyGroupListView(LoginRequiredMixin, ListView):
     template_name = 'locations/propertygroup-list.html'
     ordering = ['order']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = self.model
+        return context
+
+class PropertyGroupCreateView(LoginRequiredMixin, CreateView):
+    model = PropertyGroup
+    fields = ['name', 'order']
+    template_name = 'locations/generic-create.html'
+    success_url = reverse_lazy('propertygroup-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = self.model
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Eigenschap groep '{form.instance.name}' is aangemaakt.")
+        return super().form_valid(form)
+
 
 class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
     model = PropertyGroup
     fields = ['name', 'order']
-    template_name = 'locations/propertygroup-update.html'
-    
-    def get_success_url(self):
-        return reverse('propertygroup-list')
+    template_name = 'locations/generic-update.html'
+    success_url = reverse_lazy('propertygroup-list')
+
+
+class PropertyGroupDeleteView(LoginRequiredMixin, DeleteView):
+    model = PropertyGroup
+    template_name = 'locations/generic-delete.html'
+    success_url = reverse_lazy('propertygroup-list')
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Eigenschap groep '{self.object.name}' is verwijderd.")
+        return super().form_valid(form)
 
 
 class ExternalServivceListView(LoginRequiredMixin, ListView):
@@ -368,12 +423,43 @@ class ExternalServivceListView(LoginRequiredMixin, ListView):
     template_name = 'locations/externalservice-list.html'
     ordering = ['order']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = self.model
+        return context
+
+
+class ExternalServiceCreateView(LoginRequiredMixin, CreateView):
+    model = ExternalService
+    fields = ['name', 'short_name', 'public', 'order']
+    template_name = 'locations/generic-create.html'
+    success_url = reverse_lazy('externalservice-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = self.model
+        return context
+
+    def form_valid(self, form):
+        form.instance.last_modified_by = self.request.user
+        messages.success(self.request, f"Externe koppeling '{form.instance.name}' is aangemaakt.")
+        return super().form_valid(form)
+
 
 class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
     model = ExternalService
     fields = ['name', 'short_name', 'public', 'order']
-    template_name = 'locations/externalservice-update.html'
-    
-    def get_success_url(self):
-        return reverse('externalservice-list')
+    template_name = 'locations/generic-update.html'
+    success_url = reverse_lazy('externalservice-list')
 
+
+class ExternalServiceDeleteView(LoginRequiredMixin, DeleteView):
+    model = ExternalService
+    template_name = 'locations/generic-delete.html'
+    success_url = reverse_lazy('externalservice-list')
+
+    def form_valid(self, form):
+        breakpoint()
+        self.object.last_modified_by = self.request.user
+        messages.success(self.request, f"Externe koppeling '{self.object.name}' is verwijderd.")
+        return super().form_valid(form)

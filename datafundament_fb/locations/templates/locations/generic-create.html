@@ -1,8 +1,5 @@
 {% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify %}
-
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+{% load i18n admin_urls static admin_modify utils %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -10,9 +7,9 @@
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
-    <a href="{% url 'propertygroup-list' %}">Eigenschap groepen</a>
+    <a href="{% url model|reverse_url:'list' %}">{{ model|verbose_name:'plural' }}</a>
     <span>&rsaquo;</span>
-    {{ object.name }} wijzigen
+    Toevoegen
 </div>
 {% endblock %}
 
@@ -25,7 +22,7 @@
 {% endif %}
 
 {% block content %}
-<h2>{{ object.name }}</h2>
+<h2>Nieuwe {{ model|verbose_name }}</h2>
 
 <form action="." method="POST" novalidate>
     {% csrf_token %}
@@ -42,8 +39,8 @@
     </div>
     {% endfor %}
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'propertygroup-update' object.id %}">Opslaan</button>
-        <a href="{% url 'propertygroup-list' %}" class="btn btn-secundair">Annuleren</a>
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url model|reverse_url:'create' %}">Aanmaken</button>
+        <a href="{% url model|reverse_url:'list' %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>
 

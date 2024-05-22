@@ -1,20 +1,12 @@
-{% extends 'admin/admin_base.html' %}
+{% extends 'locations/generic-list.html' %}
 {% load i18n static admin_urls admin_modify %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="/">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    Externe koppelingen
-</div>
-{% endblock %}
-
 {% block content %}
-<h2>{% translate 'Externe koppelingen' %}</h2>
-
+{{ block.super }}
 <div class="page-content">
+    <div class="btn-container">
+        <a href="{% url 'externalservice-create' %}" class="btn btn-secundair">Aanmaken</a>
+    </div>
     <table class="table-adam">
         <thead>
             <tr>
