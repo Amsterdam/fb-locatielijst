@@ -1,0 +1,43 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n admin_urls static admin_modify utils %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'locationproperty-list' %}">{{ object.location_property|verbose_name:'plural' }}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'locationproperty-update' object.location_property.id %}">{{ object.location_property.label }}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url object|reverse_url:'update' object.location_property.id object.id %}">{{ object.option }}</a>
+    <span>&rsaquo;</span>
+    Verwijderen
+</div>
+{% endblock %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% block content %}
+<h2>{{ object.name }}</h2>
+
+<form action="." method="POST">
+    {% csrf_token %}
+    <p>Weet je zeker dat je '{{ object.option }}' uit {{ object.location_property.label }} wilt verwijderen?</p>
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'propertyoption-delete' object.location_property.id object.id %}">Verwijderen</button>
+        <a href="{% url 'locationproperty-update' object.id %}" class="btn btn-secundair">Annuleren</a>
+    </div>
+</form>
+
+{% endblock %}

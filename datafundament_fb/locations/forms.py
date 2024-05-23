@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from locations import validators
-from locations.models import LocationProperty
+from locations.models import LocationProperty, PropertyOption
 from locations.processors import LocationProcessor
 
 
@@ -215,12 +215,11 @@ class LocationListForm(forms.Form):
         )
 
 
-class LocationPropertyUpdateForm(forms.ModelForm):
+class PropertyOptionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['property_type'].disabled = True
+        self.fields['location_property'].disabled = True
 
     class Meta:
-        model = LocationProperty
-        fields = ['short_name', 'label', 'required', 'multiple', 'unique', 'public', 'group', 'order', 'property_type']
-        disabled = ['property_type']
+        model = PropertyOption
+        fields = ['option','location_property']

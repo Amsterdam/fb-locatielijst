@@ -4,9 +4,6 @@
 {% block content %}
 {{ block.super }}
 <div class="page-content">
-    <div class="btn-container">
-        <a href="{% url 'propertygroup-create' %}" class="btn btn-secundair">Aanmaken</a>
-    </div>
     <table class="table-adam">
         <thead>
             <tr>
@@ -30,5 +27,8 @@
         {% endfor %}
         </tbody>
     </table>
+    <div class="btn-container">
+        <a href="{% url 'propertygroup-create' %}" class="btn btn-secundair">Aanmaken</a>
+    </div>
 </div>
 {% endblock %}

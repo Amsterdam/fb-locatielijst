@@ -19,6 +19,7 @@ from django.urls import include, path
 from locations.views import (
     home_page, LocationAdminView, LocationLogView, 
     LocationPropertyListView, LocationPropertyCreateView, LocationPropertyUpdateView, LocationPropertyDeleteView,
+    PropertyOptionCreateView, PropertyOptionUpdateView, PropertyOptionDeleteView,
     PropertyGroupListView, PropertyGroupCreateView, PropertyGroupUpdateView, PropertyGroupDeleteView,
     ExternalServivceListView, ExternalServiceCreateView, ExternalServiceUpdateView, ExternalServiceDeleteView,
 )
@@ -34,6 +35,9 @@ urlpatterns = [
     path('beheer/locatie-eigenschappen/new', view=LocationPropertyCreateView.as_view(), name='locationproperty-create'),
     path('beheer/locatie-eigenschappen/<int:pk>/edit', view=LocationPropertyUpdateView.as_view(), name='locationproperty-update'),
     path('beheer/locatie-eigenschappen/<int:pk>/delete', view=LocationPropertyDeleteView.as_view(), name='locationproperty-delete'),
+    path('beheer/locatie-eigenschappen/<int:lp_pk>/optie', view=PropertyOptionCreateView.as_view(), name='propertyoption-create'),
+    path('beheer/locatie-eigenschappen/<int:lp_pk>/optie/<int:pk>/edit', view=PropertyOptionUpdateView.as_view(), name='propertyoption-update'),
+    path('beheer/locatie-eigenschappen/<int:lp_pk>/optie/<int:pk>/delete', view=PropertyOptionDeleteView.as_view(), name='propertyoption-delete'),
     path('beheer/eigenschap-groepen/', view=PropertyGroupListView.as_view(), name='propertygroup-list'),
     path('beheer/eigenschap-groepen/new', view=PropertyGroupCreateView.as_view(), name='propertygroup-create'),
     path('beheer/eigenschap-groepen/<int:pk>/edit', view=PropertyGroupUpdateView.as_view(), name='propertygroup-update'),

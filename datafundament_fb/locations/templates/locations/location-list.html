@@ -41,12 +41,6 @@
 </div>
 
 <div class="page-content">
-    <div class="btn-container">
-        <a href="{% url 'locations_urls:location-export' %}?{{ query }}" class="btn btn-primair">Exporteren</a>
-        {% if user.is_authenticated %}
-        <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
-        {% endif %}
-    </div>
     <table class="table-adam">
         <thead>
             <tr>
@@ -76,6 +70,11 @@
     {% endif %}
 
     <div class="h5">{{ page_obj.paginator.count }} {% if is_filtered_result %}van de {{ location_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
-
+    <div class="btn-container">
+        <a href="{% url 'locations_urls:location-export' %}?{{ query }}" class="btn btn-primair">Exporteren</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
