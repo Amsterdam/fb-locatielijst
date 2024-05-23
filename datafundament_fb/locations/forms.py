@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from locations import validators
-from locations.models import LocationProperty, PropertyOption
+from locations.models import LocationProperty
 from locations.processors import LocationProcessor
 
 

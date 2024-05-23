@@ -3,15 +3,21 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="/">Home</a>
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
     <span>&rsaquo;</span>
     <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
     <span>&rsaquo;</span>
-    <a href="{% url 'locations_urls:location-list' %}">Locaties</a>
-    <span>&rsaquo;</span>
-    Toevoegen
+    Locatie toevoegen
 </div>
 {% endblock %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 
 {% block content %}
 <h2>Nieuwe locatie</h2>
