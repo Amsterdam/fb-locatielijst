@@ -31,9 +31,9 @@
 <form action="." method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="btn-container">
-        <button class="default" type="submit" name="_save" value="Download CSV"
+        <button class="btn btn-primair" type="submit" name="_save" value="Download CSV"
             formaction="{% url 'locations_urls:location-export' %}">Download export</button>
-    </div>
+        </div>
 </form>
 
 {% endblock %}

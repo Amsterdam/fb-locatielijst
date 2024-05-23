@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.views.generic import View, ListView, UpdateView, CreateView, DeleteView
 from django.urls import reverse, reverse_lazy
@@ -351,7 +352,7 @@ class LocationPropertyListView(LoginRequiredMixin, ListView):
 
 class LocationPropertyCreateView(LoginRequiredMixin, CreateView):
     model = LocationProperty
-    template_name = 'locations/locationproperty-create.html'
+    template_name = 'locations/generic-create.html'
     fields = ['short_name', 'label', 'property_type', 'required', 'multiple', 'unique', 'public', 'group', 'order',]
     ordering = ['group__order', 'order']
     success_url = reverse_lazy('locationproperty-list')
@@ -395,6 +396,22 @@ class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
         return super().form_valid(form)
 
 
+class PropertyOptionListView(LoginRequiredMixin, ListView):
+    model = PropertyOption
+    template_name = 'locations/propertyoption-list.html'
+    ordering = ['option']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['location_property'] = get_object_or_404(LocationProperty, id=self.kwargs.get('lp_pk'))
+        context['model'] = self.model
+        return context
+    
+    def get_queryset(self):
+        queryset = PropertyOption.objects.filter(location_property=self.kwargs.get('lp_pk'))
+        return queryset
+
+
 class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
     model = PropertyOption
     template_name = 'locations/propertyoption-create.html'
@@ -402,7 +419,7 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         # WISH: Als je een switch maakt vanuit het form kan je ook een button toevoegen om direct na de ene een andere optie aan te maken; net zoals in de adminform
-        return reverse('locationproperty-update', args=[self.object.location_property.id])
+        return reverse('propertyoption-update', args=[self.object.location_property.id, self.object.id])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -412,11 +429,11 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.last_modified_by = self.request.user
-        messages.success(self.request, f"Optie '{object.option}' is toegevoegd aan {form.instance.location_property.label}.")
+        messages.success(self.request, f"Optie '{form.instance.option}' is toegevoegd aan {form.instance.location_property.label}.")
         return super().form_valid(form)
     
     def get_initial(self):
-        location_property = LocationProperty.objects.get(id=self.kwargs.get('lp_pk', ''))
+        location_property = get_object_or_404(LocationProperty, id=self.kwargs.get('lp_pk'))
         return {'location_property': location_property}
 
 
@@ -426,12 +443,16 @@ class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
     form_class = PropertyOptionForm
 
     def get_success_url(self):
-        return reverse('locationproperty-update', args=[self.object.location_property.id])
+        return reverse('propertyoption-list', args=[self.object.location_property.id])
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
         messages.success(self.request, f"Optie '{self.object.option}' is gewijzigd.")
         return super().form_valid(form)
+
+    def get_object(self):
+        object = get_object_or_404(self.model, id=self.kwargs.get('pk'), location_property=self.kwargs.get('lp_pk'))
+        return object
 
 
 class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
@@ -439,11 +460,11 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'locations/propertyoption-delete.html'
 
     def get_success_url(self):
-        return reverse('locationproperty-update', args=[self.object.location_property.id])
+        return reverse('propertyoption-list', args=[self.object.location_property.id])
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
-        messages.success(self.request, f"Optie '{self.object.label}' is verwijderd.")
+        messages.success(self.request, f"Optie '{self.object.option}' is verwijderd.")
         return super().form_valid(form)
 
 

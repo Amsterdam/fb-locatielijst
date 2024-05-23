@@ -36,18 +36,15 @@
         </div>
     </div>
     {% endfor %}
-    {% if object.property_type == 'CHOICE' and property_options|length > 0 %}
-    <div class="data-view-row">
-        <div class="data-label">Keuze opties</div>
-        <div class="data-value">
-            <dl class="data-view">
-                {% for field in property_options %}
-                <div class="data-view-row">
-                    <dd class="data-value"><a href="{% url 'propertyoption-update' object.id field.id %}">{{ field.option }}</a></dd>
-                </div>
-                {% endfor %}
-            </dl>
-        </div>
+    {% if object.property_type == 'CHOICE' %}
+    <h3>Keuze opties</h3>
+    <ul>
+        {% for option in property_options %}
+        <li>{{ option.option }}</li>
+        {% endfor %}
+    </ul>
+    <div class="btn-container">
+        <a href="{% url 'propertyoption-list' object.id %}" class="btn btn-secundair">Keuze opties beheren</a>
     </div>
     {% endif %}
     <div class="btn-container">
@@ -55,7 +52,6 @@
             formaction="{% url object|reverse_url:'update' object.id %}">Opslaan</button>
         <a href="{% url object|reverse_url:'list' %}" class="btn btn-secundair">Annuleren</a>
         <a href="{% url object|reverse_url:'delete' object.id %}" class="btn btn-secundair">Verwijderen</a>
-        <a href="{% url 'propertyoption-create' object.id %}" class="btn btn-secundair">Optie toevoegen</a>
     </div>
 </form>
 

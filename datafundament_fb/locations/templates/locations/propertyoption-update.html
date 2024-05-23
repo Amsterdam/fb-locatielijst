@@ -20,15 +20,6 @@
 </div>
 {% endblock %}
 
-
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
 {% block content %}
 <h2>{{ object.name }}</h2>
 
@@ -48,7 +39,7 @@
     {% endfor %}
     <div class="btn-container">
         <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'propertyoption-update' object.location_property.id object.id %}">Opslaan</button>
-        <a href="{% url 'locationproperty-update' object.location_property.id %}" class="btn btn-secundair">Annuleren</a>
+        <a href="{% url 'propertyoption-list' object.location_property.id %}" class="btn btn-secundair">Annuleren</a>
         <a href="{% url 'propertyoption-delete' object.location_property.id object.id %}" class="btn btn-secundair">Verwijderen</a>
     </div>
 </form>

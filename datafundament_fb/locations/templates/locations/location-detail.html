@@ -15,14 +15,6 @@
 </div>
 {% endblock %}
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
 {% block content %}
 {% if location_data.archief %}
 <div class="alert alert-info">
