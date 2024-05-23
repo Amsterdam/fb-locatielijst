@@ -21,11 +21,18 @@
 {% endblock %}
 
 {% block content %}
-<h2>{{ object.name }}</h2>
-
+<h2>Verwijder optie {{ object.option }} uit {{ object.location_property.label }}</h2>
+<h2>{% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}</h2>
+<p>
+    <p>Weet je zeker dat je '{{ object.option }}' uit {{ object.location_property.label }} wilt verwijderen?</p>
+</p>
+{% if locations_affected > 0 %}
+<p>
+    Door deze wijziging worden {{ locations_affected }} locaties aangepast.
+</p>
+{% endif %}
 <form action="." method="POST">
     {% csrf_token %}
-    <p>Weet je zeker dat je '{{ object.option }}' uit {{ object.location_property.label }} wilt verwijderen?</p>
     <div class="btn-container">
         <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'propertyoption-delete' object.location_property.id object.id %}">Verwijderen</button>
         <a href="{% url 'propertyoption-update' object.location_property.id object.id %}" class="btn btn-secundair">Annuleren</a>

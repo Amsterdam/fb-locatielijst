@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>{{ object.name }}</h2>
+<h2>Wijzig optie {{ object.option }} in {{ object.location_property.label }}</h2>
 
 <form action="." method="POST" novalidate>
     {% csrf_token %}

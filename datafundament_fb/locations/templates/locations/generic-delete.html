@@ -12,18 +12,24 @@
     <span>&rsaquo;</span>
     <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
     <span>&rsaquo;</span>
-    {{ object.name }}
+    {% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}
     <span>&rsaquo;</span>
     Verwijderen
 </div>
 {% endblock %}
 
 {% block content %}
-<h2>{{ object.name }}</h2>
-
+<h2>Verwijder {% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}</h2>
+<p>
+    Weet je zeker dat je '{% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}' wilt verwijderen?
+</p>
+{% if locations_affected > 0 %}
+<p>
+    Door deze wijziging worden {{ locations_affected }} locaties aangepast.
+</p>
+{% endif %}
 <form action="." method="POST">
     {% csrf_token %}
-    <p>Weet je zeker dat je '{{ object.name }}' wilt verwijderen?</p>
     <div class="btn-container">
         <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url object|reverse_url:'delete' object.id %}">Verwijderen</button>
         <a href="{% url object|reverse_url:'update' object.id %}" class="btn btn-secundair">Annuleren</a>

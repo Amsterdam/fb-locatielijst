@@ -5,15 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.views.generic import View, ListView, UpdateView, CreateView, DeleteView
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from locations.forms import LocationDataForm, LocationImportForm, LocationListForm, PropertyOptionForm
-from locations.models import Location, Log, LocationProperty, PropertyGroup, ExternalService, PropertyOption
+from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
+from locations.models import Location, Log, LocationProperty, PropertyGroup, ExternalService, PropertyOption, LocationData, LocationExternalService
 from locations.processors import LocationProcessor
 
 # Create your views here.
@@ -387,13 +387,19 @@ class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
 
 class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
     model = LocationProperty
-    template_name = 'locations/locationproperty-delete.html'
+    template_name = 'locations/generic-delete.html'
     success_url = reverse_lazy('locationproperty-list')
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
         messages.success(self.request, f"Locatie eigenschap '{self.object.label}' is verwijderd.")
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['locations_affected'] = LocationData.objects.filter(
+            location_property=self.object).values('location').distinct().count()
+        return context
 
 
 class PropertyOptionListView(LoginRequiredMixin, ListView):
@@ -403,23 +409,29 @@ class PropertyOptionListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['location_property'] = get_object_or_404(LocationProperty, id=self.kwargs.get('lp_pk'))
+        context['location_property'] = self.location_property
         context['model'] = self.model
         return context
     
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.location_property = LocationProperty.objects.filter(id=self.kwargs.get('lp_pk'), property_type='CHOICE').first()
+
     def get_queryset(self):
-        queryset = PropertyOption.objects.filter(location_property=self.kwargs.get('lp_pk'))
+        if self.location_property:
+            queryset = self.model.objects.filter(location_property=self.location_property)
+        else:
+            raise Http404
         return queryset
 
 
 class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
     model = PropertyOption
     template_name = 'locations/propertyoption-create.html'
-    form_class = PropertyOptionForm
+    fields = ['option']
 
     def get_success_url(self):
-        # WISH: Als je een switch maakt vanuit het form kan je ook een button toevoegen om direct na de ene een andere optie aan te maken; net zoals in de adminform
-        return reverse('propertyoption-update', args=[self.object.location_property.id, self.object.id])
+        return reverse('propertyoption-list', args=[self.object.location_property.id])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -427,20 +439,24 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
         context['model'] = self.model
         return context
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.location_property = get_object_or_404(LocationProperty, id=self.kwargs.get('lp_pk'), property_type='CHOICE')
+
     def form_valid(self, form):
         form.instance.last_modified_by = self.request.user
-        messages.success(self.request, f"Optie '{form.instance.option}' is toegevoegd aan {form.instance.location_property.label}.")
+        form.instance.location_property = self.location_property
+        messages.success(self.request, f"Optie '{form.instance.option}' is toegevoegd aan {self.location_property.label}.")
         return super().form_valid(form)
     
     def get_initial(self):
-        location_property = get_object_or_404(LocationProperty, id=self.kwargs.get('lp_pk'))
-        return {'location_property': location_property}
+        return {'location_property': self.location_property}
 
 
 class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
     model = PropertyOption
     template_name = 'locations/propertyoption-update.html'
-    form_class = PropertyOptionForm
+    fields = ['option']
 
     def get_success_url(self):
         return reverse('propertyoption-list', args=[self.object.location_property.id])
@@ -466,6 +482,13 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
         self.object.last_modified_by = self.request.user
         messages.success(self.request, f"Optie '{self.object.option}' is verwijderd.")
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['locations_affected'] = LocationData.objects.filter(
+            location_property=self.object.location_property,
+            _property_option=self.object).values('location').distinct().count()
+        return context
 
 
 class PropertyGroupListView(LoginRequiredMixin, ListView):
@@ -565,3 +588,11 @@ class ExternalServiceDeleteView(LoginRequiredMixin, DeleteView):
         self.object.last_modified_by = self.request.user
         messages.success(self.request, f"Externe koppeling '{self.object.name}' is verwijderd.")
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['locations_affected'] = LocationExternalService.objects.filter(
+            external_service=self.object).values('location').distinct().count()
+        return context
+
+

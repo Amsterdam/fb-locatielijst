@@ -214,12 +214,3 @@ class LocationListForm(forms.Form):
             choices=archive_list,
         )
 
-
-class PropertyOptionForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['location_property'].disabled = True
-
-    class Meta:
-        model = PropertyOption
-        fields = ['option','location_property']

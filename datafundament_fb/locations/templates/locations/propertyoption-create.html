@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>Nieuwe {{ model|verbose_name }} voor {{ model.location_property.label }}</h2>
+<h2>Nieuwe optie in {{ location_property.label }}</h2>
 
 <form action="." method="POST" novalidate>
     {% csrf_token %}

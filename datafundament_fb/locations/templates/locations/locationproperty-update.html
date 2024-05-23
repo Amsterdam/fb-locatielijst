@@ -38,11 +38,16 @@
     {% endfor %}
     {% if object.property_type == 'CHOICE' %}
     <h3>Keuze opties</h3>
-    <ul>
-        {% for option in property_options %}
-        <li>{{ option.option }}</li>
-        {% endfor %}
-    </ul>
+    <div>
+        <ul class="location-property-options">
+            {% for option in property_options|slice:'9' %}
+            <li>{{ option.option }}</li>
+            {% endfor %}
+            {% if property_options|length > 9 %}
+            <li>... (nog {{ property_options|length|add:'-9' }} meer)</li>
+            {% endif %}
+        </ul>
+    </div>
     <div class="btn-container">
         <a href="{% url 'propertyoption-list' object.id %}" class="btn btn-secundair">Keuze opties beheren</a>
     </div>
