@@ -31,5 +31,27 @@ def set_query(request, parameter=None, value=None, pop=False):
             else:
                 query[parameter] = value
 
-
     return query.urlencode()
+
+@register.simple_tag
+def get_order(request, value=None):
+    """
+    Return if the value is in de 'order_by' paramenter of the url.
+    If so, return the order direction (asc/desc)
+    If not, result ''
+    """
+    order_by = request.GET.get('order_by')
+    order = request.GET.get('order')
+    # Only check the parameter if present 
+    if order_by:
+        # Compare parameter with the value
+        if order_by == value:
+            # Get the default order direction
+            if order == 'desc':
+                return 'desc'
+            else:
+                return 'asc'
+        else:
+            return ''
+
+    return ''

@@ -34,10 +34,22 @@
         <thead>
             <tr>
                 <th scope="col" class="column-pancode">
-                    <a href="?{% set_query request 'order_by' 'pandcode' %}">Pandcode</a>
+                    <a href="?{% set_query request 'order_by' 'pandcode' %}">
+                        Pandcode
+                        {% get_order request 'pandcode' as order_pancode %}
+                        {% if order_pancode %}
+                            {% include "includes/order-icon.html" with direction=order_pancode only %}
+                        {% endif %}
+                    </a>
                 </th>
                 <th scope="col">
-                    <a href="?{% set_query request 'order_by' 'name' %}">Naam</a>
+                    <a href="?{% set_query request 'order_by' 'name' %}">
+                        Naam
+                        {% get_order request 'name' as order_name %}
+                        {% if order_name %}
+                            {% include "includes/order-icon.html" with direction=order_name only %}
+                        {% endif %}
+                    </a>
                 </th>
             </tr>
         </thead>

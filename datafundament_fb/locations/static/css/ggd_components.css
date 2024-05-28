@@ -160,3 +160,24 @@ div.ams-pagination__button--current {
   width: 0.625rem;
   fill: var(--color-blue)
 }
+
+/********** TABLE SORTING **********/
+
+thead th a:link,
+thead th a:visited {
+  color: var(--color-black);
+  text-decoration: none;
+}
+
+.list-order-icon {
+  margin-left: 5px;
+}
+
+.list-order-icon .icon {
+  display: inline-block;
+  width: 12px;
+}
+
+.list-order-icon .icon svg {
+  fill: var(--color-blue);
+}
