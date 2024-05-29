@@ -1,0 +1,108 @@
+<!-- based on base.html in Django admin templates -->
+{% load i18n static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:" en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+
+<head>
+  <title>Datfundament Facilitair Beheer{% block title %}{% endblock %}</title>
+  {% block extrastyle %}
+  <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ggd_base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ggd_buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ggd_components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ggd_header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ggd_pages.css' %}">
+  {% endblock %}
+  {% block extrahead %}{% endblock %}
+  {% block blockbots %}
+  <meta name="robots" content="NONE,NOARCHIVE">
+  {% endblock %}
+</head>
+
+<body>
+  <!-- Container -->
+  <div id="container">
+
+    <!-- Header -->
+    {% block header %}
+    <header id="header">
+      <div id="branding">
+        {% block branding %}
+        <h1>
+          <a href="/">
+            <div id="site-logo">
+              <img src="{% static 'images/logo-gemeente-amsterdam.svg' %}" class="site-logo-large"
+                alt="Logo Gemeente Amsterdam" />
+              <img src="{% static 'images/logo-gemeente-amsterdam-small.svg' %}" class="site-logo-small"
+                alt="Logo Gemeente Amsterdam" />
+            </div>
+            <div id="site-name">{{ site_header|default:_('Datafundament Facilitair Bureau') }}</div>
+          </a>
+        </h1>
+        {% endblock %}
+      </div>
+      {% block nav-global %}
+      <nav>
+        <ul>
+          {% if user.is_anonymous %}
+          <li><a href="{% url 'admin:login' %}?next={{ request.path }}">Inloggen</a></li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>
+          <li><a href="{% url 'locations_urls:location-admin' %}">Beheer</a></li>
+          <li>
+            <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+              {% csrf_token %}
+              <button type="submit">Uitloggen</button>
+            </form>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endblock %}
+    </header>
+    {% endblock %}
+    <!-- END Header -->
+
+    {% block nav-breadcrumbs %}
+    <nav aria-label="{% translate 'Breadcrumbs' %}">
+      {% block breadcrumbs %}
+      <div class="breadcrumbs">
+        <a href="/">Home</a>
+        {% if user.is_authenticated %}
+        <span>&rsaquo;</span>
+        <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
+        {% endif %}
+        <span>&rsaquo;</span>
+        <a href="{% url 'locations_urls:location-list' %}">Locaties</a>
+        {% block extra-breadcrumbs %}{% endblock %}
+      </div>
+      {% endblock %}
+    </nav>
+    {% endblock %}
+
+    <div class="main" id="main">
+      <main id="content-start" class="content" tabindex="-1">
+        {% block messages %}
+        {% if messages %}
+        <ul class="messagelist">{% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message|capfirst }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endblock messages %}
+        <!-- Content -->
+        <div id="content">
+          {% block content %}{% endblock %}
+        </div>
+        <!-- END Content -->
+        {% block footer %}<div id="footer"></div>{% endblock %}
+      </main>
+    </div>
+  </div>
+  <!-- END Container -->
+
+</body>
+
+</html>

@@ -134,6 +134,7 @@ class LocationDetailView(View):
         location.save()
         return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[pandcode]))
 
+
 class LocationCreateView(LoginRequiredMixin, View):
     model = Location
     form = LocationDataForm
@@ -361,7 +362,7 @@ class LocationPropertyCreateView(LoginRequiredMixin, CreateView):
     template_name = 'locations/generic-create.html'
     fields = ['short_name', 'label', 'property_type', 'required', 'multiple', 'unique', 'public', 'group', 'order',]
     ordering = ['group__order', 'order']
-    success_url = reverse_lazy('locationproperty-list')
+    success_url = reverse_lazy('locations_urls:locationproperty-list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -378,7 +379,7 @@ class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
     model = LocationProperty
     template_name = 'locations/locationproperty-update.html'
     fields = ['short_name', 'label', 'required', 'multiple', 'unique', 'public', 'group', 'order',]
-    success_url = reverse_lazy('locationproperty-list')
+    success_url = reverse_lazy('locations_urls:locationproperty-list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -394,7 +395,7 @@ class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
 class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
     model = LocationProperty
     template_name = 'locations/generic-delete.html'
-    success_url = reverse_lazy('locationproperty-list')
+    success_url = reverse_lazy('locations_urls:locationproperty-list')
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
@@ -437,7 +438,7 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
     fields = ['option']
 
     def get_success_url(self):
-        return reverse('propertyoption-list', args=[self.object.location_property.id])
+        return reverse('locations_urls:propertyoption-list', args=[self.object.location_property.id])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -465,7 +466,7 @@ class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
     fields = ['option']
 
     def get_success_url(self):
-        return reverse('propertyoption-list', args=[self.object.location_property.id])
+        return reverse('locations_urls:propertyoption-list', args=[self.object.location_property.id])
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
@@ -482,7 +483,7 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'locations/propertyoption-delete.html'
 
     def get_success_url(self):
-        return reverse('propertyoption-list', args=[self.object.location_property.id])
+        return reverse('locations_urls:propertyoption-list', args=[self.object.location_property.id])
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
@@ -511,7 +512,7 @@ class PropertyGroupCreateView(LoginRequiredMixin, CreateView):
     model = PropertyGroup
     fields = ['name', 'order']
     template_name = 'locations/generic-create.html'
-    success_url = reverse_lazy('propertygroup-list')
+    success_url = reverse_lazy('locations_urls:propertygroup-list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -527,7 +528,7 @@ class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
     model = PropertyGroup
     fields = ['name', 'order']
     template_name = 'locations/generic-update.html'
-    success_url = reverse_lazy('propertygroup-list')
+    success_url = reverse_lazy('locations_urls:propertygroup-list')
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
@@ -538,7 +539,7 @@ class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
 class PropertyGroupDeleteView(LoginRequiredMixin, DeleteView):
     model = PropertyGroup
     template_name = 'locations/generic-delete.html'
-    success_url = reverse_lazy('propertygroup-list')
+    success_url = reverse_lazy('locations_urls:propertygroup-list')
 
     def form_valid(self, form):
         messages.success(self.request, f"Eigenschap groep '{self.object.name}' is verwijderd.")
@@ -560,7 +561,7 @@ class ExternalServiceCreateView(LoginRequiredMixin, CreateView):
     model = ExternalService
     fields = ['name', 'short_name', 'public', 'order']
     template_name = 'locations/generic-create.html'
-    success_url = reverse_lazy('externalservice-list')
+    success_url = reverse_lazy('locations_urls:externalservice-list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -577,7 +578,7 @@ class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
     model = ExternalService
     fields = ['name', 'short_name', 'public', 'order']
     template_name = 'locations/generic-update.html'
-    success_url = reverse_lazy('externalservice-list')
+    success_url = reverse_lazy('locations_urls:externalservice-list')
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
@@ -588,7 +589,7 @@ class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
 class ExternalServiceDeleteView(LoginRequiredMixin, DeleteView):
     model = ExternalService
     template_name = 'locations/generic-delete.html'
-    success_url = reverse_lazy('externalservice-list')
+    success_url = reverse_lazy('locations_urls:externalservice-list')
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user

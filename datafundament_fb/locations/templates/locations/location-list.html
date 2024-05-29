@@ -1,7 +1,22 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n static admin_urls admin_modify utils %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block title %}
+| Locaties
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    {% if user.is_authenticated %}
+    <span>&rsaquo;</span>
+    <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
+    {% endif %}
+    {% block extra-breadcrumbs %}{% endblock %}
+    <span>&rsaquo;</span>
+    Locaties
+</div>
+{% endblock %}
 
 {% block content %}
 <h2>{% translate 'Locaties' %}</h2>

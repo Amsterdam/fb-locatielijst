@@ -1,16 +1,15 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify utils %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url model|reverse_url:'list' %}">{{ model|verbose_name:'plural' }}</a>
-    <span>&rsaquo;</span>
-    Toevoegen
-</div>
+{% block title %}
+| {{ model|verbose_name:'plural' }} aanmaken
+{% endblock %}
+
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+<a href="{% url model|reverse_url:'list' %}">{{ model|verbose_name:'plural' }}</a>
+<span>&rsaquo;</span>
+Toevoegen
 {% endblock %}
 
 {% block content %}

@@ -1,8 +1,17 @@
-{% extends 'locations/generic-list.html' %}
-{% load i18n static admin_urls admin_modify %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
+
+{% block title %}
+| {{ model|verbose_name:'plural' }}
+{% endblock %}
+
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+{{ model|verbose_name:'plural' }}
+{% endblock %}
 
 {% block content %}
-{{ block.super }}
+<h2>{{ model|verbose_name:'plural' }}</h2>
 <div class="page-content">
     <table class="table-adam">
         <thead>
@@ -18,7 +27,7 @@
         {% for object in object_list %}
             <tr>
                 <td>
-                    <a href="{% url 'locationproperty-update' object.id %}">
+                    <a href="{% url 'locations_urls:locationproperty-update' object.id %}">
                     {{object.label}}
                     </a>
                 </td>
@@ -40,7 +49,7 @@
         </tbody>
     </table>
     <div class="btn-container">
-        <a href="{% url 'locationproperty-create' %}" class="btn btn-secundair">Aanmaken</a>
+        <a href="{% url 'locations_urls:locationproperty-create' %}" class="btn btn-secundair">Aanmaken</a>
     </div>
 </div>
 {% endblock %}
