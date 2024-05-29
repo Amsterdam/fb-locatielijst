@@ -1,0 +1,39 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n admin_urls static admin_modify utils %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
+    <span>&rsaquo;</span>
+    {% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}
+    <span>&rsaquo;</span>
+    Verwijderen
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>Verwijder {% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}</h2>
+<p>
+    Weet je zeker dat je '{% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}' wilt verwijderen?
+</p>
+{% if locations_affected > 0 %}
+<p>
+    Door deze wijziging worden {{ locations_affected }} locaties aangepast.
+</p>
+{% endif %}
+<form action="." method="POST">
+    {% csrf_token %}
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url object|reverse_url:'delete' object.id %}">Verwijderen</button>
+        <a href="{% url object|reverse_url:'update' object.id %}" class="btn btn-secundair">Annuleren</a>
+    </div>
+</form>
+
+{% endblock %}

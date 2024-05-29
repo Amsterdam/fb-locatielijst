@@ -1,0 +1,34 @@
+{% extends 'locations/generic-list.html' %}
+{% load i18n static admin_urls admin_modify %}
+
+{% block content %}
+{{ block.super }}
+<div class="page-content">
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col" class="column-pancode">Volgorde</th>
+                <th scope="col">Groep</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                {{ object.order }}
+                </td>
+                <td>
+                    <a href="{% url 'propertygroup-update' object.id %}">
+                    {{object.name}}
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="btn-container">
+        <a href="{% url 'propertygroup-create' %}" class="btn btn-secundair">Aanmaken</a>
+    </div>
+</div>
+{% endblock %}
