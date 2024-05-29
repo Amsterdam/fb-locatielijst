@@ -1,5 +1,5 @@
 {% extends 'admin/admin_base.html' %}
-{% load i18n static admin_urls admin_modify %}
+{% load i18n static admin_urls admin_modify utils %}
 
 {% block breadcrumbs %}{% endblock %}
 
@@ -29,13 +29,28 @@
         <button class="btn btn-primair" type="submit" formaction="{% url 'locations_urls:location-list' %}">Zoek</button>
     </form>
 </div>
-
 <div class="page-content">
     <table class="table-adam">
         <thead>
             <tr>
-                <th scope="col" class="column-pancode">Pandcode</th>
-                <th scope="col">Naam</th>
+                <th scope="col" class="column-pancode">
+                    <a href="?{% set_query request 'order_by' 'pandcode' %}">
+                        Pandcode
+                        {% get_order request 'pandcode' as order_pancode %}
+                        {% if order_pancode %}
+                            {% include "includes/order-icon.html" with direction=order_pancode only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'name' %}">
+                        Naam
+                        {% get_order request 'name' as order_name %}
+                        {% if order_name %}
+                            {% include "includes/order-icon.html" with direction=order_name only %}
+                        {% endif %}
+                    </a>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -62,7 +77,7 @@
     <div class="h5">{{ page_obj.paginator.count }} {% if is_filtered_result %}van de {{ location_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
 
     <div class="btn-container">
-        <a href="{% url 'locations_urls:location-export' %}?{{ query }}" class="btn btn-primair">Exporteren</a>
+        <a href="{% url 'locations_urls:location-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
         {% if user.is_authenticated %}
         <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
         {% endif %}

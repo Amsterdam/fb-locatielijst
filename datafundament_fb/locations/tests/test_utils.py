@@ -1,7 +1,7 @@
-from django.test import TestCase
-from locations.templatetags.utils import get_type, verbose_name, reverse_url
+from django.test import TestCase, Client
+from locations.templatetags.utils import get_type, verbose_name, reverse_url, get_order
 from locations.models import Location
-from django.db import models
+
 class LocationUtilsTest(TestCase):
     """
     Test Utils
@@ -32,3 +32,34 @@ class LocationUtilsTest(TestCase):
         # Test list view and empty view
         self.assertEqual(reverse_url(Location, 'list'), 'location-list')
         self.assertEqual(reverse_url(Location, ''), 'location-')
+
+    def test_get_order(self):
+        client = Client()
+
+        # Test default ordering
+        request = client.get('/').wsgi_request
+        self.assertEqual(get_order(request, 'pandcode'), 'asc')
+        self.assertEqual(get_order(request, 'name'), '')
+
+        # Test order parameter
+        request = client.get('/?order=desc').wsgi_request
+        self.assertEqual(get_order(request, 'pandcode'), 'desc')
+        self.assertEqual(get_order(request, 'name'), '')
+
+        # Test order_by parameter
+        request = client.get('/?order_by=pandcode').wsgi_request
+        self.assertEqual(get_order(request, 'pandcode'), 'asc')
+        self.assertEqual(get_order(request, 'name'), '')
+
+        request = client.get('/?order_by=name').wsgi_request
+        self.assertEqual(get_order(request, 'pandcode'), '')
+        self.assertEqual(get_order(request, 'name'), 'asc')
+
+        # Test order_by and order parameter
+        request = client.get('/?order_by=pandcode&order=desc').wsgi_request
+        self.assertEqual(get_order(request, 'pandcode'), 'desc')
+        self.assertEqual(get_order(request, 'name'), '')
+
+        request = client.get('/?order_by=name&order=desc').wsgi_request
+        self.assertEqual(get_order(request, 'pandcode'), '')
+        self.assertEqual(get_order(request, 'name'), 'desc')

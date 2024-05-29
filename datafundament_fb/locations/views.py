@@ -1,5 +1,4 @@
 import csv
-import urllib.parse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -67,12 +66,28 @@ class LocationListView(ListView):
     template_name = 'locations/location-list.html'
     paginate_by = 50
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.location_processor = LocationProcessor(user=request.user)
+
+    def set_ordering(self):
+        # Set column to order on; default is pandcode
+        order_by = self.request.GET.get('order_by')
+        if not order_by in ['name', 'pandcode']:
+            order_by = 'pandcode'
+        # Switch ordering
+        order = '-' if self.request.GET.get('order') == 'desc' else ''
+        return order + order_by
+
     def get_queryset(self):
-        # Get a QuerySet of filtered locations 
+        # Set ordering
+        ordering = self.set_ordering()
+        # Apply search filter
         locations = Location.objects.search_filter(
             params=self.request.GET.dict(),
-             user=self.request.user)
-        return locations
+            user=self.request.user)
+        # Return ordered queryset
+        return locations.order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -82,10 +97,9 @@ class LocationListView(ListView):
         context['form'] = LocationListForm(initial=initial_data, user=self.request.user)
         # Create at list of search input elements to be used in a JS function for hiding/unhiding these elements
         property_list = ['id_search']
-        location_properties = LocationProcessor(user=self.request.user).location_property_instances
-        for location_property in location_properties:
-            if location_property.property_type == 'CHOICE':
-                property_list.append('id_' + location_property.short_name)
+        for instance in self.location_processor.location_property_instances:
+            if instance.property_type == 'CHOICE':
+                property_list.append('id_' + instance.short_name)
         context['property_list'] = property_list
         # Number of locations in the search result, filtered by archive
         archive = self.request.GET.get('archive', '')
@@ -93,11 +107,6 @@ class LocationListView(ListView):
         context['location_count'] = location_count
         # Boolean if the search result if filtered by the search query
         context['is_filtered_result'] = context['page_obj'].paginator.count < location_count
-        # Pass the url query to the url for exporting the search result as csv file; remove page parameter if present
-        query = self.request.GET.dict()
-        # Remove page parameter is present
-        query.pop('page', None)
-        context['query'] = urllib.parse.urlencode(query)
         return context
         
 
@@ -123,8 +132,6 @@ class LocationDetailView(View):
         if request.POST['_archive'] == 'dearchive':
             location.is_archived = False
         location.save()
-        
-        # return to the location-detail page
         return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[pandcode]))
 
 class LocationCreateView(LoginRequiredMixin, View):

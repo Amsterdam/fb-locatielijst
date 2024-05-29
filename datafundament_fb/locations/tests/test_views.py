@@ -4,16 +4,16 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.messages import get_messages
 from django.core.files.base import ContentFile
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 from parameterized import parameterized
 from locations.models import Location, LocationProperty, LocationData, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
-from locations.views import get_csv_file_response
+from locations.views import get_csv_file_response, LocationListView
 
 
-class LocationListView(TestCase):
+class TestLocationListView(TestCase):
     """
     Tests for searching in the list of locations
     """
@@ -153,6 +153,31 @@ class LocationListView(TestCase):
         self.assertEqual(response.status_code, 200)
         # Verify if the correct template is used
         self.assertTemplateUsed(response, 'locations/location-list.html')
+
+    def test_ordering(self):
+        """Test default ordering on column pandcode"""
+        client = Client()
+        list_view = LocationListView()
+
+        # Test default ordering
+        request = client.get('/').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), 'pandcode')
+
+        # Test ordering descending
+        request = client.get('/?order=desc').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), '-pandcode')
+
+        # Test ordering on name column
+        request = client.get('/?order_by=name').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), 'name')
+
+        # Test ordering on invalid column name
+        request = client.get('/?order_by=straat').wsgi_request
+        list_view.setup(request)
+        self.assertEqual(list_view.set_ordering(), 'pandcode')
 
 
 class LocationDetailViewTest(TestCase):
@@ -941,8 +966,8 @@ class TestListViewPaginator(TestCase):
     ]
 
     @patch('locations.views.LocationListView.paginate_by', new_callable=PropertyMock)
-    def test_page_pop(self, mock):
-        """Test to verify if the page parameter is ommitted from the export url"""
+    def test_pagination(self, mock):
+        """Test to verify if a page is returned"""
         # Set pagination to 1 result per page to invoke pagination
         mock.return_value = '1'
         # Call the location list view
@@ -952,8 +977,6 @@ class TestListViewPaginator(TestCase):
         self.assertEqual(response.status_code, 200)
         # Assert 1 result per page
         self.assertEqual(len(response.context['object_list']), 1)
-        # Query variable should not contain the parameter page
-        self.assertEqual(response.context['query'], '')
         # Verify that the mock attribute is called
         self.assertTrue(mock.called)
 
