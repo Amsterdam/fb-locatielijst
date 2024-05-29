@@ -32,7 +32,7 @@ requirements: pip-tools             ## (Re)compile requirements.txt and requirem
 	$(pip_compile) requirements.in
 	$(pip_compile) requirements_dev.in
 
-upgrade:                            ## Upgrade the requirements.txt files, adhering to the constraints in the requirements.in files.  
+upgrade:                            ## Upgrade the requirements.txt files, adhering to the constraints in the requirements.in files.
 	$(pip_compile) --upgrade requirements.in
 	$(pip_compile) --upgrade requirements_dev.in
 
