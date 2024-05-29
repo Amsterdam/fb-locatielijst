@@ -1,0 +1,42 @@
+{% extends 'admin/admin_base.html' %}
+{% load i18n admin_urls static admin_modify utils %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
+    <span>&rsaquo;</span>
+    {{ object.name }}
+    <span>&rsaquo;</span>
+    Wijzigen
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>{{ object.name }}</h2>
+
+<form action="." method="POST" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="data-view-row">
+        <div class="data-label">
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+        </div>
+        <div class="data-value">
+            {{ field }}
+            {{ field.errors }}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url object|reverse_url:'update' object.id %}">Opslaan</button>
+        <a href="{% url object|reverse_url:'list' %}" class="btn btn-secundair">Annuleren</a>
+        <a href="{% url object|reverse_url:'delete' object.id %}" class="btn btn-secundair">Verwijderen</a>
+    </div>
+</form>
+
+{% endblock %}

@@ -6,6 +6,16 @@ register = template.Library()
 def get_type(value):
     return type(value).__name__
 
+@register.filter
+def verbose_name(model, plural=False):
+    if plural:
+        return model._meta.verbose_name_plural
+    return model._meta.verbose_name
+
+@register.filter
+def reverse_url(instance, view):
+    return instance._meta.model_name + "-" + view
+
 @register.simple_tag
 def set_query(request, parameter=None, value=None, pop=False):
     """
@@ -34,24 +44,25 @@ def set_query(request, parameter=None, value=None, pop=False):
     return query.urlencode()
 
 @register.simple_tag
-def get_order(request, value=None):
+def get_order(request, column=None):
     """
-    Return if the value is in de 'order_by' paramenter of the url.
-    If so, return the order direction (asc/desc)
-    If not, result ''
+    Return asc/desc if the column name is in de 'order_by' paramenter of the url.
+    When no order_by parameter is present but column name is pandcode, default to ascending for pandcode column
     """
     order_by = request.GET.get('order_by')
     order = request.GET.get('order')
-    # Only check the parameter if present 
-    if order_by:
-        # Compare parameter with the value
-        if order_by == value:
-            # Get the default order direction
-            if order == 'desc':
-                return 'desc'
-            else:
-                return 'asc'
+    # Set order for the requested column
+    if order_by == column:
+        if order == 'desc':
+            value = 'desc'
         else:
-            return ''
-
-    return ''
+            value = 'asc'
+    # Set order when column is pandcode
+    elif column == 'pandcode' and not order_by:
+        if order == 'desc':
+            value = 'desc'
+        else:
+            value = 'asc'
+    else:
+        value = ''
+    return value

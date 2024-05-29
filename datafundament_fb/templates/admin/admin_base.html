@@ -46,3 +46,14 @@
 {% endblock %}
 
 {% block nav-sidebar %}{% endblock %}
+
+{% block messages %}
+{{ block.super }}
+{% if form.non_field_errors %}
+<ul class="messagelist">
+  {% for error in form.non_field_errors %}
+  <li class="error">{{ error }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -121,6 +121,7 @@ class PropertyOption(models.Model):
     class Meta:
         verbose_name = 'Eigenschap optie'
         verbose_name_plural = 'Eigenschappen opties'
+        ordering = ['option']
         constraints = [models.UniqueConstraint(
             fields=['location_property', 'option'], name='unique_property_option')]
 

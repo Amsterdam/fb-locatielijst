@@ -1,0 +1,63 @@
+{% extends 'locations/generic-list.html' %}
+{% load i18n static admin_urls admin_modify utils %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
+    <span>&rsaquo;</span>
+    <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
+    <span>&rsaquo;</span>
+    {{ object.label }}
+    <span>&rsaquo;</span>
+    Wijzigen
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>{{ object.label }}</h2>
+
+<form action="." method="POST" novalidate>
+    {% csrf_token %}
+    <div class="data-view-row">
+        <div class="data-label">Gegevens type</div>
+        <div class="data-value">{{ object.get_property_type_display }}</div>
+    </div>
+    {% for field in form %}
+    <div class="data-view-row">
+        <div class="data-label">
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+        </div>
+        <div class="data-value">
+            {{ field }}
+            {{ field.errors }}
+        </div>
+    </div>
+    {% endfor %}
+    {% if object.property_type == 'CHOICE' %}
+    <h3>Keuze opties</h3>
+    <div>
+        <ul class="location-property-options">
+            {% for option in property_options|slice:'9' %}
+            <li>{{ option.option }}</li>
+            {% endfor %}
+            {% if property_options|length > 9 %}
+            <li>... (nog {{ property_options|length|add:'-9' }} meer)</li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="btn-container">
+        <a href="{% url 'propertyoption-list' object.id %}" class="btn btn-secundair">Keuze opties beheren</a>
+    </div>
+    {% endif %}
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Save"
+            formaction="{% url object|reverse_url:'update' object.id %}">Opslaan</button>
+        <a href="{% url object|reverse_url:'list' %}" class="btn btn-secundair">Annuleren</a>
+        <a href="{% url object|reverse_url:'delete' object.id %}" class="btn btn-secundair">Verwijderen</a>
+    </div>
+</form>
+
+{% endblock %}
