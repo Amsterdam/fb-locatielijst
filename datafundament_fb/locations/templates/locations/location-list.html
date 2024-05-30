@@ -94,7 +94,7 @@
     <div class="btn-container">
         <a href="{% url 'locations_urls:location-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
         {% if user.is_authenticated %}
-        <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Aanmaken</a>
+        <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Toevoegen</a>
         {% endif %}
     </div>
 </div>

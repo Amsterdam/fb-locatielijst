@@ -158,7 +158,7 @@ class LocationCreateView(LoginRequiredMixin, View):
 
             except ValidationError as err:
                 # Return error message when the location is not saved
-                message = f"Fout bij het aanmaken van de locatie: {err}."
+                message = f"Fout bij het toevoegen van de locatie: {err}."
                 messages.error(request, message)
                 context = {'form': form}
                 context['model'] = self.model

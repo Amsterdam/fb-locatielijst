@@ -2,7 +2,7 @@
 {% load i18n static %}
 
 {% block title %}
-| Locatie aanmaken
+| Locatie toevoegen
 {% endblock %}
 
 {% block extra-breadcrumbs %}
@@ -39,7 +39,7 @@ Locatie toevoegen
         {% endfor %}
     </div>
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'locations_urls:location-create' %}">Aanmaken</button>
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'locations_urls:location-create' %}">Toevoegen</button>
         <a href="{% url 'locations_urls:location-list' %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>

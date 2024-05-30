@@ -2,7 +2,7 @@
 {% load i18n static utils %}
 
 {% block title %}
-| {{ model|verbose_name:'plural' }} aanmaken
+| {{ model|verbose_name:'plural' }} toevoegen
 {% endblock %}
 
 {% block extra-breadcrumbs %}
@@ -30,7 +30,7 @@ Toevoegen
     </div>
     {% endfor %}
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url model|reverse_url:'create' %}">Aanmaken</button>
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url model|reverse_url:'create' %}">Toevoegen</button>
         <a href="{% url model|reverse_url:'list' %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>
