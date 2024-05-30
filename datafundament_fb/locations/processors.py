@@ -1,16 +1,14 @@
 from typing import Self
-from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import get_locationdata_validator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
+from shared.middleware import get_current_user
 
 class LocationProcessor():
-    # Switch to include all properties (including private), or only public properties
-    user = AnonymousUser()
 
     def _create_or_update(self, location_property, value):
         """Helper function to create or update a LocationData instance"""
@@ -94,17 +92,14 @@ class LocationProcessor():
         for property in self.location_properties:
             setattr(self, property, None)
 
-    def __init__(self, user: User=AnonymousUser(), data: dict=None):
+    def __init__(self, data: dict=None):
         """
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
-        attr: user
-          Properties are filtered on whether a user has permission.
-          Default is an anonymous user
         """
-        # Set User
-        self.user = user
-        
+        # User is retrieved form request by middlewhere, default to Anonymous
+        self.user = get_current_user()
+
         # Set an empty Location instance
         self.location_instance = Location()
 
@@ -118,11 +113,11 @@ class LocationProcessor():
                     setattr(self, key, value)
 
     @classmethod
-    def get(cls, pandcode: int, user: User=AnonymousUser())-> Self: 
+    def get(cls, pandcode: int)-> Self: 
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls(user=user)
+        object = cls()
         object.location_instance = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
 
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
@@ -218,7 +213,7 @@ class LocationProcessor():
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
 
-        self.location_instance.last_modified_by = self.user
+        self.location_instance.last_modified_by = get_current_user()
 
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db

@@ -11,6 +11,7 @@ from locations.models import Location, LocationProperty, LocationData, PropertyO
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
 from locations.views import get_csv_file_response, LocationListView
+from shared.middleware import set_current_user, get_current_user
 
 
 class TestLocationListView(TestCase):
@@ -40,7 +41,8 @@ class TestLocationListView(TestCase):
             pandcode=24002, name='Stopera', is_archived=False)
         Location.objects.create(
             pandcode=24003, name='Ambtswoning', is_archived=True )
-        LocationProcessor(user=self.authenticated_user, data={
+        set_current_user(self.authenticated_user)
+        LocationProcessor(data={
             'pandcode': '24001',
             'naam': 'Stadhuis',
             'public': 'Publiek',
@@ -48,7 +50,7 @@ class TestLocationListView(TestCase):
             'choice': 'KeuzeOptie1',
             'external': '10042',
         }).save()
-        LocationProcessor(user=self.authenticated_user, data={
+        LocationProcessor(data={
             'pandcode': '24002',
             'naam': 'Stopera',
             'public': 'Publiek',
@@ -56,7 +58,7 @@ class TestLocationListView(TestCase):
             'choice': 'KeuzeOptie2',
             'external': '20042',
         }).save()
-        LocationProcessor(user=self.authenticated_user, data={
+        LocationProcessor(data={
             'pandcode': '24003',
             'naam': 'Ambtswoning',
             'public': 'Burgemeester',
@@ -131,7 +133,9 @@ class TestLocationListView(TestCase):
             user = self.anonymous_user
 
         # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
-        location_properties = LocationProcessor(user=user).location_properties
+        # Set current user
+        set_current_user(user)
+        location_properties = LocationProcessor().location_properties
         is_choice_property = LocationProperty.objects.filter(short_name=location_property, property_type='CHOICE').exists()
         if location_property in location_properties and is_choice_property:
             params[location_property] = search
@@ -831,7 +835,8 @@ class TestLocationExport(TestCase):
         """ Test getting the csv http response object as an anonymous user"""
         # Request the csv file http response
         request = HttpRequest()
-        request.user = AnonymousUser()
+        # Current user to anonymous
+        set_current_user(AnonymousUser())
         locations = Location.objects.all()
         # Call the function to get the csv file reponse
         response = get_csv_file_response(request=request, locations=locations)
@@ -861,7 +866,7 @@ class TestLocationExport(TestCase):
         """ Test getting the csv http response as an authenticated user; all fields should be in the csv"""        
         # Request the csv file http response
         request = HttpRequest()
-        request.user = self.user
+        set_current_user(self.user)
         locations = Location.objects.all()
         # Call the function to get the csv file reponse
         response = get_csv_file_response(request=request, locations=locations)

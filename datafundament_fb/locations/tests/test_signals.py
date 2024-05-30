@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from locations.models import Location, LocationData, LocationProperty, PropertyOption, ExternalService, LocationExternalService, PropertyGroup, Log
 from locations.signals import disconnect_signals, connect_signals
-
+from shared.middleware import set_current_user
 
 class TestReorderObjects(TestCase):
     def setUp(self) -> None:
@@ -78,6 +78,8 @@ class TestLogging(TestCase):
         self.location_external_service = LocationExternalService(
             location=self.location, external_service=self.external_service, external_location_code='Code', last_modified_by=self.user, 
         )
+        # set current user 
+        set_current_user(self.user)
     
     def test_property_create_log(self):
         """

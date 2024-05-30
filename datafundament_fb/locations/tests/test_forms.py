@@ -5,12 +5,15 @@ from locations.forms import LocationDataForm, LocationListForm
 from locations.models import Location, LocationProperty, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
-
+from shared.middleware import set_current_user
 
 class TestLocationDataForm(TestCase):
     def setUp(self) -> None:
         # Disable signals called for log events
         disconnect_signals()
+        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        # set curren_user object
+        set_current_user(self.user)
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
@@ -44,8 +47,7 @@ class TestLocationDataForm(TestCase):
             location_property=self.multichoice_property, option='Bus')
         self.external_service = ExternalService.objects.create(
             name='Externe service', short_name='extservice')
-        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
-        self.location_data_form = LocationDataForm(user=self.user)
+        self.location_data_form = LocationDataForm()
 
     def test_location_property_form_fields(self):
         """
@@ -118,7 +120,7 @@ class TestLocationDataForm(TestCase):
         undefined_property = LocationProperty.objects.create(short_name='undefined', label='Undefined property', property_type='onbekend')
         field = self.location_data_form.fields[self.boolean_property.short_name] 
         with self.assertRaises(ValueError) as value_error:
-            LocationDataForm(user=self.user)
+            LocationDataForm()
         
         # Verify the error message
         self.assertIn(
@@ -130,6 +132,9 @@ class TestLocationListForm(TestCase):
     def setUp(self) -> None:
         # Disable signals called for log events
         disconnect_signals()
+        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        # Set current user object
+        set_current_user(self.user)
         self.public_property = LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)
         self.private_property = LocationProperty.objects.create(
@@ -146,8 +151,7 @@ class TestLocationListForm(TestCase):
             pandcode=24002, name='Stopera', is_archived=False)
         Location.objects.create(
             pandcode=24003, name='Ambtswoning', is_archived=True )
-        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
-        LocationProcessor(user=self.user, data={
+        LocationProcessor(data={
             'pandcode': '24001',
             'naam': 'Stadhuis',
             'public': 'Publieke info',
@@ -155,7 +159,7 @@ class TestLocationListForm(TestCase):
             'choice': 'Keuze optie',
             'external': 'Externe code 24001',
         }).save()
-        LocationProcessor(user=self.user, data={
+        LocationProcessor(data={
             'pandcode': '24002',
             'naam': 'Stopera',
             'public': 'Publieke info',
@@ -163,7 +167,7 @@ class TestLocationListForm(TestCase):
             'choice': 'Keuze optie',
             'external': 'Externe code 24002',
         }).save()
-        LocationProcessor(user=self.user, data={
+        LocationProcessor(data={
             'pandcode': '24003',
             'naam': 'Ambtswoning',
             'public': 'Publieke info',
@@ -174,7 +178,7 @@ class TestLocationListForm(TestCase):
 
     def test_search_form_fields_authenticated(self):
         # Render the form as an authenticated user
-        location_list_form = LocationListForm(user=self.user)
+        location_list_form = LocationListForm()
 
         # Verify the form fields
         # Property field
@@ -204,8 +208,8 @@ class TestLocationListForm(TestCase):
 
     def test_search_form_field_anonymous(self):
         # Render the form as an anonymous user
-        user = AnonymousUser()
-        location_list_form = LocationListForm(user=user)
+        set_current_user(AnonymousUser())
+        location_list_form = LocationListForm()
 
         # Verify the form fields
         # Property field
