@@ -8,6 +8,7 @@
 {% block nav-breadcrumbs %}{% endblock %}
 
 {% block content %}
+<h2>Aanmelden</h2>
 <div id="content-main">
 <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
