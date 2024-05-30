@@ -4,7 +4,7 @@ from locations.models import (
     PropertyGroup, LocationProperty, ExternalService, Location, LocationProperty, ExternalService, LocationData,
     LocationExternalService, PropertyOption)
 from shared.utils import reorder_grouped_objects, add_log, get_log_parameters
-
+from shared.middleware import get_current_user
 
 @receiver(post_save, sender=PropertyGroup)
 @receiver(post_save, sender=ExternalService)
@@ -18,6 +18,7 @@ def property_create_log(instance, raw, created, **kwargs):
     """
     Create a log whenever the value of a location property is added
     """
+    user = get_current_user()
     # Skip when importing fixtures
     if raw:
         return
@@ -30,7 +31,7 @@ def property_create_log(instance, raw, created, **kwargs):
             # Only create a log when the property has location data
             if instance_value:
                 message = f"Waarde ({instance_value}) gezet."
-                add_log(instance.location, instance.last_modified_by, target, message)
+                add_log(instance.location, user, target, message)
 
 @receiver(pre_save, sender=LocationData)
 @receiver(pre_save, sender=LocationExternalService)
@@ -38,6 +39,7 @@ def property_change_log(sender, instance, raw, **kwargs):
     """
     Create a log whenever the value of a location property changes
     """
+    user = get_current_user()
     # Skip when importing fixtures
     if raw:
         return
@@ -52,16 +54,17 @@ def property_change_log(sender, instance, raw, **kwargs):
 
             if current_value != instance_value:
                 message = f"Waarde was ({current_value}), is gewijzigd naar ({instance_value})."
-                add_log(instance.location, instance.last_modified_by, target, message)
+                add_log(instance.location, user, target, message)
 
 @receiver(pre_delete, sender=LocationData)
 def property_delete_log(instance, **kwargs):
     """
     When a location property of the type 'multiple' is deleted a log entry is added
     """
+    user = get_current_user()
     target = instance.location_property.label
     message = f"Waarde ({instance.value}) verwijderd."
-    add_log(instance.location, instance.last_modified_by, target, message)
+    add_log(instance.location, user, target, message)
 
 @receiver(post_save, sender=ExternalService)
 @receiver(post_save, sender=PropertyOption)
@@ -71,6 +74,7 @@ def model_create_log(instance, raw, created, **kwargs):
     """
     Create a log event whenever an instance of one of these models is added or modified 
     """
+    user = get_current_user()
     # Skip when importing fixtures
     if raw:
         return
@@ -78,7 +82,7 @@ def model_create_log(instance, raw, created, **kwargs):
     if created:
         target = instance._meta.verbose_name
         message = f'{instance} is aangemaakt.'
-        add_log(None, instance.last_modified_by, target, message)
+        add_log(None, user, target, message)
 
 @receiver(pre_save, sender=ExternalService)
 @receiver(pre_save, sender=PropertyOption)
@@ -89,6 +93,7 @@ def model_change_log(sender, instance, raw, **kwargs):
     Create a log event whenever an instance of one of these models is added or modified 
     """
     # Skip when importing fixtures
+    user = get_current_user()
     if raw:
         return
 
@@ -102,7 +107,7 @@ def model_change_log(sender, instance, raw, **kwargs):
 
             if current_value != instance_value:
                 message = f"Waarde was ({current_value}), is gewijzigd naar ({instance_value})."
-                add_log(instance, instance.last_modified_by, target, message)
+                add_log(instance, user, target, message)
 
 @receiver(pre_delete, sender=Location)
 @receiver(pre_delete, sender=PropertyOption)
@@ -112,9 +117,10 @@ def model_delete_log(instance, **kwargs):
     """
     Whenever an instance of one of the above models is deleted a log event is created 
     """
+    user = get_current_user()
     target = instance._meta.verbose_name
     message = f"{instance} is verwijderd."
-    add_log(None, instance.last_modified_by, target, message)
+    add_log(None, user, target, message)
 
 def disconnect_signals():
     """
