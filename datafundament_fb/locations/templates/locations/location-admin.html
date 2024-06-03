@@ -1,9 +1,13 @@
-{% extends 'admin/admin_base.html' %}
+{% extends 'site-base.html' %}
 {% load i18n static%}
+
+{% block title %}
+| Beheer
+{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <a href="/">Home</a>
     <span>&rsaquo;</span>
     Beheer
 </div>
@@ -25,7 +29,7 @@
         | Overzicht van alle locaties en het toevoegen, wijzigen van bestaande.
     </li>
     <li>
-        <a href="{% url 'locationproperty-list' %}">
+        <a href="{% url 'locations_urls:locationproperty-list' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -36,7 +40,7 @@
         | Voor het beheren van de locatie eigenschappen.
     </li>
     <li>
-        <a href="{% url 'propertygroup-list' %}">
+        <a href="{% url 'locations_urls:propertygroup-list' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -47,7 +51,7 @@
         | Voor het groeperen van de locatie eigenschappen.
     </li>
     <li>
-        <a href="{% url 'externalservice-list' %}">
+        <a href="{% url 'locations_urls:externalservice-list' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
@@ -66,7 +70,7 @@
             </span>
             Data importeren
         </a>
-        | Voor het importeren van nieuwe en gewijzigde locaties middels een CSV bestand. 
+        | Voor het importeren van nieuwe en gewijzigde locaties middels een CSV bestand.
     </li>
     <li>
         <a href="{% url 'locations_urls:location-export' %}">
@@ -80,7 +84,7 @@
         | Voor het exporteren van de locaties naar een CSV bestand.
     </li>
     <li>
-        <a href="{% url 'location-log' %}">
+        <a href="{% url 'locations_urls:location-log' %}">
             <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                     <path fill-rule="evenodd" d="m9.757 32-2.9-2.91L19.937 16 6.857 2.91 9.757 0l16 16z"></path>
