@@ -131,7 +131,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Auth settings
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = '/auth/login'
+LOGIN_REDIRECT_URL = '/locaties/beheer'
 LOGOUT_REDIRECT_URL = '/'
 
 # CSRF settings

@@ -1,0 +1,39 @@
+{% extends "site-base.html" %}
+{% load i18n static utils %}
+
+{% block title %}
+| Login
+{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<h2>Aanmelden</h2>
+<div id="content-main">
+<form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="data-view-row">
+        <div class="data-label">
+            <label for="username">{{ form.username.label_tag }}</label>
+        </div>
+        <div class="data-value">
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+    </div>
+    <div class="data-view-row">
+        <div class="data-label">
+            <label for="username">{{ form.password.label_tag }}</label>
+        </div>
+        <div class="data-value">
+            {{ form.password }}
+            {{ form.password.errors }}
+        </div>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_login" value="Login">Aanmelden</button>
+        <a href="/" class="btn btn-secundair">Annuleren</a>
+    </div>
+</form>
+{% endblock %}

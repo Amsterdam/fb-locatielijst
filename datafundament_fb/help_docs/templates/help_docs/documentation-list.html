@@ -1,12 +1,13 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n static admin_urls admin_modify %}
+{% extends 'site-base.html' %}
+{% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+{% block title %}
+| Help
+{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
+    <a href="/">Home</a>
     <span>&rsaquo;</span>
     Help
 </div>

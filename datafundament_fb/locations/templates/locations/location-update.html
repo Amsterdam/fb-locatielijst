@@ -1,19 +1,15 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify %}
+{% extends 'site-base.html' %}
+{% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+{% block title %}
+| {{ location_data.pandcode }} - {{ location_data.naam }} wijzigen
+{% endblock %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'locations_urls:location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
-    <span>&rsaquo;</span>
-    Wijzigen
-</div>
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+<a href="{% url 'locations_urls:location-detail' location_data.pandcode %}">{{ location_data.naam }}</a>
+<span>&rsaquo;</span>
+Wijzigen
 {% endblock %}
 
 {% if messages %}
