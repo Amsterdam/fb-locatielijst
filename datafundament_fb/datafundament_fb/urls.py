@@ -15,37 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path
 from locations.views import (
-    home_page, LocationAdminView, LocationLogView, 
-    LocationPropertyListView, LocationPropertyCreateView, LocationPropertyUpdateView, LocationPropertyDeleteView,
-    PropertyOptionListView, PropertyOptionCreateView, PropertyOptionUpdateView, PropertyOptionDeleteView,
-    PropertyGroupListView, PropertyGroupCreateView, PropertyGroupUpdateView, PropertyGroupDeleteView,
-    ExternalServivceListView, ExternalServiceCreateView, ExternalServiceUpdateView, ExternalServiceDeleteView,
+    home_page,
 )
 
 urlpatterns = [
+    path('auth/login', LoginView.as_view(template_name='login.html'), name='login'),
+    path('auth/logout', LogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),
     path('locaties/', include(('locations.urls', 'locations'), namespace='locations_urls')),
     path('help/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
-    path('beheer/', view=LocationAdminView.as_view(), name='location-admin'),
-    path('beheer/log/', view=LocationLogView.as_view(), name='location-log'),
-    path('beheer/log/<int:pandcode>', view=LocationLogView.as_view(), name='location-detail-log'),
-    path('beheer/locatie-eigenschappen/', view=LocationPropertyListView.as_view(), name='locationproperty-list'),
-    path('beheer/locatie-eigenschappen/new', view=LocationPropertyCreateView.as_view(), name='locationproperty-create'),
-    path('beheer/locatie-eigenschappen/<int:pk>/edit', view=LocationPropertyUpdateView.as_view(), name='locationproperty-update'),
-    path('beheer/locatie-eigenschappen/<int:pk>/delete', view=LocationPropertyDeleteView.as_view(), name='locationproperty-delete'),
-    path('beheer/locatie-eigenschappen/<int:lp_pk>/opties/', view=PropertyOptionListView.as_view(), name='propertyoption-list'),
-    path('beheer/locatie-eigenschappen/<int:lp_pk>/opties/new', view=PropertyOptionCreateView.as_view(), name='propertyoption-create'),
-    path('beheer/locatie-eigenschappen/<int:lp_pk>/opties/<int:pk>/edit', view=PropertyOptionUpdateView.as_view(), name='propertyoption-update'),
-    path('beheer/locatie-eigenschappen/<int:lp_pk>/opties/<int:pk>/delete', view=PropertyOptionDeleteView.as_view(), name='propertyoption-delete'),
-    path('beheer/eigenschap-groepen/', view=PropertyGroupListView.as_view(), name='propertygroup-list'),
-    path('beheer/eigenschap-groepen/new', view=PropertyGroupCreateView.as_view(), name='propertygroup-create'),
-    path('beheer/eigenschap-groepen/<int:pk>/edit', view=PropertyGroupUpdateView.as_view(), name='propertygroup-update'),
-    path('beheer/eigenschap-groepen/<int:pk>/delete', view=PropertyGroupDeleteView.as_view(), name='propertygroup-delete'),
-    path('beheer/externe-koppelingen/', view=ExternalServivceListView.as_view(), name='externalservice-list'),
-    path('beheer/externe-koppelingen/new', view=ExternalServiceCreateView.as_view(), name='externalservice-create'),
-    path('beheer/externe-koppelingen/<int:pk>/edit', view=ExternalServiceUpdateView.as_view(), name='externalservice-update'),
-    path('beheer/externe-koppelingen/<int:pk>/delete', view=ExternalServiceDeleteView.as_view(), name='externalservice-delete'),
     path('', home_page, name='home'),
 ]

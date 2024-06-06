@@ -1,18 +1,17 @@
-{% extends 'locations/generic-list.html' %}
-{% load i18n static admin_urls admin_modify utils %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
-    <span>&rsaquo;</span>
-    {{ object.label }}
-    <span>&rsaquo;</span>
-    Wijzigen
-</div>
+{% block title %}
+| {{ object.label }} wijzigen
+{% endblock %}
+
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+<a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
+<span>&rsaquo;</span>
+{{ object.label }}
+<span>&rsaquo;</span>
+Wijzigen
 {% endblock %}
 
 {% block content %}
@@ -49,7 +48,7 @@
         </ul>
     </div>
     <div class="btn-container">
-        <a href="{% url 'propertyoption-list' object.id %}" class="btn btn-secundair">Keuze opties beheren</a>
+        <a href="{% url 'locations_urls:propertyoption-list' object.id %}" class="btn btn-secundair">Keuze opties beheren</a>
     </div>
     {% endif %}
     <div class="btn-container">

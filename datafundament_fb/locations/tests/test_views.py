@@ -289,7 +289,7 @@ class LocationDetailViewTest(TestCase):
 
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-detail', args=[self.location.pandcode])
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-detail', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
         # Verify that the location is not archived
@@ -330,7 +330,7 @@ class LocationCreateViewTest(TestCase):
         response = self.client.get(reverse('locations_urls:location-create'))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-create')
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-create')
         self.assertEqual(response.url, url)
 
     def test_get_view_authenticated(self):
@@ -449,7 +449,7 @@ class LocationUpdateViewTest(TestCase):
         response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-update', args=[self.location.pandcode])
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-update', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
     def test_get_view_authenticated(self):
@@ -937,7 +937,7 @@ class TestLocationAdminView(TestCase):
     def test_get_view_authenticated(self):
         """Test requesting the view as an authenticated user"""
         # Request the location admin page
-        response = self.client.get(reverse('location-admin'))
+        response = self.client.get(reverse('locations_urls:location-admin'))
         self.assertEqual(response.status_code, 200)
         # Verify if the correct template is used
         self.assertTemplateUsed(response, 'locations/location-admin.html')
@@ -947,10 +947,10 @@ class TestLocationAdminView(TestCase):
         # Log out the user
         self.client.logout()
         # Requesting the page
-        response = self.client.get(reverse('location-admin'))
+        response = self.client.get(reverse('locations_urls:location-admin'))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('location-admin')
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-admin')
         self.assertEqual(response.url, url)
 
 

@@ -14,7 +14,7 @@ def verbose_name(model, plural=False):
 
 @register.filter
 def reverse_url(instance, view):
-    return instance._meta.model_name + "-" + view
+    return "locations_urls:" + instance._meta.model_name + "-" + view
 
 @register.simple_tag
 def set_query(request, parameter=None, value=None, pop=False):
