@@ -151,4 +151,4 @@ CSP_FRAME_ANCESTORS = ("'none'")
 CSP_FORM_ACTION = ("'self'")
 
 # Automatic redirect to HTTPS
-SECURE_SSL_REDIRECT = bool(int(os.getenv('HTTPS', 1)))
+SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
