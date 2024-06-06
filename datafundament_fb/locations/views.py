@@ -492,7 +492,7 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
         try:
             self.object.delete()
         except (ProtectedError, RestrictedError) as error:
-            messages.error(self.request, f"Optie '{self.object.option} kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld.")
+            messages.error(self.request, f"Optie '{self.object.option}' kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld.")
             return super().form_invalid(form)
         else:
             messages.success(self.request, f"Optie '{self.object.option}' is verwijderd.")
