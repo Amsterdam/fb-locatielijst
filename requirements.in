@@ -1,4 +1,5 @@
 Django
+django-csp
 psycopg2
 pyodbc
 wfastcgi
