@@ -988,3 +988,30 @@ class TestListViewPaginator(TestCase):
         # Verify that the mock attribute is called
         self.assertTrue(mock.called)
 
+
+class TestPropertyOptionDeleteView(TestCase):
+    """
+    Test the PropertyOptionDeleteView
+    """
+    fixtures = [
+        'locations',
+        'property_groups',
+        'location_properties',
+        'property_options',
+        'location_data',
+        'external_services',
+        'location_external_services',
+    ]
+
+    def test_restricted_error(self):
+        # get property option related to a location
+        property_option = PropertyOption.objects.filter(locationdata__location__isnull=False).first()
+        # post delete request
+        url = reverse('locations_urls:propertyoption-delete', args=[property_option.location_property.id, property_option.id])
+        user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        self.client.force_login(user)
+        response = self.client.post(path=url)
+        # check for the error message in the response
+        error_message = [msg for msg in get_messages(response.wsgi_request)][0].message
+        expected_message = f"Optie '{property_option.option}' kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld."
+        self.assertEqual(error_message, expected_message)

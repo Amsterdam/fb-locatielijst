@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError, RestrictedError
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views import View
@@ -487,8 +488,15 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         self.object.last_modified_by = self.request.user
-        messages.success(self.request, f"Optie '{self.object.option}' is verwijderd.")
-        return super().form_valid(form)
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+        except (ProtectedError, RestrictedError) as error:
+            messages.error(self.request, f"Optie '{self.object.option}' kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld.")
+            return super().form_invalid(form)
+        else:
+            messages.success(self.request, f"Optie '{self.object.option}' is verwijderd.")
+            return HttpResponseRedirect(success_url)(success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
