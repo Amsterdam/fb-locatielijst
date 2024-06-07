@@ -78,7 +78,7 @@ def model_create_log(instance, raw, created, **kwargs):
     if created:
         target = instance._meta.verbose_name
         message = f'{instance} is aangemaakt.'
-        add_log(None, instance.last_modified_by, target, message)
+        add_log(instance, instance.last_modified_by, target, message)
 
 @receiver(pre_save, sender=ExternalService)
 @receiver(pre_save, sender=PropertyOption)
@@ -114,7 +114,7 @@ def model_delete_log(instance, **kwargs):
     """
     target = instance._meta.verbose_name
     message = f"{instance} is verwijderd."
-    add_log(None, instance.last_modified_by, target, message)
+    add_log(instance, instance.last_modified_by, target, message)
 
 def disconnect_signals():
     """

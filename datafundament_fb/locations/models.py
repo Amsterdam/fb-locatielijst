@@ -252,28 +252,30 @@ class Log(models.Model):
     """
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, null=True, blank=True)
-    property_option = models.ForeignKey(PropertyOption, on_delete=models.CASCADE, null=True, blank=True)
-    external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, null=True, blank=True)
+    instance_name = models.CharField(verbose_name='Object', max_length=50)
+    instance_id = models.IntegerField(verbose_name='Id')
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+    location_property = models.ForeignKey(LocationProperty, on_delete=models.SET_NULL, null=True, blank=True)
+    property_option = models.ForeignKey(PropertyOption, on_delete=models.SET_NULL, null=True, blank=True)
+    external_service = models.ForeignKey(ExternalService, on_delete=models.SET_NULL, null=True, blank=True)
     target = models.CharField(max_length=100)
     message = models.CharField(max_length=1000)
 
     @property
     def instance(self):
-        model = None
+        instance = None
         if self.location:
-            model = self.location
+            instance = self.location
         if self.location_property:
-            model = self.location_property
+            instance = self.location_property
         if self.property_option:
-            model = self.property_option
+            instance = self.property_option
         if self.external_service:
-            model = self.external_service
-        return model
+            instance = self.external_service
+        return instance
     
     @instance.setter
-    def model(self, instance):
+    def instance(self, instance):
         match instance.__class__.__name__:
             case 'Location':
                 self.location = instance
@@ -282,7 +284,9 @@ class Log(models.Model):
             case 'PropertyOption':
                 self.property_option = instance
             case 'ExternalService':
-                self.external_service = instance            
+                self.external_service = instance
+        self.instance_name = instance._meta.verbose_name
+        self.instance_id = instance.id
 
     class Meta:
         verbose_name = 'Datafundament log'
@@ -290,5 +294,5 @@ class Log(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return f'{self.model}, {self.user}, {self.target}, {self.message}'
+        return f'{self.instance}, {self.user}, {self.target}, {self.message}'
 

@@ -32,11 +32,11 @@ def reorder_grouped_objects(sender, instance, raw, **kwargs):
             sender.objects.filter(id=object.id).update(order=index)
             index += 1    
 
-def add_log(model, user, target, message):
+def add_log(instance, user, target, message):
     """
     Write a log entry to the database
     """
-    Log.objects.create(model=model, user=user, target=target, message=message)
+    Log.objects.create(instance=instance, user=user, target=target, message=message)
 
 def get_log_parameters(instance)-> list:
     """
