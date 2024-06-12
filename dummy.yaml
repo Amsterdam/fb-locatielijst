@@ -1,0 +1,4 @@
+jobs:
+- job: A
+  steps:
+  - bash: echo "A"
