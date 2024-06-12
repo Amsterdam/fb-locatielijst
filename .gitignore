@@ -91,3 +91,6 @@ data/
 # vim
 *.swp
 *.swo
+
+# webserver
+*web.config
