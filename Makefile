@@ -88,3 +88,6 @@ dumpdata:                           ## Create a json dump. Optionally use models
 fixtures = locations location_properties property_options location_data external_services location_external_services location_docs property_groups
 loaddata:                           ## Load $fixtures. Multiple fixtures can be loaded (space seperated), i.e. fixtures=fixture1 fixture2; or a json file, i.e. fixtures=dump.json
 	$(manage) loaddata $(fixtures)
+
+push:                              ## Push to container registry
+	$(dc) push 
