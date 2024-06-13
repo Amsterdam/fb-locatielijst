@@ -66,9 +66,6 @@ coverage.xml
 # Django stuff:
 *.log
 
-# DotEnv configuration
-*.env
-
 # Database
 *.db
 *.rdb
