@@ -214,7 +214,7 @@ class TestLogging(TestCase):
 
     def test_model_delete_log(self):
         """
-        Test logging delete events for for ExternalService, PropertyOption, LocationProperty and Location
+        Test logging delete events for for ExternalService, LocationProperty, PropertyOption and Location
         """
         instances = [self.location, self.location_property, self.external_service]
         for instance in instances:
@@ -241,3 +241,30 @@ class TestLogging(TestCase):
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.target, self.property_option._meta.verbose_name)
         self.assertEqual(log.message, f"{self.property_option} is verwijderd.")
+
+    def test_location_property_delete(self):
+        """
+        Test casceded logging for LocationProperty.
+        When a LocationProperty is deleted, all cascaded LocationData and PropertyOption should be deleted and logged as well. 
+        """
+        # Testing PropertyOption seperately because of dependen on LocationProperty
+        # Save the instance
+        self.location.save()
+        self.location_property.save()
+        self.property_option.save()
+        self.location_data._value = None
+        self.location_data._property_option = self.property_option
+        self.location_data.save()
+        # Delete the LocationProperty
+        self.location_property.delete()
+        
+        # Check resulting log.
+        log = Log.objects.all()
+        # For deleted LocationData
+        self.assertEqual(log[2].message, f"Waarde ({self.location_data.value}) verwijderd.")
+        # For deleted PropertyOption
+        self.assertEqual(log[1].message, f"{self.property_option} is verwijderd.")
+        # For deleted LocationProperty
+        self.assertEqual(log[0].message, f"{self.location_property} is verwijderd.")
+
+    
