@@ -1,22 +1,21 @@
-{% extends 'locations/generic-list.html' %}
-{% load i18n static admin_urls admin_modify utils %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'locationproperty-list' %}">{{ location_property|verbose_name:'plural' }}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'locationproperty-update' location_property.id %}">{{ location_property.label }}</a>
-    <span>&rsaquo;</span>
-    Keuze opties
-</div>
+{% block title %}
+| {{ model|verbose_name:'plural' }}
+{% endblock %}
+
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+<a href="{% url 'locations_urls:locationproperty-list' %}">{{ location_property|verbose_name:'plural' }}</a>
+<span>&rsaquo;</span>
+<a href="{% url 'locations_urls:locationproperty-update' location_property.id %}">{{ location_property.label }}</a>
+<span>&rsaquo;</span>
+Keuze opties
 {% endblock %}
 
 {% block content %}
-<h2>{{ location_property.label }}</h2>
+<h2>{{ model|verbose_name:'plural' }}</h2>
 <div class="page-content">
     <table class="table-adam">
         <thead>
@@ -28,7 +27,7 @@
             {% for object in object_list %}
             <tr>
                 <td>
-                    <a href="{% url 'propertyoption-update' location_property.id object.id %}">{{ object.option }}</a>
+                    <a href="{% url 'locations_urls:propertyoption-update' location_property.id object.id %}">{{ object.option }}</a>
                 </td>
             </tr>
             {% empty %}
@@ -36,8 +35,8 @@
         </tbody>
     </table>
     <div class="btn-container">
-        <a href="{% url 'propertyoption-create' location_property.id %}" class="btn btn-primair">Aanmaken</a>
-        <a href="{% url 'locationproperty-update' location_property.id %}" class="btn btn-secundair">Terug</a>
+        <a href="{% url 'locations_urls:propertyoption-create' location_property.id %}" class="btn btn-primair">Toevoegen</a>
+        <a href="{% url 'locations_urls:locationproperty-update' location_property.id %}" class="btn btn-secundair">Terug</a>
     </div>
 </div>
 {% endblock %}

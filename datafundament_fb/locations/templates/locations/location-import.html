@@ -1,26 +1,14 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify %}
+{% extends 'site-base.html' %}
+{% load i18n static  %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    {% translate 'Import Locations' %}
-</div>
+{% block title %}
+| Locaties importeren
 {% endblock %}
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
-</ul>
-{% endif %}
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+Import
+{% endblock %}
 
 {% block content %}
 <h2>Locaties importeren</h2>

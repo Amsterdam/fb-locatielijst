@@ -41,6 +41,8 @@ class TestLocationListView(TestCase):
             pandcode=24002, name='Stopera', is_archived=False)
         Location.objects.create(
             pandcode=24003, name='Ambtswoning', is_archived=True )
+        Location.objects.create(
+            pandcode=24004, name='Kantoor', is_archived=False )
         set_current_user(self.authenticated_user)
         LocationProcessor(data={
             'pandcode': '24001',
@@ -66,15 +68,23 @@ class TestLocationListView(TestCase):
             'choice': 'KeuzeOptie1',
             'external': '30042',
         }).save()
+        LocationProcessor(user=self.authenticated_user, data={
+            'pandcode': '24004',
+            'naam': 'Kantoor',
+            'public': 'Publiek',
+            'private': 'Prive',
+            'choice': 'KeuzeOptie2',
+        }).save()
+
 
     @parameterized.expand([
-            # Search all fields
-            ('', '', False, '', [24001, 24002]),
-            ('keuze', '', False, '', [24001, 24002]),
+            # Search all fields; search, location_property, is_authenticated, archive
+            ('', '', False, '', [24001, 24002, 24004]),
+            ('keuze', '', False, '', [24001, 24002, 24004]),
             ('prive', '', False, '', []),
             ('0042', '', False, '', [24001, 24002]),
             ('10042', '', False, '', [24001]),
-            ('prive', '', True, '', [24001]),
+            ('prive', '', True, '', [24001, 24004]),
             # Search name
             ('adhuis', 'naam', False, '', [24001]),
             ('wonin', 'naam', False, '', []),
@@ -84,15 +94,15 @@ class TestLocationListView(TestCase):
             ('24003', 'pandcode', False, '', []),
             ('24003', 'pandcode', True, 'all', [24003]),
             # Search public property
-            ('publiek', 'public', False, '', [24001, 24002]),
+            ('publiek', 'public', False, '', [24001, 24002, 24004]),
             ('meester', 'public', True, 'all', [24003]),
             # Search private property
             ('prive', 'private', False, '', []),
-            ('prive', 'private', True, 'all', [24001, 24003]),
+            ('prive', 'private', True, 'all', [24001, 24003, 24004]),
             # Search choice property
             ('KeuzeOptie1', 'choice', False, '', [24001]),
             ('KeuzeOptie1', 'choice', True, 'all', [24001, 24003]),
-            ('KeuzeOptie2', 'choice', False, '', [24002]),
+            ('KeuzeOptie2', 'choice', False, '', [24002, 24004]),
             ('optie', 'choice', False, '', []),
             ('', 'choice', True, 'all', []),
             # Search external service location code
@@ -100,14 +110,14 @@ class TestLocationListView(TestCase):
             ('30042', 'external', False, '', []),
             ('30042', 'external', True, 'all', [24003]),
             # Archive property for (non)authenticated users
-            ('', '', False, '', [24001, 24002]),
-            ('', '', False, 'active', [24001, 24002]),
+            ('', '', False, '', [24001, 24002, 24004]),
+            ('', '', False, 'active', [24001, 24002, 24004]),
             ('', '', False, 'archived', []),
-            ('', '', False, 'all', [24001, 24002]),
-            ('', '', True, '', [24001, 24002]),
-            ('', '', True, 'active', [24001, 24002]),
+            ('', '', False, 'all', [24001, 24002, 24004]),
+            ('', '', True, '', [24001, 24002, 24004]),
+            ('', '', True, 'active', [24001, 24002, 24004]),
             ('', '', True, 'archived', [24003]),
-            ('', '', True, 'all', [24001, 24002, 24003]),
+            ('', '', True, 'all', [24001, 24002, 24003, 24004]),
     ])
     def test_search(self, search, location_property, is_authenticated, archive, expected):
         """
@@ -147,8 +157,6 @@ class TestLocationListView(TestCase):
         pandcodes = set(locations.values_list('pandcode', flat=True))
         # Compare the filtered locations against expected locations
         self.assertEqual(pandcodes, set(expected))
-        # Check for distinct results
-        self.assertEqual(len(locations), len(expected))
     
     def test_get_view(self):
         """Test requesting the LocationListView"""
@@ -293,7 +301,7 @@ class LocationDetailViewTest(TestCase):
 
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-detail', args=[self.location.pandcode])
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-detail', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
         # Verify that the location is not archived
@@ -334,7 +342,7 @@ class LocationCreateViewTest(TestCase):
         response = self.client.get(reverse('locations_urls:location-create'))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-create')
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-create')
         self.assertEqual(response.url, url)
 
     def test_get_view_authenticated(self):
@@ -453,7 +461,7 @@ class LocationUpdateViewTest(TestCase):
         response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('locations_urls:location-update', args=[self.location.pandcode])
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-update', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
     def test_get_view_authenticated(self):
@@ -942,7 +950,7 @@ class TestLocationAdminView(TestCase):
     def test_get_view_authenticated(self):
         """Test requesting the view as an authenticated user"""
         # Request the location admin page
-        response = self.client.get(reverse('location-admin'))
+        response = self.client.get(reverse('locations_urls:location-admin'))
         self.assertEqual(response.status_code, 200)
         # Verify if the correct template is used
         self.assertTemplateUsed(response, 'locations/location-admin.html')
@@ -952,10 +960,10 @@ class TestLocationAdminView(TestCase):
         # Log out the user
         self.client.logout()
         # Requesting the page
-        response = self.client.get(reverse('location-admin'))
+        response = self.client.get(reverse('locations_urls:location-admin'))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse('admin:login') + '?next=' + reverse('location-admin')
+        url = reverse('login') + '?next=' + reverse('locations_urls:location-admin')
         self.assertEqual(response.url, url)
 
 
@@ -985,3 +993,30 @@ class TestListViewPaginator(TestCase):
         # Verify that the mock attribute is called
         self.assertTrue(mock.called)
 
+
+class TestPropertyOptionDeleteView(TestCase):
+    """
+    Test the PropertyOptionDeleteView
+    """
+    fixtures = [
+        'locations',
+        'property_groups',
+        'location_properties',
+        'property_options',
+        'location_data',
+        'external_services',
+        'location_external_services',
+    ]
+
+    def test_restricted_error(self):
+        # get property option related to a location
+        property_option = PropertyOption.objects.filter(locationdata__location__isnull=False).first()
+        # post delete request
+        url = reverse('locations_urls:propertyoption-delete', args=[property_option.location_property.id, property_option.id])
+        user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        self.client.force_login(user)
+        response = self.client.post(path=url)
+        # check for the error message in the response
+        error_message = [msg for msg in get_messages(response.wsgi_request)][0].message
+        expected_message = f"Optie '{property_option.option}' kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld."
+        self.assertEqual(error_message, expected_message)

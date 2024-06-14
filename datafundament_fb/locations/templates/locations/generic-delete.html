@@ -1,21 +1,17 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify utils %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+{% block title %}
+| {{ object|verbose_name:'plural' }} verwijderen
+{% endblock %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
-    <span>&rsaquo;</span>
-    {% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}
-    <span>&rsaquo;</span>
-    Verwijderen
-</div>
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+<a href="{% url object|reverse_url:'list' %}">{{ object|verbose_name:'plural' }}</a>
+<span>&rsaquo;</span>
+{% if object.label %}{{ object.label }}{% else %}{{ object.name }}{% endif %}
+<span>&rsaquo;</span>
+Verwijderen
 {% endblock %}
 
 {% block content %}

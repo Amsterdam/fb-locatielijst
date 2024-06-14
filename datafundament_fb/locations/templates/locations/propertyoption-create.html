@@ -1,23 +1,19 @@
-{% extends 'admin/admin_base.html' %}
-{% load i18n admin_urls static admin_modify utils %}
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+{% block title %}
+| {{ location_property.label }} optie toevoegen
+{% endblock %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'locations_urls:location-list' %}">Home</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'location-admin' %}">{% translate 'Beheer' %}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'locationproperty-list' %}">{{ location_property|verbose_name:'plural' }}</a>
-    <span>&rsaquo;</span>
-    <a href="{% url 'locationproperty-update' location_property.id %}">{{ location_property.label }}</a>
-    <span>&rsaquo;</span>
-    Optie
-    <span>&rsaquo;</span>
-    Toevoegen
-</div>
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+<a href="{% url 'locations_urls:locationproperty-list' %}">{{ location_property|verbose_name:'plural' }}</a>
+<span>&rsaquo;</span>
+<a href="{% url 'locations_urls:locationproperty-update' location_property.id %}">{{ location_property.label }}</a>
+<span>&rsaquo;</span>
+Optie
+<span>&rsaquo;</span>
+Toevoegen
 {% endblock %}
 
 {% block content %}
@@ -38,8 +34,8 @@
     </div>
     {% endfor %}
     <div class="btn-container">
-        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'propertyoption-create' location_property.id  %}">Aanmaken</button>
-        <a href="{% url 'propertyoption-list' location_property.id %}" class="btn btn-secundair">Annuleren</a>
+        <button class="btn btn-primair" type="submit" name="_save" value="Save" formaction="{% url 'locations_urls:propertyoption-create' location_property.id  %}">Toevoegen</button>
+        <a href="{% url 'locations_urls:propertyoption-list' location_property.id %}" class="btn btn-secundair">Annuleren</a>
     </div>
 </form>
 

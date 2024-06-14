@@ -30,8 +30,8 @@ class LocationUtilsTest(TestCase):
         """Test reverse url path from instance"""
 
         # Test list view and empty view
-        self.assertEqual(reverse_url(Location, 'list'), 'location-list')
-        self.assertEqual(reverse_url(Location, ''), 'location-')
+        self.assertEqual(reverse_url(Location, 'list'), 'locations_urls:location-list')
+        self.assertEqual(reverse_url(Location, ''), 'locations_urls:location-')
 
     def test_get_order(self):
         client = Client()

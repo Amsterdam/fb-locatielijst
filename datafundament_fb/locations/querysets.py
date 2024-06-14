@@ -61,12 +61,18 @@ class LocationQuerySet(QuerySet):
         # Filter if archive value
         qfilter &= filter_on_archive(archive_value)
 
-        # If a user is not authenticated, filter for active locations and public properties only
+        # Filter the results for non authentiated (public) users
         if not user.is_authenticated:
+            # Show only active locations
+            qfilter &=  Q(is_archived=False)
+
+            # If a field in the resulting query is not part of a public locationdata or locationexternalservice property, then the result should be filtered for that field.
+            # But it should NOT be filtered when there are no related records for locationdata or locationexternalservice,
+            # because a non existing field is never part of a set (and thus the result will always be empty). Hence the XOR in the filter.
             qfilter &= (
-                Q(is_archived=False) &
-                Q(locationdata__location_property__short_name__in=location_properties) &
-                Q(locationexternalservice__external_service__short_name__in=location_properties))
+                (Q(locationdata__location_property__short_name__in=location_properties) ^ Q(locationdata__isnull=True)) &
+                (Q(locationexternalservice__external_service__short_name__in=location_properties) ^ Q(locationexternalservice__isnull=True))
+            )
 
         return self.filter(qfilter).distinct()
 
