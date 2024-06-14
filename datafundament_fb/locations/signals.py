@@ -4,7 +4,7 @@ from locations.models import (
     PropertyGroup, LocationProperty, ExternalService, Location, LocationProperty, ExternalService, LocationData,
     LocationExternalService, PropertyOption)
 from shared.utils import reorder_grouped_objects, add_log, get_log_parameters
-from shared.middleware import get_current_user
+from shared.context import current_user
 
 @receiver(post_save, sender=PropertyGroup)
 @receiver(post_save, sender=ExternalService)
@@ -18,7 +18,7 @@ def property_create_log(instance, raw, created, **kwargs):
     """
     Create a log whenever the value of a location property is added
     """
-    user = get_current_user()
+    user = current_user.get()
     # Skip when importing fixtures
     if raw:
         return
@@ -39,7 +39,7 @@ def property_change_log(sender, instance, raw, **kwargs):
     """
     Create a log whenever the value of a location property changes
     """
-    user = get_current_user()
+    user = current_user.get()
     # Skip when importing fixtures
     if raw:
         return
@@ -61,7 +61,7 @@ def property_delete_log(instance, **kwargs):
     """
     When a location property of the type 'multiple' is deleted a log entry is added
     """
-    user = get_current_user()
+    user = current_user.get()
     target = instance.location_property.label
     message = f"Waarde ({instance.value}) verwijderd."
     add_log(instance.location, user, target, message)
@@ -74,7 +74,7 @@ def model_create_log(instance, raw, created, **kwargs):
     """
     Create a log event whenever an instance of one of these models is added or modified 
     """
-    user = get_current_user()
+    user = current_user.get()
     # Skip when importing fixtures
     if raw:
         return
@@ -93,7 +93,7 @@ def model_change_log(sender, instance, raw, **kwargs):
     Create a log event whenever an instance of one of these models is added or modified 
     """
     # Skip when importing fixtures
-    user = get_current_user()
+    user = current_user.get()
     if raw:
         return
 
@@ -117,7 +117,7 @@ def model_delete_log(instance, **kwargs):
     """
     Whenever an instance of one of the above models is deleted a log event is created 
     """
-    user = get_current_user()
+    user = current_user.get()
     target = instance._meta.verbose_name
     message = f"{instance} is verwijderd."
     add_log(None, user, target, message)

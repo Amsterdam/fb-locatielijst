@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import get_locationdata_validator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
-from shared.middleware import get_current_user
+from shared.middleware import current_user
 
 class LocationProcessor():
 
@@ -98,7 +98,7 @@ class LocationProcessor():
         when a dict is passed, with the corresponding values
         """
         # User is retrieved form request by middlewhere, default to Anonymous
-        self.user = get_current_user()
+        self.user = current_user.get()
 
         # Set an empty Location instance
         self.location_instance = Location()
@@ -213,7 +213,7 @@ class LocationProcessor():
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
 
-        self.location_instance.last_modified_by = get_current_user()
+        self.location_instance.last_modified_by = current_user.get()
 
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db
