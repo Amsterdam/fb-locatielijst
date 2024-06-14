@@ -5,7 +5,7 @@ from locations.forms import LocationDataForm, LocationListForm
 from locations.models import Location, LocationProperty, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
-from shared.middleware import set_current_user
+from shared.middleware import current_user
 
 class TestLocationDataForm(TestCase):
     def setUp(self) -> None:
@@ -13,7 +13,7 @@ class TestLocationDataForm(TestCase):
         disconnect_signals()
         self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
         # set curren_user object
-        set_current_user(self.user)
+        current_user.set(self.user)
         self.location = Location.objects.create(pandcode='25000', name='Stopera')
         self.boolean_property = LocationProperty.objects.create(
             short_name='bool', label='Boolean', property_type='BOOL')
@@ -134,7 +134,7 @@ class TestLocationListForm(TestCase):
         disconnect_signals()
         self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
         # Set current user object
-        set_current_user(self.user)
+        current_user.set(self.user)
         self.public_property = LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)
         self.private_property = LocationProperty.objects.create(
@@ -208,7 +208,7 @@ class TestLocationListForm(TestCase):
 
     def test_search_form_field_anonymous(self):
         # Render the form as an anonymous user
-        set_current_user(AnonymousUser())
+        current_user.set(AnonymousUser())
         location_list_form = LocationListForm()
 
         # Verify the form fields

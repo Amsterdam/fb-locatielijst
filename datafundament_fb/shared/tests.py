@@ -12,17 +12,17 @@ class TestSharedUtils(TestCase):
     
     def setUp(self) -> None:
         user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
-        location = Location.objects.create(pandcode=24001, name='Stadhuis', is_archived=False, last_modified_by=user,)
+        location = Location.objects.create(pandcode=24001, name='Stadhuis', is_archived=False,)
         location_property = LocationProperty.objects.create(
-            short_name='property', label='Location property', property_type='CHOICE', public=True, last_modified_by=user,)
+            short_name='property', label='Location property', property_type='CHOICE', public=True,)
         property_option = PropertyOption.objects.create(
-            location_property=location_property, option='Optie', last_modified_by=user,)
+            location_property=location_property, option='Optie',)
         external_service = ExternalService.objects.create(
-            name='External service', short_name='service', public=True, last_modified_by=user,)
+            name='External service', short_name='service', public=True,)
         location_data = LocationData.objects.create(
-            location=location, location_property=location_property, _property_option=property_option, last_modified_by=user,)
+            location=location, location_property=location_property, _property_option=property_option,)
         location_external_service = LocationExternalService.objects.create(
-            location=location, external_service=external_service, external_location_code='Code', last_modified_by=user, 
+            location=location, external_service=external_service, external_location_code='Code', 
         )
 
 

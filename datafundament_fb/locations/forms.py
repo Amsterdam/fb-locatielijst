@@ -5,7 +5,7 @@ from locations.models import LocationProperty
 from locations.processors import LocationProcessor
 
 
-def set_location_property_fields(user: bool=False)-> dict:
+def set_location_property_fields()-> dict:
     fields = dict()
     
     # Get all location properties instances
@@ -111,7 +111,7 @@ def set_location_property_fields(user: bool=False)-> dict:
 
     return fields
 
-def set_external_services_fields(user: bool=False) -> dict:
+def set_external_services_fields() -> dict:
     fields = dict()
 
     # Get all external service instances
@@ -137,9 +137,8 @@ class LocationDataForm(forms.Form):
     # Model fields pandcode and last_modified from the Location model are added in the View
 
     def __init__(self, *args, **kwargs):
-        # Set and remove pandcode and user argument before calling init
+        # Set and remove pandcode before calling init
         pandcode = kwargs.pop('pandcode', None)
-        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
         # Add location name field for custom validation
@@ -169,7 +168,6 @@ class LocationListForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
         # Set and remove user argument before calling init
-        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
    
         # Get all LocationProperty and ExternalService objects 

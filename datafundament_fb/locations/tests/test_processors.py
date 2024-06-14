@@ -5,7 +5,7 @@ from django.test import TestCase
 from locations.models import Location, LocationProperty, PropertyOption
 from locations.signals import disconnect_signals
 from locations.processors import LocationProcessor
-from shared.middleware import set_current_user
+from shared.middleware import current_user
 
 
 class TestLocationProcessor(TestCase):
@@ -18,7 +18,7 @@ class TestLocationProcessor(TestCase):
         disconnect_signals()
         self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
         # Set current user; otherwise LocationProcessor will be run as AnonymousUser
-        set_current_user(self.user)
+        current_user.set(self.user)
         self.boolean_property = LocationProperty.objects.create(
             short_name='occupied', label='occupied', property_type='BOOL', required=True, public=True, order=1)
         self.date_property = LocationProperty.objects.create(
@@ -84,7 +84,7 @@ class TestLocationProcessor(TestCase):
         # Location fields and properties filtered by _set_location_properties(); added with fields from location
         # Included properties are public
         # Set current user to Anonymous; otherwise LocationProcessor will be run under a specific user
-        set_current_user(AnonymousUser())
+        current_user.set(AnonymousUser())
         processor = LocationProcessor()
         location_properties = processor.location_properties
         found_location_properties = set(location_properties)
@@ -326,7 +326,7 @@ class TestLocationProcessor(TestCase):
         LocationProcessor(data=self.location_data_dict).save()
 
         # Set current user object as anonymous
-        set_current_user(AnonymousUser())
+        current_user.set(AnonymousUser())
 
         # Get the object
         get_location = LocationProcessor.get(pandcode=self.location_data_dict['pandcode'])

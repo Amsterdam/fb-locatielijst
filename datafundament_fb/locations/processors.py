@@ -28,7 +28,6 @@ class LocationProcessor():
                 location_property=location_property
             )
         if location_data.value != value:
-            location_data.last_modified_by = self.user
             location_data.value = value
             location_data.full_clean()
             location_data.save()
@@ -62,7 +61,6 @@ class LocationProcessor():
                 location=self.location_instance, external_service=external_service
             )
         if location_external_service.external_location_code != value:
-            location_external_service.last_modified_by = self.user
             location_external_service.external_location_code = value
             location_external_service.full_clean()
             location_external_service.save()
@@ -212,8 +210,6 @@ class LocationProcessor():
                 self.location_instance = Location(name=self.naam)
                 # Update this instance with the pandcode
                 self.pandcode = self.location_instance.pandcode
-
-        self.location_instance.last_modified_by = current_user.get()
 
         # Atomic is used to prevent incomplete locations being added;
         # for instance when a specific property value is rejected by the db

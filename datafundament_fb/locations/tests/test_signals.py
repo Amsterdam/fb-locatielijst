@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from locations.models import Location, LocationData, LocationProperty, PropertyOption, ExternalService, LocationExternalService, PropertyGroup, Log
 from locations.signals import disconnect_signals, connect_signals
-from shared.middleware import set_current_user
+from shared.middleware import current_user
 
 class TestReorderObjects(TestCase):
     def setUp(self) -> None:
@@ -66,20 +66,20 @@ class TestLogging(TestCase):
         # Make sure signals are connected
         connect_signals()
         self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
-        self.location = Location(pandcode=24001, name='Stadhuis', is_archived=False, last_modified_by=self.user,)
+        self.location = Location(pandcode=24001, name='Stadhuis', is_archived=False,)
         self.location_property = LocationProperty(
-            short_name='property', label='Locatie eigenschap', property_type='STR', public=True, last_modified_by=self.user,)
+            short_name='property', label='Locatie eigenschap', property_type='STR', public=True,)
         self.property_option = PropertyOption(
-            location_property=self.location_property, option='Optie', last_modified_by=self.user)
+            location_property=self.location_property, option='Optie',)
         self.external_service = ExternalService(
-            name='Externe service', short_name='service', public=True, last_modified_by=self.user,)
+            name='Externe service', short_name='service', public=True,)
         self.location_data = LocationData(
-            location=self.location, location_property=self.location_property, last_modified_by=self.user, _value='Tekst')
+            location=self.location, location_property=self.location_property, _value='Tekst')
         self.location_external_service = LocationExternalService(
-            location=self.location, external_service=self.external_service, external_location_code='Code', last_modified_by=self.user, 
+            location=self.location, external_service=self.external_service, external_location_code='Code', 
         )
         # set current user 
-        set_current_user(self.user)
+        current_user.set(self.user)
     
     def test_property_create_log(self):
         """

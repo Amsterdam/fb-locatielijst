@@ -5,9 +5,7 @@ class CurrentUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        return response
-
-    def process_view(self, request, view_func, view_args, view_kwargs):
         if request.user.is_authenticated:
             current_user.set(request.user)
+        response = self.get_response(request)
+        return response
