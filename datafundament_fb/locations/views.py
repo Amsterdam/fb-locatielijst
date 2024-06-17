@@ -490,7 +490,7 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
             return super().form_invalid(form)
         else:
             messages.success(self.request, f"Optie '{self.object.option}' is verwijderd.")
-            return HttpResponseRedirect(success_url)(success_url)
+            return HttpResponseRedirect(success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

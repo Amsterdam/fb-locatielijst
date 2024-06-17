@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'shared.middleware.CurrentUserMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'datafundament_fb.urls'
@@ -136,5 +137,19 @@ LOGIN_URL = '/auth/login'
 LOGIN_REDIRECT_URL = '/locaties/beheer'
 LOGOUT_REDIRECT_URL = '/'
 
-# CSRF settings
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost').split(',')
+# Cross Site Request Forgery (CSRF) settings
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+CSRF_COOKIE_SECURE = bool(int(os.environ.get("CSRF_COOKIE_SECURE", 1)))
+
+# Content Security Policy (CSP) settings
+CSP_DEFAULT_SRC = ("'none'")
+CSP_STYLE_SRC = ("'self'")
+CSP_SCRIPT_SRC = ("'self'")
+CSP_CONNECT_SRC = ("'self'")
+CSP_IMG_SRC = ("'self'")
+CSP_FONT_SRC = ("'self'")
+CSP_FRAME_ANCESTORS = ("'none'")
+CSP_FORM_ACTION = ("'self'")
+
+# Automatic redirect to HTTPS
+SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
