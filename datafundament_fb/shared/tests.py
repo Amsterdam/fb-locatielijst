@@ -1,8 +1,9 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
+from django.urls import reverse
 from shared.utils import get_log_parameters
+from shared.middleware import current_user
 from locations.models import Location, LocationData, LocationProperty, PropertyOption, ExternalService, LocationExternalService
-
 
 # Create your tests here.
 class TestSharedUtils(TestCase):
@@ -12,6 +13,8 @@ class TestSharedUtils(TestCase):
     
     def setUp(self) -> None:
         user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        # because of CurrentUserMiddleware set current_user to this user
+        current_user.set(user)
         location = Location.objects.create(pandcode=24001, name='Stadhuis', is_archived=False,)
         location_property = LocationProperty.objects.create(
             short_name='property', label='Location property', property_type='CHOICE', public=True,)
@@ -37,3 +40,24 @@ class TestSharedUtils(TestCase):
                 has_attribute = hasattr(model, obj['attribute_name'])
                 self.assertTrue(has_attribute)
                 self.assertIsNotNone(obj['display_name'])
+
+
+
+class TestCurrentUserMiddleware(TestCase):
+    """
+    Test setting a contextvar with the user associated with a request, in case of an authenticated session. Or an 
+    anonymous user for non authenticated requests.
+    """
+
+    def test_authenticated_user(self):
+        # Log in to a restricted page on the website
+        self.user = User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0]
+        self.client.force_login(self.user)
+        response  = self.client.get(reverse('locations_urls:location-admin'))
+        self.assertEqual(response.context['request'].user, current_user.get())
+
+    def test_anonymous_user(self):
+        # Request a page as an anonymous user
+        self.client.logout()
+        response  = self.client.get(reverse('locations_urls:location-list'))
+        self.assertEqual(response.context['request'].user, current_user.get())
