@@ -11,7 +11,7 @@ from locations.models import Location, LocationProperty, LocationData, PropertyO
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
 from locations.views import get_csv_file_response, LocationListView
-from shared.middleware import current_user
+from shared.context import current_user
 
 
 class TestLocationListView(TestCase):

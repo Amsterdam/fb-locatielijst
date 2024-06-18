@@ -5,7 +5,7 @@ from django.test import TestCase
 from locations.models import Location, LocationProperty, PropertyOption
 from locations.signals import disconnect_signals
 from locations.processors import LocationProcessor
-from shared.middleware import current_user
+from shared.context import current_user
 
 
 class TestLocationProcessor(TestCase):

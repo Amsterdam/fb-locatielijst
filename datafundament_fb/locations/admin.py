@@ -100,7 +100,7 @@ class PropertyGroupAdmin(admin.ModelAdmin):
 class LogAdmin(admin.ModelAdmin):
     ordering = ['timestamp']
     readonly_fields = []
-    list_display = ['timestamp', 'user', 'instance_name', 'instance_id', 'target', 'message' ]
+    list_display = ['timestamp', 'user', 'content_type', 'object_name', 'object_id', 'action', 'field', 'message' ]
 
     def has_add_permission(self, request, obj=None):
         return False

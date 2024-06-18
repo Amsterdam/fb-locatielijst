@@ -2,6 +2,7 @@ import re
 from django.db import models
 from django.db.models import Max, Q, F
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
@@ -244,15 +245,30 @@ class Log(models.Model):
     """
     Log model for keeping a log on system and content changes
     """
+
+    class Action:
+        """
+        Action performed on the object being logged
+        """
+        READ = 0
+        CREATE = 1
+        UPDATE = 2
+        DELETE = 3
+
+        choices = (
+            (READ, _("read")),
+            (CREATE, _("create")),
+            (UPDATE, _("update")),
+            (DELETE, _("delete")),
+        )
+
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    instance_name = models.CharField(verbose_name='Object', max_length=50)
-    instance_id = models.IntegerField(verbose_name='Id')
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
-    location_property = models.ForeignKey(LocationProperty, on_delete=models.SET_NULL, null=True, blank=True)
-    property_option = models.ForeignKey(PropertyOption, on_delete=models.SET_NULL, null=True, blank=True)
-    external_service = models.ForeignKey(ExternalService, on_delete=models.SET_NULL, null=True, blank=True)
-    target = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, blank=True, null=True)
+    action = models.PositiveSmallIntegerField(choices=Action.choices)
+    object_name = models.CharField(verbose_name='Object', max_length=100)
+    object_id = models.IntegerField(verbose_name='Id')
+    field = models.CharField(max_length=100, null=True, blank=True)
     message = models.CharField(max_length=1000)
 
     @property

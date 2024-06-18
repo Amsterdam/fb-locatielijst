@@ -32,9 +32,9 @@ Logs
             <tr>
                 <th scope="col" class="column-pancode">Datum/tijd</th>
                 <th scope="col">Door</th>
-                <th scope="col">Object</th>
-                <th scope="col">Id</th>
-                <th scope="col">Onderdeel</th>
+                <th scope="col">Wat</th>
+                <th scope="col">Naam</th>
+                <th scope="col">Veld</th>
                 <th scope="col">Log bericht</th>
             </tr>
         </thead>
@@ -48,13 +48,13 @@ Logs
                     {{ object.user }}
                 </td>
                 <td>
-                    {{ object.instance_name }}
+                    {{ object.content_type.name }}
                 </td>
                 <td>
-                    {{ object.instance_id }}
+                    {{ object.object_name }}
                 </td>
                 <td>
-                    {{ object.target }}
+                    {{ object.field }}
                 </td>
                 <td>
                     {{ object.message }}

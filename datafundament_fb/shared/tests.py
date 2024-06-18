@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 from django.urls import reverse
 from shared.utils import get_log_parameters
-from shared.middleware import current_user
+from shared.context import current_user
 from locations.models import Location, LocationData, LocationProperty, PropertyOption, ExternalService, LocationExternalService
 
 # Create your tests here.
