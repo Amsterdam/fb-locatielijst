@@ -1,3 +1,4 @@
+uwsgi
 Django
 django-csp
 psycopg2
