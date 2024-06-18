@@ -15,8 +15,8 @@ class LocationQuerySet(QuerySet):
 
         # Get request parameters
         property_value = params.get('property', '')
-        # Get existing location and external service properties, filtered by access permission
-        location_properties = LocationProcessor(user=user).location_properties
+        # Get existing location and external service properties
+        location_properties = LocationProcessor().location_properties
         # Set the correct search name when filtering on location property with a choice list
         is_choice_property = LocationProperty.objects.filter(short_name=property_value, property_type='CHOICE').exists()
         if property_value in location_properties and is_choice_property:

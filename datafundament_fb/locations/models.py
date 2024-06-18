@@ -30,7 +30,6 @@ class Location(models.Model):
     pandcode = models.IntegerField(verbose_name='Pandcode', default=compute_pandcode)  # possible race condition when a location is added simultaneously; not worried about it now
     name = models.CharField(verbose_name='Naam', max_length=100)
     last_modified = models.DateTimeField(verbose_name='Laatste wijziging', auto_now=True)
-    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name='Aanmaakdatum', auto_now_add=True)
     is_archived = models.BooleanField(verbose_name="Archief", default=False)
     objects = LocationManager()
@@ -88,7 +87,6 @@ class LocationProperty(models.Model):
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
     group = models.ForeignKey(PropertyGroup, verbose_name='Groeperen in', on_delete=models.SET_NULL, blank=True, null=True)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True, validators=[MinValueValidator(1)])
-    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie eigenschap'
@@ -116,7 +114,6 @@ class PropertyOption(models.Model):
     '''
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     option = models.CharField(verbose_name='Optie', max_length=100)
-    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     
     class Meta:
         verbose_name = 'Eigenschap optie'
@@ -137,7 +134,6 @@ class LocationData(models.Model):
     location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, verbose_name='Locatie eigenschap')
     _property_option = models.ForeignKey(PropertyOption, on_delete=models.RESTRICT, null=True, blank=True, verbose_name='Optie')
     _value = models.TextField(verbose_name='Waarde', max_length=1024, null=True, blank=True)
-    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie gegeven'
@@ -214,7 +210,6 @@ class ExternalService(models.Model):
     short_name = models.CharField(verbose_name='Korte naam', max_length=10, validators=[validate_short_name])
     public = models.BooleanField(verbose_name='Zichtbaar voor niet ingelogde gebruikers', default=False)
     order = models.IntegerField(verbose_name='Volgorde', null=True, blank=True, validators=[MinValueValidator(1)])
-    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
     
     class Meta:
         verbose_name = 'Externe koppeling'
@@ -236,7 +231,6 @@ class LocationExternalService(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='Locatie')
     external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, verbose_name='Externe API')
     external_location_code = models.CharField(verbose_name='Externe locatie code', max_length=100, blank=True, null=True)
-    last_modified_by = models.ForeignKey(User, verbose_name="Laatst gewijzigd door", on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Locatie koppeling'

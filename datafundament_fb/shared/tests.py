@@ -1,8 +1,9 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
+from django.urls import reverse
 from shared.utils import get_log_parameters
+from shared.middleware import current_user
 from locations.models import Location, LocationData, LocationProperty, PropertyOption, ExternalService, LocationExternalService
-
 
 # Create your tests here.
 class TestSharedUtils(TestCase):
@@ -12,17 +13,19 @@ class TestSharedUtils(TestCase):
     
     def setUp(self) -> None:
         user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
-        location = Location.objects.create(pandcode=24001, name='Stadhuis', is_archived=False, last_modified_by=user,)
+        # because of CurrentUserMiddleware set current_user to this user
+        current_user.set(user)
+        location = Location.objects.create(pandcode=24001, name='Stadhuis', is_archived=False,)
         location_property = LocationProperty.objects.create(
-            short_name='property', label='Location property', property_type='CHOICE', public=True, last_modified_by=user,)
+            short_name='property', label='Location property', property_type='CHOICE', public=True,)
         property_option = PropertyOption.objects.create(
-            location_property=location_property, option='Optie', last_modified_by=user,)
+            location_property=location_property, option='Optie',)
         external_service = ExternalService.objects.create(
-            name='External service', short_name='service', public=True, last_modified_by=user,)
+            name='External service', short_name='service', public=True,)
         location_data = LocationData.objects.create(
-            location=location, location_property=location_property, _property_option=property_option, last_modified_by=user,)
+            location=location, location_property=location_property, _property_option=property_option,)
         location_external_service = LocationExternalService.objects.create(
-            location=location, external_service=external_service, external_location_code='Code', last_modified_by=user, 
+            location=location, external_service=external_service, external_location_code='Code', 
         )
 
 
@@ -37,3 +40,24 @@ class TestSharedUtils(TestCase):
                 has_attribute = hasattr(model, obj['attribute_name'])
                 self.assertTrue(has_attribute)
                 self.assertIsNotNone(obj['display_name'])
+
+
+
+class TestCurrentUserMiddleware(TestCase):
+    """
+    Test setting a contextvar with the user associated with a request, in case of an authenticated session. Or an 
+    anonymous user for non authenticated requests.
+    """
+
+    def test_authenticated_user(self):
+        # Log in to a restricted page on the website
+        self.user = User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0]
+        self.client.force_login(self.user)
+        response  = self.client.get(reverse('locations_urls:location-admin'))
+        self.assertEqual(response.context['request'].user, current_user.get())
+
+    def test_anonymous_user(self):
+        # Request a page as an anonymous user
+        self.client.logout()
+        response  = self.client.get(reverse('locations_urls:location-list'))
+        self.assertEqual(response.context['request'].user, current_user.get())
