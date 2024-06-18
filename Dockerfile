@@ -15,7 +15,7 @@ FROM python:3.11-slim-buster as app
   RUN pip install --upgrade pip
   RUN pip install -r requirements.txt
 
-  COPY deploy app/deploy
+  COPY deploy /app/deploy
   # TODO tijdens het draaien van collectstatic moet de env ENVIRONMENT gegeven zijn
   # anders kan settings\init.py niet de juiste settings laden;
   # behalve met een work-around waarbij een default settings wordt gezet
