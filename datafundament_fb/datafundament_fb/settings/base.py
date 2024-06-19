@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'locations',
     'help_docs',
     'shared',
+    'health',
 ]
 
 MIDDLEWARE = [
