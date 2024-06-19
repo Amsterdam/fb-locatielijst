@@ -4,7 +4,6 @@ from locations.models import (
     PropertyGroup, LocationProperty, ExternalService, Location, LocationProperty, ExternalService, LocationData,
     LocationExternalService, PropertyOption)
 from shared.utils import reorder_grouped_objects, add_log, get_log_parameters
-from shared.context import current_user
 
 @receiver(post_save, sender=PropertyGroup)
 @receiver(post_save, sender=ExternalService)
@@ -16,7 +15,7 @@ def reorder_objects(sender, instance, raw, **kwargs):
 @receiver(post_save, sender=LocationExternalService)
 def property_create_log(instance, raw, created, **kwargs):
     """
-    Create a log whenever the value of a 'location property' is added
+    Create a log whenever the value of a location property is added
     """
     if created:
         for param in get_log_parameters(instance):
@@ -33,7 +32,7 @@ def property_create_log(instance, raw, created, **kwargs):
 @receiver(pre_save, sender=LocationExternalService)
 def property_change_log(sender, instance, raw, **kwargs):
     """
-    Create a log whenever the value of a 'location property' changes
+    Create a log whenever the value of a location property changes
     """
     if instance.id and not raw:
         db_instance = sender.objects.filter(id=instance.id).first()
@@ -67,7 +66,7 @@ def model_create_log(instance, raw, created, **kwargs):
     Create a log event whenever an instance of one of these models is added 
     """
     if created:
-        action = 1
+        action = 0
         field = instance._meta.verbose_name
         message = f'{instance} is aangemaakt.'
         add_log(instance, action, field, message)

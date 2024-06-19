@@ -331,6 +331,7 @@ class LocationAdminView(LoginRequiredMixin, View):
 
 class LocationLogView(LoginRequiredMixin, ListView):
     template_name = 'locations/location-log.html'
+    paginate_by = 50
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations

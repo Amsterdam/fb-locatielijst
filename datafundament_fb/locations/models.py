@@ -248,16 +248,16 @@ class Log(models.Model):
 
     class Action:
         """
-        Action performed on the object being logged
+        Action performed on the object being logged (CRUD)
         """
-        READ = 0
-        CREATE = 1
+        CREATE = 0
+        READ = 1
         UPDATE = 2
         DELETE = 3
 
         choices = (
-            (READ, _("read")),
             (CREATE, _("create")),
+            (READ, _("read")),
             (UPDATE, _("update")),
             (DELETE, _("delete")),
         )
@@ -271,38 +271,11 @@ class Log(models.Model):
     field = models.CharField(max_length=100, null=True, blank=True)
     message = models.CharField(max_length=1000)
 
-    @property
-    def instance(self):
-        instance = None
-        if self.location:
-            instance = self.location
-        if self.location_property:
-            instance = self.location_property
-        if self.property_option:
-            instance = self.property_option
-        if self.external_service:
-            instance = self.external_service
-        return instance
-    
-    @instance.setter
-    def instance(self, instance):
-        match instance.__class__.__name__:
-            case 'Location':
-                self.location = instance
-            case 'LocationProperty':
-                self.location_property = instance
-            case 'PropertyOption':
-                self.property_option = instance
-            case 'ExternalService':
-                self.external_service = instance
-        self.instance_name = instance._meta.verbose_name
-        self.instance_id = instance.id
-
     class Meta:
         verbose_name = 'Datafundament log'
         verbose_name_plural = 'Datafundament logs'
         ordering = ['-timestamp']
 
     def __str__(self):
-        return f'{self.instance}, {self.user}, {self.target}, {self.message}'
+        return f'{self.content_type.name}, {self.user}, {self.field}, {self.message}'
 

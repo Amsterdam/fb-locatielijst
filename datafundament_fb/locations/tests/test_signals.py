@@ -95,6 +95,7 @@ class TestLogging(TestCase):
         log = Log.objects.all().first()
         self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
+        self.assertEqual(log.action, 2)
         self.assertEqual(log.field, self.location_property.label)
         message = 'Waarde ({value}) gezet.'.format(value=self.location_data.value)
         self.assertEqual(log.message, message)
@@ -105,6 +106,7 @@ class TestLogging(TestCase):
         log = Log.objects.all().first()
         self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
+        self.assertEqual(log.action, 2)
         self.assertEqual(log.field, self.external_service.name)
         message = 'Waarde ({value}) gezet.'.format(value=self.location_external_service.external_location_code)
         self.assertEqual(log.message, message)
@@ -128,6 +130,7 @@ class TestLogging(TestCase):
         log = Log.objects.all().first()
         self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
+        self.assertEqual(log.action, 2)
         self.assertEqual(log.field, self.location_property.label)
         message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
         self.assertEqual(log.message, message)
@@ -143,6 +146,7 @@ class TestLogging(TestCase):
         log = Log.objects.all().first()
         self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
+        self.assertEqual(log.action, 2)
         self.assertEqual(log.field, self.external_service.name)
         message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
         self.assertEqual(log.message, message)
@@ -162,6 +166,7 @@ class TestLogging(TestCase):
         log = Log.objects.all().first()
         self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
+        self.assertEqual(log.action, 2)
         self.assertEqual(log.field, self.location_property.label)
         message = 'Waarde ({value}) verwijderd.'.format(value=self.location_data.value)
         self.assertEqual(log.message, message)
@@ -178,6 +183,7 @@ class TestLogging(TestCase):
             log = Log.objects.all().first()
             self.assertEqual(log.content_type.name, instance._meta.verbose_name)
             self.assertEqual(log.user, self.user)
+            self.assertEqual(log.action, 0)
             self.assertEqual(log.field, instance._meta.verbose_name)
             self.assertEqual(log.message, f"{instance} is aangemaakt.")
 
@@ -208,6 +214,7 @@ class TestLogging(TestCase):
             log = Log.objects.all().first()
             self.assertEqual(log.content_type.name, instance._meta.verbose_name)
             self.assertEqual(log.user, self.user)
+            self.assertEqual(log.action, 2)
             self.assertEqual(log.field, instance._meta.get_field(attribute).verbose_name)
             message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
             self.assertEqual(log.message, message)
@@ -226,6 +233,7 @@ class TestLogging(TestCase):
             log = Log.objects.all().first()
             self.assertEqual(log.content_type.name, instance._meta.verbose_name)
             self.assertEqual(log.user, self.user)
+            self.assertEqual(log.action, 3)
             self.assertEqual(log.field, None)
             self.assertEqual(log.message, f"{instance} is verwijderd.")
 
@@ -239,6 +247,7 @@ class TestLogging(TestCase):
         log = Log.objects.all().first()
         self.assertEqual(log.content_type.name, self.property_option._meta.verbose_name)
         self.assertEqual(log.user, self.user)
+        self.assertEqual(log.action, 3)
         self.assertEqual(log.field, None)
         self.assertEqual(log.message, f"{self.property_option} is verwijderd.")
 

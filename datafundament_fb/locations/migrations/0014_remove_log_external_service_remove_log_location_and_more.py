@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='log',
             name='action',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'create'), (1, 'update'), (2, 'delete'), (3, 'access')], default=0),
+            field=models.PositiveSmallIntegerField(choices=[(0, 'create'), (1, 'read'), (2, 'update'), (3, 'delete')], default=1),
             preserve_default=False,
         ),
         migrations.AddField(
