@@ -4,4 +4,4 @@ set -e   # stop on any error
 set -x
 
 # run uwsgi
-exec uwsgi --ini main/uwsgi.ini
+uwsgi uwsgi.ini
