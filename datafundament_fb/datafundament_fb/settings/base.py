@@ -138,7 +138,7 @@ LOGIN_REDIRECT_URL = '/locaties/beheer'
 LOGOUT_REDIRECT_URL = '/'
 
 # Cross Site Request Forgery (CSRF) settings
-CSRF_TRUSTED_ORIGINS = ['http://localhost','https://localhost']
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
 CSRF_COOKIE_SECURE = bool(int(os.environ.get("CSRF_COOKIE_SECURE", 1)))
 
 # Content Security Policy (CSP) settings
