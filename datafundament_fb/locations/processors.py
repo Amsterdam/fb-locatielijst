@@ -1,4 +1,5 @@
 from typing import Self
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
@@ -6,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from locations.validators import get_locationdata_validator
 from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
-from shared.middleware import current_user
+from shared.context import current_user
 
 class LocationProcessor():
 
@@ -95,8 +96,8 @@ class LocationProcessor():
         Initiate the object with all location property fields and,
         when a dict is passed, with the corresponding values
         """
-        # User is retrieved form request by middlewhere, default to Anonymous
-        self.user = current_user.get()
+        # User is retrieved form request by middlewhere, if none default to Anonymous
+        self.user = current_user.get() or AnonymousUser
 
         # Set an empty Location instance
         self.location_instance = Location()

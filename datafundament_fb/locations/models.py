@@ -2,6 +2,7 @@ import re
 from django.db import models
 from django.db.models import Max, Q, F
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
@@ -244,39 +245,31 @@ class Log(models.Model):
     """
     Log model for keeping a log on system and content changes
     """
-    timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    location_property = models.ForeignKey(LocationProperty, on_delete=models.CASCADE, null=True, blank=True)
-    property_option = models.ForeignKey(PropertyOption, on_delete=models.CASCADE, null=True, blank=True)
-    external_service = models.ForeignKey(ExternalService, on_delete=models.CASCADE, null=True, blank=True)
-    target = models.CharField(max_length=100)
-    message = models.CharField(max_length=1000)
 
-    @property
-    def instance(self):
-        model = None
-        if self.location:
-            model = self.location
-        if self.location_property:
-            model = self.location_property
-        if self.property_option:
-            model = self.property_option
-        if self.external_service:
-            model = self.external_service
-        return model
-    
-    @instance.setter
-    def model(self, instance):
-        match instance.__class__.__name__:
-            case 'Location':
-                self.location = instance
-            case 'LocationProperty':
-                self.location_property = instance
-            case 'PropertyOption':
-                self.property_option = instance
-            case 'ExternalService':
-                self.external_service = instance            
+    class Action:
+        """
+        Action performed on the object being logged (CRUD)
+        """
+        CREATE = 0
+        READ = 1
+        UPDATE = 2
+        DELETE = 3
+
+        choices = (
+            (CREATE, _("create")),
+            (READ, _("read")),
+            (UPDATE, _("update")),
+            (DELETE, _("delete")),
+        )
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, blank=True, null=True)
+    action = models.PositiveSmallIntegerField(choices=Action.choices)
+    object_name = models.CharField(verbose_name='Object', max_length=100)
+    object_id = models.IntegerField(verbose_name='Id')
+    field = models.CharField(max_length=100, null=True, blank=True)
+    message = models.CharField(max_length=1000)
 
     class Meta:
         verbose_name = 'Datafundament log'
@@ -284,5 +277,5 @@ class Log(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return f'{self.model}, {self.user}, {self.target}, {self.message}'
+        return f'{self.content_type.name}, {self.user}, {self.field}, {self.message}'
 

@@ -1,4 +1,6 @@
 from locations.models import Log
+from django.contrib.contenttypes.models import ContentType
+from shared.context import current_user
 
 def reorder_grouped_objects(sender, instance, raw, **kwargs):
     """
@@ -32,15 +34,25 @@ def reorder_grouped_objects(sender, instance, raw, **kwargs):
             sender.objects.filter(id=object.id).update(order=index)
             index += 1    
 
-def add_log(model, user, target, message):
+def add_log(instance, action, field, message):
     """
     Write a log entry to the database
     """
-    Log.objects.create(model=model, user=user, target=target, message=message)
+    content_type = ContentType.objects.get_for_model(instance)
+    user = current_user.get()
+    Log.objects.create(
+        user=user,
+        content_type=content_type,
+        action=action,
+        object_name=str(instance),
+        object_id=instance.id,
+        field=field,
+        message=message
+    )
 
 def get_log_parameters(instance)-> list:
     """
-    Return a list of dictionaries containing the field that is modified (attribute_name) and the name the field will have in the log (target).
+    Return a list of dictionaries containing the field that is modified (attribute_name) and the name the field will have in the log field.
     The name of the field will default to the verbose_name of the model field,
     but if a tuple is given than the referenced object is used as a name 
     """

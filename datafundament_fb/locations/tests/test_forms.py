@@ -5,7 +5,7 @@ from locations.forms import LocationDataForm, LocationListForm
 from locations.models import Location, LocationProperty, PropertyOption, ExternalService
 from locations.processors import LocationProcessor
 from locations.signals import disconnect_signals
-from shared.middleware import current_user
+from shared.context import current_user
 
 class TestLocationDataForm(TestCase):
     def setUp(self) -> None:

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from locations.models import Location, LocationData, LocationProperty, PropertyOption, ExternalService, LocationExternalService, PropertyGroup, Log
 from locations.signals import disconnect_signals, connect_signals
-from shared.middleware import current_user
+from shared.context import current_user
 
 class TestReorderObjects(TestCase):
     def setUp(self) -> None:
@@ -93,9 +93,10 @@ class TestLogging(TestCase):
         self.location_data.save()
         # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location)
+        self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
-        self.assertEqual(log.target, self.location_property.label)
+        self.assertEqual(log.action, 2)
+        self.assertEqual(log.field, self.location_property.label)
         message = 'Waarde ({value}) gezet.'.format(value=self.location_data.value)
         self.assertEqual(log.message, message)
  
@@ -103,9 +104,10 @@ class TestLogging(TestCase):
         self.location_external_service.save()
         # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location)
+        self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
-        self.assertEqual(log.target, self.external_service.name)
+        self.assertEqual(log.action, 2)
+        self.assertEqual(log.field, self.external_service.name)
         message = 'Waarde ({value}) gezet.'.format(value=self.location_external_service.external_location_code)
         self.assertEqual(log.message, message)
 
@@ -126,9 +128,10 @@ class TestLogging(TestCase):
         self.location_data.save()
         # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location)
+        self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
-        self.assertEqual(log.target, self.location_property.label)
+        self.assertEqual(log.action, 2)
+        self.assertEqual(log.field, self.location_property.label)
         message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
         self.assertEqual(log.message, message)
 
@@ -141,9 +144,10 @@ class TestLogging(TestCase):
         self.location_external_service.save()
         # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location)
+        self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
-        self.assertEqual(log.target, self.external_service.name)
+        self.assertEqual(log.action, 2)
+        self.assertEqual(log.field, self.external_service.name)
         message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
         self.assertEqual(log.message, message)
 
@@ -160,9 +164,10 @@ class TestLogging(TestCase):
         self.location_data.delete()
         # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertEqual(log.model, self.location)
+        self.assertEqual(log.content_type.name, self.location._meta.verbose_name)
         self.assertEqual(log.user, self.user)
-        self.assertEqual(log.target, self.location_property.label)
+        self.assertEqual(log.action, 2)
+        self.assertEqual(log.field, self.location_property.label)
         message = 'Waarde ({value}) verwijderd.'.format(value=self.location_data.value)
         self.assertEqual(log.message, message)
 
@@ -176,9 +181,10 @@ class TestLogging(TestCase):
             instance.save()
             # Check resulting log. Should be the first in the queryset
             log = Log.objects.all().first()
-            self.assertIsNone(log.model)
+            self.assertEqual(log.content_type.name, instance._meta.verbose_name)
             self.assertEqual(log.user, self.user)
-            self.assertEqual(log.target, instance._meta.verbose_name)
+            self.assertEqual(log.action, 0)
+            self.assertEqual(log.field, instance._meta.verbose_name)
             self.assertEqual(log.message, f"{instance} is aangemaakt.")
 
     def test_model_change_log(self):
@@ -206,9 +212,10 @@ class TestLogging(TestCase):
             
             # Check resulting log. Should be the first in the queryset
             log = Log.objects.all().first()
-            self.assertEqual(log.model, instance)
+            self.assertEqual(log.content_type.name, instance._meta.verbose_name)
             self.assertEqual(log.user, self.user)
-            self.assertEqual(log.target, instance._meta.get_field(attribute).verbose_name)
+            self.assertEqual(log.action, 2)
+            self.assertEqual(log.field, instance._meta.get_field(attribute).verbose_name)
             message = f"Waarde was ({old_value}), is gewijzigd naar ({new_value})."
             self.assertEqual(log.message, message)
 
@@ -224,9 +231,10 @@ class TestLogging(TestCase):
             instance.delete()
             # Check resulting log. Should be the first in the queryset
             log = Log.objects.all().first()
-            self.assertIsNone(log.model)
+            self.assertEqual(log.content_type.name, instance._meta.verbose_name)
             self.assertEqual(log.user, self.user)
-            self.assertEqual(log.target, instance._meta.verbose_name)
+            self.assertEqual(log.action, 3)
+            self.assertEqual(log.field, None)
             self.assertEqual(log.message, f"{instance} is verwijderd.")
 
         # Testing PropertyOption seperately because of dependen on LocationProperty
@@ -237,9 +245,10 @@ class TestLogging(TestCase):
         self.property_option.delete()
         # Check resulting log. Should be the first in the queryset
         log = Log.objects.all().first()
-        self.assertIsNone(log.model)
+        self.assertEqual(log.content_type.name, self.property_option._meta.verbose_name)
         self.assertEqual(log.user, self.user)
-        self.assertEqual(log.target, self.property_option._meta.verbose_name)
+        self.assertEqual(log.action, 3)
+        self.assertEqual(log.field, None)
         self.assertEqual(log.message, f"{self.property_option} is verwijderd.")
 
     def test_location_property_delete(self):

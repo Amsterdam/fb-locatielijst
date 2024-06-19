@@ -2,6 +2,7 @@ import csv
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError, RestrictedError
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -330,13 +331,16 @@ class LocationAdminView(LoginRequiredMixin, View):
 
 class LocationLogView(LoginRequiredMixin, ListView):
     template_name = 'locations/location-log.html'
+    paginate_by = 50
 
     def get_queryset(self):
         # Get a QuerySet of filtered locations
         if pandcode := self.kwargs.get('pandcode', None):
-            logs = Log.objects.filter(location__pandcode=pandcode)
+            location = get_object_or_404(Location, pandcode=pandcode)
+            content_type = ContentType.objects.get_for_model(location)
+            logs = Log.objects.filter(content_type=content_type, object_id=location.id)
         else:
-            logs = Log.objects.filter(location__isnull=True)
+            logs = Log.objects.all()
         return logs
 
     def get_context_data(self, **kwargs):

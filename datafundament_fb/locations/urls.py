@@ -17,7 +17,7 @@ urlpatterns = [
     path('export', view=LocationExportView.as_view(), name='location-export'),
     path('import', LocationImportView.as_view(), name='location-import'),
     path('log/', view=LocationLogView.as_view(), name='location-log'),
-    path('log/location/<int:pandcode>', view=LocationLogView.as_view(), name='location-detail-log'),
+    path('log/locatie/<int:pandcode>', view=LocationLogView.as_view(), name='location-detail-log'),
     path('locatie-eigenschappen/', view=LocationPropertyListView.as_view(), name='locationproperty-list'),
     path('locatie-eigenschappen/toevoegen', view=LocationPropertyCreateView.as_view(), name='locationproperty-create'),
     path('locatie-eigenschappen/<int:pk>/wijzigen', view=LocationPropertyUpdateView.as_view(), name='locationproperty-update'),
