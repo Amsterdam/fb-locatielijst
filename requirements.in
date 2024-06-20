@@ -1,6 +1,7 @@
 uwsgi
 Django
 django-csp
+django-extensions
 psycopg2
 pyodbc
 wfastcgi

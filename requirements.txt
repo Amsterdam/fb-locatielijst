@@ -12,6 +12,9 @@ django==5.0.6
     #   django-csp
 django-csp==3.8
     # via -r requirements.in
+    #   django-extensions
+django-extensions==3.2.3
+    # via -r requirements.in
 psycopg2==2.9.9
     # via -r requirements.in
 pyodbc==5.1.0
