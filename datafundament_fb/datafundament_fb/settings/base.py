@@ -82,17 +82,6 @@ WSGI_APPLICATION = 'datafundament_fb.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         "ENGINE": "django.db.backends.postgresql",
-#         'NAME':             os.environ.get('DATABASE_NAME', 'default_database'),
-#         'HOST':             os.environ.get('DATABASE_HOST', 'default_host'),
-#         'PORT':             os.environ.get('DATABASE_PORT', 'default_port'),
-#         'USER':             os.environ.get('DATABASE_USER', 'default_user'),
-#         'PASSWORD':         os.environ.get('DATABASE_PASSWORD', 'default_password'),
-#     }
-# }
-
 DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
 DATABASE_NAME = os.getenv("DATABASE_NAME", "dev")
 DATABASE_USER = os.getenv("DATABASE_USER", "dev")
