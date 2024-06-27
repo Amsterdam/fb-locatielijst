@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from .azure_settings import Azure
 
+# Starts an azure class in which we can retrieve azure identity tokens to connect to azure resources like the database.
 azure = Azure()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

@@ -89,5 +89,5 @@ fixtures = locations location_properties property_options location_data external
 loaddata:                           ## Load $fixtures. Multiple fixtures can be loaded (space seperated), i.e. fixtures=fixture1 fixture2; or a json file, i.e. fixtures=dump.json
 	$(manage) loaddata $(fixtures)
 
-push:                              ## Push to container registry
+push:                               ## Push to container registry
 	$(dc) push 
