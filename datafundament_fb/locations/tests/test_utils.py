@@ -38,13 +38,13 @@ class LocationUtilsTest(TestCase):
 
         # Test default ordering
         request = client.get('/').wsgi_request
-        self.assertEqual(get_order(request, 'pandcode'), 'asc')
-        self.assertEqual(get_order(request, 'name'), '')
+        self.assertEqual(get_order(request, 'name'), 'asc')
+        self.assertEqual(get_order(request, 'pandcode'), '')
 
         # Test order parameter
         request = client.get('/?order=desc').wsgi_request
-        self.assertEqual(get_order(request, 'pandcode'), 'desc')
-        self.assertEqual(get_order(request, 'name'), '')
+        self.assertEqual(get_order(request, 'name'), 'desc')
+        self.assertEqual(get_order(request, 'pandcode'), '')
 
         # Test order_by parameter
         request = client.get('/?order_by=pandcode').wsgi_request

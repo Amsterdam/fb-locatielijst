@@ -47,7 +47,7 @@ def set_query(request, parameter=None, value=None, pop=False):
 def get_order(request, column=None):
     """
     Return asc/desc if the column name is in de 'order_by' paramenter of the url.
-    When no order_by parameter is present but column name is pandcode, default to ascending for pandcode column
+    When no order_by parameter is present but column name is pandcode, default to ascending for name column
     """
     order_by = request.GET.get('order_by')
     order = request.GET.get('order')
@@ -58,7 +58,7 @@ def get_order(request, column=None):
         else:
             value = 'asc'
     # Set order when column is pandcode
-    elif column == 'pandcode' and not order_by:
+    elif column == 'name' and not order_by:
         if order == 'desc':
             value = 'desc'
         else:

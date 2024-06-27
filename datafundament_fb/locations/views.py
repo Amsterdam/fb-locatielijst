@@ -73,10 +73,10 @@ class LocationListView(ListView):
         self.location_processor = LocationProcessor()
 
     def set_ordering(self):
-        # Set column to order on; default is pandcode
+        # Set column to order on; default is name
         order_by = self.request.GET.get('order_by')
         if not order_by in ['name', 'pandcode']:
-            order_by = 'pandcode'
+            order_by = 'name'
         # Switch ordering
         order = '-' if self.request.GET.get('order') == 'desc' else ''
         return order + order_by

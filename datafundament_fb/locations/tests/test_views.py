@@ -167,29 +167,29 @@ class TestLocationListView(TestCase):
         self.assertTemplateUsed(response, 'locations/location-list.html')
 
     def test_ordering(self):
-        """Test default ordering on column pandcode"""
+        """Test default ordering on column name"""
         client = Client()
         list_view = LocationListView()
 
         # Test default ordering
         request = client.get('/').wsgi_request
         list_view.setup(request)
-        self.assertEqual(list_view.set_ordering(), 'pandcode')
+        self.assertEqual(list_view.set_ordering(), 'name')
 
         # Test ordering descending
         request = client.get('/?order=desc').wsgi_request
         list_view.setup(request)
-        self.assertEqual(list_view.set_ordering(), '-pandcode')
+        self.assertEqual(list_view.set_ordering(), '-name')
 
         # Test ordering on name column
-        request = client.get('/?order_by=name').wsgi_request
+        request = client.get('/?order_by=pandcode').wsgi_request
         list_view.setup(request)
-        self.assertEqual(list_view.set_ordering(), 'name')
+        self.assertEqual(list_view.set_ordering(), 'pandcode')
 
         # Test ordering on invalid column name
         request = client.get('/?order_by=straat').wsgi_request
         list_view.setup(request)
-        self.assertEqual(list_view.set_ordering(), 'pandcode')
+        self.assertEqual(list_view.set_ordering(), 'name')
 
 
 class LocationDetailViewTest(TestCase):
