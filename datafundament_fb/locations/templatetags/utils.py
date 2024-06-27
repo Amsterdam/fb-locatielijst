@@ -26,7 +26,7 @@ def set_query(request, parameter=None, value=None, pop=False):
     # Only alter the query if a query parameter is present 
     if parameter:
         # Add order and direction to query
-        if query.get('order_by') == value or (query.get('order_by') is None and value == 'pandcode'):
+        if query.get('order_by') == value or (query.get('order_by') is None and value == 'name'):
         # Set default order direction
             if query.get('order') == 'desc':
                 query.pop('order', None)
