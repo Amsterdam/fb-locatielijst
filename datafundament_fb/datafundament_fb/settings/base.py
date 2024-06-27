@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from .azure_settings import Azure
+
+# Starts an azure class in which we can retrieve azure identity tokens to connect to azure resources like the database.
+azure = Azure()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -36,10 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     # project app
     'locations',
     'help_docs',
     'shared',
+    'health',
 ]
 
 MIDDLEWARE = [
@@ -78,15 +85,28 @@ WSGI_APPLICATION = 'datafundament_fb.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "dev")
+DATABASE_USER = os.getenv("DATABASE_USER", "dev")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
+DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
+DATABASE_OPTIONS = {'sslmode': 'allow', 'connect_timeout': 5}
+
+if 'azure.com' in DATABASE_HOST:
+    DATABASE_PASSWORD = azure.auth.db_password
+    DATABASE_OPTIONS['sslmode'] = 'require'
+
 DATABASES = {
-    'default': {
+    "default": {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME':             os.environ.get('DATABASE_NAME', 'default_database'),
-        'HOST':             os.environ.get('DATABASE_HOST', 'default_host'),
-        'PORT':             os.environ.get('DATABASE_PORT', 'default_port'),
-        'USER':             os.environ.get('DATABASE_USER', 'default_user'),
-        'PASSWORD':         os.environ.get('DATABASE_PASSWORD', 'default_password'),
-    }
+        "NAME": DATABASE_NAME,
+        "USER": DATABASE_USER,
+        "PASSWORD": DATABASE_PASSWORD,
+        "HOST": DATABASE_HOST,
+        "CONN_MAX_AGE": 60 * 5,
+        "PORT": DATABASE_PORT,
+        'OPTIONS': {'sslmode': 'allow', 'connect_timeout': 5},
+    },
 }
 
 

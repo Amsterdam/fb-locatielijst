@@ -1,5 +1,13 @@
+uwsgi
 Django
 django-csp
+django-extensions
 psycopg2
 pyodbc
 wfastcgi
+
+azure-cli
+azure-core
+azure-identity
+azure-keyvault
+azure-keyvault-secrets
