@@ -9,6 +9,3 @@ import os
 from datafundament_fb.settings.base import *
 
 # Settings specific to this enviromnent
-INSTALLED_APPS += [
-    'django_extensions',
-]
