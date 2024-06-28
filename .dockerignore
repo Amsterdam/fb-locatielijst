@@ -2,6 +2,7 @@
 .idea
 .git
 .env*
-venv
-.venv
+venv*
+.venv*
+.vscode
 docker-compose.override.yml

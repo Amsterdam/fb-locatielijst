@@ -16,9 +16,10 @@ services:
         - BUILD_DATE
         - BUILD_REVISION
         - BUILD_VERSION
-    # @TODO update image to location of official image for app deployments 
     image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-it4c/datafundament}:${VERSION:-latest}
-    command: /app/deploy/app/docker-run.sh
+    command: /app/runtime/app/docker-run.sh
+    ports:
+      - "8000:8000"
 
   dev:
     <<: *base-app
