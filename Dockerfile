@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster as app
+FROM python:3.12-slim-bookworm as app
 
   # build variables.
   ENV DEBIAN_FRONTEND noninteractive
