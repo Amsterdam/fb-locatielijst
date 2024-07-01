@@ -16,7 +16,7 @@ build_version := $(shell git describe --tags --exact-match 2> /dev/null || git s
 build_revision := $(shell git rev-parse --short HEAD)
 build_date := $(shell date --iso-8601=seconds)
 
-init: clean build migrate           ## Init clean
+init: clean build migrate loaddata  ## Init clean
 
 help:                               ## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'

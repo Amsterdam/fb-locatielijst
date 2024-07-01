@@ -1,10 +1,9 @@
-FROM python:3.11-slim-buster as app
+FROM python:3.12-slim-bookworm as app
 
   # build variables.
   ENV DEBIAN_FRONTEND noninteractive
 
-  # install Microsoft SQL Server requirements.
-  ENV ACCEPT_EULA=Y
+  # install PostgreSQL requirements.
   RUN apt-get update \
   && apt-get -y install libpq-dev gcc
 
@@ -15,11 +14,16 @@ FROM python:3.11-slim-buster as app
   RUN pip install --upgrade pip
   RUN pip install -r requirements.txt
 
+  # copy deployment files
   COPY deploy /app/deploy
-  RUN chmod +x /app/deploy/app/docker-run.sh
-  RUN chmod +x /app/deploy/wait-for-it.sh
-  RUN chmod +x /app/deploy/db/entrypoint.sh
-  RUN chmod +x /app/deploy/db/setup-database.sh
+  # RUN chmod +x /app/deploy/wait-for-it.sh
+  # RUN chmod +x /app/deploy/db/entrypoint.sh
+  # RUN chmod +x /app/deploy/db/setup-database.sh
+  
+  # copy runtime files
+  COPY runtime /app/runtime
+  RUN chmod +x /app/runtime/app/docker-run.sh
+
   # TODO tijdens het draaien van collectstatic moet de env ENVIRONMENT gegeven zijn
   # anders kan settings\init.py niet de juiste settings laden;
   # behalve met een work-around waarbij een default settings wordt gezet
@@ -33,7 +37,6 @@ FROM python:3.11-slim-buster as app
   ENV BUILD_REVISION=$BUILD_REVISION
   ENV BUILD_VERSION=$BUILD_VERSION
 
-  # CMD ["/app/deploy/docker-run.sh"]
 
 # stage 2, dev
 FROM app as dev

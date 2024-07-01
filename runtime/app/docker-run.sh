@@ -4,4 +4,4 @@ set -e   # stop on any error
 set -x
 
 # run uwsgi
-uwsgi uwsgi.ini
+uwsgi /app/runtime/app/uwsgi.ini
