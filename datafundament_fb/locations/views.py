@@ -487,7 +487,7 @@ class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
             return self.form_invalid(form)
         messages.success(self.request, f"Optie '{self.object.option}' is gewijzigd.")
         return HttpResponseRedirect(self.get_success_url())
-        
+
     def get_object(self):
         object = get_object_or_404(self.model, id=self.kwargs.get('pk'), location_property=self.kwargs.get('lp_pk'))
         return object
