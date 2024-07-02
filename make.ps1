@@ -1,9 +1,16 @@
 # PowerShell script to replicate Make functionality on Windows
 # VERSION = 2024.07.01
 
+<#
+Instead of running .\make.ps1 when calling this script, you can add 'make' as an alias to your Powershell environment.
+- Open up a prompt for your favorite Powershell console
+- Execute: Add-Content -Value "Set-Alias -Name make -Value '.\make.ps1'" -Path $PROFILE
+- Now you can run this script as you were using the actual make program: make help
+#>
+
 param (
     [Parameter(Mandatory = $true, Position = 0)]
-    [ArgumentCompletions(
+    [ValidateSet(
         'help', 'pip-tools', 'sync', 'requirements', 'upgrade', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
         'shell', 'dev', 'dev-http', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
     )]
@@ -18,10 +25,6 @@ $run = "$dc run --rm -u 0:0"
 $manage = "$run dev python manage.py"
 $pytest = "$run test pytest $ARGS"
 $pip_compile = "pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet"
-
-$build_version = (git describe --tags --exact-match 2> $null || git symbolic-ref -q --short HEAD)
-$build_revision = (git rev-parse --short HEAD)
-$build_date = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
 
 function help {
     $helpText = @"
@@ -89,9 +92,6 @@ switch ($Command) {
         Invoke-Expression "$manage show_urls"
     }
     "build" {
-        $env:BUILD_DATE = $build_date
-        $env:BUILD_REVISION = $build_revision
-        $env:BUILD_VERSION = $build_version
         Invoke-Expression "$dc build"
     }
     "app" {
