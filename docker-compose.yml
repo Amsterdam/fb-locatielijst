@@ -1,4 +1,3 @@
-version: "3"
 x-app: &base-app
   build:
     context: .
