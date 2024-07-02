@@ -463,7 +463,7 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
         messages.success(self.request, f"Optie '{form.instance.option}' is toegevoegd aan {self.location_property.label}.")
         return HttpResponseRedirect(self.get_success_url())
-    
+
     def get_initial(self):
         initial = super().get_initial()
         initial['location_property'] = self.location_property
