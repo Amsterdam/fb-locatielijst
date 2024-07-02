@@ -4,7 +4,7 @@
 <#
 Instead of running .\make.ps1 when calling this script, you can add 'make' as an alias to your Powershell environment.
 - Open up a prompt for your favorite Powershell console
-- Execute: New-Item $PROFILE -Force
+- Execute: if (!(Test-Path $PROFILE)){ New-Item $PROFILE -Force }
 - Execute: Add-Content -Value "Set-Alias -Name make -Value '.\make.ps1'" -Path $PROFILE
 - Now you can run this script as you were using the actual make program: make help
 #>
