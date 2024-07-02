@@ -2,12 +2,15 @@
 # VERSION = 2024.07.01
 
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, Position = 0)]
     [ArgumentCompletions(
         'help', 'pip-tools', 'sync', 'requirements', 'upgrade', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
         'shell', 'dev', 'dev-http', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
     )]
-    [string]$Command
+    [string]$Command,
+
+    [Parameter(Position = 1, ValueFromRemainingArguments)]
+    [string]$Arguments
 )
 
 $dc = "docker-compose"
@@ -37,13 +40,13 @@ bash             Run the container and start bash.
 shell            Run a Django shell.
 dev              Run the development app over SSL with runserver_plus.
 dev-http         Run the development app over plain http with runserver.
-test             Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models.
+test             Execute tests. Optionally use an argument to define which specific test(s), i.e.: make test app.class.function
 clean            Clean docker stuff.
 env              Print current env.
 superuser        Create a superuser (user with admin rights).
 janitor          Run the janitor.
-dumpdata         Create a json dump. Optionally use models= to define which tables (space separated), i.e. models=app app2.model.
-loaddata         Load fixtures. Multiple fixtures can be loaded (space separated), i.e. fixtures=fixture1 fixture2; or a json file, i.e. fixtures=dump.json.
+dumpdata         Create a json dump. Optionally use arguments to define which tables, i.e.: make dumpdata app app2.model.
+loaddata         Load fixtures. User arguments to load multiple fixtures, i.e.: make loaddata fixture1 fixture2.json
 push             Push to container registry.
 
 make             Call this script with make as an alias by setting: Set-Alias -Name make -Value '.\make.ps1'
@@ -107,7 +110,12 @@ switch ($Command) {
         Invoke-Expression "$run --service-ports dev python manage.py runserver 0.0.0.0:8000"
     }
     "test" {
-        Invoke-Expression "$manage test"
+        if ($Arguments) {
+            Invoke-Expression "$manage test $Arguments"            
+        }
+        else {
+            Invoke-Expression "$manage test"
+        }
     }
     "clean" {
         Invoke-Expression "$dc down -v --remove-orphans"
@@ -122,10 +130,15 @@ switch ($Command) {
         Invoke-Expression "$manage janitor"
     }
     "dumpdata" {
-        Invoke-Expression "$run dev bash -c './manage.py dumpdata -a --indent 2 --format=json $model> dump.json'"
+        Invoke-Expression "$run dev bash -c './manage.py dumpdata -a --indent 2 --format=json $Arguments> dump.json'"
     }
     "loaddata" {
-        $fixtures = "locations location_properties property_options location_data external_services location_external_services location_docs property_groups"
+        if ($Arguments) {
+            $fixtures = $Arguments -join ' '
+        }
+        else {
+            $fixtures = "locations location_properties property_options location_data external_services location_external_services location_docs property_groups"
+        }
         Invoke-Expression "$manage loaddata $fixtures"
     }
     "push" {
