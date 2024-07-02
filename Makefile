@@ -61,10 +61,10 @@ bash:                               ## Run the container and start bash
 shell:	                            ## Run a Django shell
 	$(manage) shell
 
-dev:	                            ## Run the development app over SSL with runserver_plus
+dev-https:                          ## Run the development app over SSL with runserver_plus
 	$(run) --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key
 
-dev-http:	                        ## Run the development app over plain http with runserver
+dev:                                ## Run the development app over plain http with runserver
 	$(run) --service-ports dev python manage.py runserver 0.0.0.0:8000
 
 test:                               ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models

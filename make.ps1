@@ -13,7 +13,7 @@ param (
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateSet(
         'help', 'init', 'pip-tools', 'sync', 'requirements', 'upgrade', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
-        'shell', 'dev', 'dev-http', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
+        'shell', 'dev', 'dev-https', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
     )]
     [string]$Command,
 
@@ -42,8 +42,8 @@ build            Build docker image.
 app              Run app.
 bash             Run the container and start bash.
 shell            Run a Django shell.
-dev              Run the development app over SSL with runserver_plus.
-dev-http         Run the development app over plain http with runserver.
+dev              Run the development app over plain http with runserver.
+dev-https        Run the development app over SSL with runserver_plus.
 test             Execute tests. Optionally use an argument to define which specific test(s), i.e.: make test app.class.function
 clean            Clean docker stuff.
 env              Print current env.
@@ -105,10 +105,10 @@ switch ($Command) {
         Invoke-Expression "$manage shell"
     }
     "dev" {
-        Invoke-Expression "$run --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key"
-    }
-    "dev-http" {
         Invoke-Expression "$run --service-ports dev python manage.py runserver 0.0.0.0:8000"
+    }
+    "dev-https" {
+        Invoke-Expression "$run --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key"
     }
     "test" {
         if ($Arguments) {
