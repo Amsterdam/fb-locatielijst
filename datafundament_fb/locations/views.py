@@ -457,7 +457,7 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
         form.instance.location_property = self.location_property
         # Added try because location_property field is excluded from the form and unqiue constraint is therefore not handled by modelform
         try:
-            form.save()
+            self.object = form.save()
         except IntegrityError as err:
             form.add_error(None, f"'{form.instance.option}' bestaat al in {form.instance.location_property.label}.")
             return self.form_invalid(form)
@@ -481,7 +481,7 @@ class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         # Added try because location_property field is excluded from the form and unqiue constraint is therefore not handled by modelform
         try:
-            form.save()
+            self.object = form.save()
         except IntegrityError as err:
             form.add_error(None, f"'{form.instance.option}' bestaat al in {form.instance.location_property.label}.")
             return self.form_invalid(form)
