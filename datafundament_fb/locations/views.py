@@ -229,6 +229,7 @@ class LocationImportView(LoginRequiredMixin, View):
         form = self.form(request.POST, request.FILES)
 
         if form.is_valid():
+            location_added = 0
             csv_file = form.cleaned_data.get('csv_file')
             if csv_file.name.endswith('.csv'):
                 try:
@@ -271,10 +272,7 @@ class LocationImportView(LoginRequiredMixin, View):
                     try:
                         # Save the locationprocessor instance                        
                         location.save()
-
-                        # Return message for success
-                        message = f"Locatie {row['naam']} is geïmporteerd/ge-update."
-                        messages.add_message(request, messages.SUCCESS, message)
+                        location_added += 1
 
                     except ValidationError as err:
                         if getattr(err, 'error_list', None):
@@ -295,6 +293,10 @@ class LocationImportView(LoginRequiredMixin, View):
             message = f"Het formulier is niet juist ingevuld."
             messages.add_message(request, messages.ERROR, message)
         context = {'form': form}
+        if location_added > 0:
+            # Message for succesful imports
+            message = f"{location_added} locatie(s) geïmporteerd/ge-update."
+            messages.add_message(request, messages.SUCCESS, message)
         return render(request, template_name=self.template_name, context=context)        
     
 
