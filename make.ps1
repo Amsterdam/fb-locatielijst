@@ -12,7 +12,7 @@ Instead of running .\make.ps1 when calling this script, you can add 'make' as an
 param (
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateSet(
-        'help', 'init', 'pip-tools', 'sync', 'requirements', 'upgrade', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
+        'help', 'init', 'pip-tools', 'sync', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
         'shell', 'dev', 'dev-https', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
     )]
     [string]$Command,
@@ -25,7 +25,6 @@ $dc = "docker-compose"
 $run = "$dc run --rm -u 0:0"
 $manage = "$run dev python manage.py"
 $pytest = "$run test pytest $ARGS"
-$pip_compile = "pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet"
 
 function help {
     $helpText = @"
@@ -33,8 +32,6 @@ help             Show this help.
 init             Start with a clean docker workload.
 pip-tools        Install pip-tools.
 sync             Sync your local venv with expected state as defined in requirements.txt.
-requirements     (Re)compile requirements.txt and requirements_dev.txt.
-upgrade          Upgrade the requirements.txt files, adhering to the constraints in the requirements.in files.
 migrations       Make migrations.
 migrate          Migrate.
 urls             Show URLs.
@@ -73,15 +70,6 @@ switch ($Command) {
     "sync" {
         pip install pip-tools
         pip-sync requirements.txt requirements_dev.txt
-    }
-    "requirements" {
-        pip install pip-tools
-        Invoke-Expression "$pip_compile requirements.in"
-        Invoke-Expression "$pip_compile requirements_dev.in"
-    }
-    "upgrade" {
-        Invoke-Expression "$pip_compile --upgrade requirements.in"
-        Invoke-Expression "$pip_compile --upgrade requirements_dev.in"
     }
     "migrations" {
         Invoke-Expression "$manage makemigrations"
