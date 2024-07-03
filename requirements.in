@@ -6,7 +6,6 @@ psycopg2
 pyodbc
 wfastcgi
 
-azure-cli
 azure-core
 azure-identity
 azure-keyvault
