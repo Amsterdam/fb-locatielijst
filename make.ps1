@@ -1,11 +1,19 @@
 # PowerShell script to replicate Make functionality on Windows
 # VERSION = 2024.07.01
 
+<#
+Instead of running .\make.ps1 when calling this script, you can add 'make' as an alias to your Powershell environment.
+- Open up a prompt for your favorite Powershell console
+- Execute: if (!(Test-Path $PROFILE)){ New-Item $PROFILE -Force }
+- Execute: Add-Content -Value "Set-Alias -Name make -Value '.\make.ps1'" -Path $PROFILE
+- Now you can run this script as you were using the actual make program: make help
+#>
+
 param (
     [Parameter(Mandatory = $true, Position = 0)]
-    [ArgumentCompletions(
-        'help', 'pip-tools', 'sync', 'requirements', 'upgrade', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
-        'shell', 'dev', 'dev-http', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
+    [ValidateSet(
+        'help', 'init', 'pip-tools', 'sync', 'requirements', 'upgrade', 'migrations', 'migrate', 'urls', 'build', 'app', 'bash',
+        'shell', 'dev', 'dev-https', 'test', 'clean', 'env', 'superuser', 'janitor', 'dumpdata', 'loaddata', 'push'
     )]
     [string]$Command,
 
@@ -18,10 +26,6 @@ $run = "$dc run --rm -u 0:0"
 $manage = "$run dev python manage.py"
 $pytest = "$run test pytest $ARGS"
 $pip_compile = "pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet"
-
-$build_version = (git describe --tags --exact-match 2> $null || git symbolic-ref -q --short HEAD)
-$build_revision = (git rev-parse --short HEAD)
-$build_date = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
 
 function help {
     $helpText = @"
@@ -38,8 +42,8 @@ build            Build docker image.
 app              Run app.
 bash             Run the container and start bash.
 shell            Run a Django shell.
-dev              Run the development app over SSL with runserver_plus.
-dev-http         Run the development app over plain http with runserver.
+dev              Run the development app over plain http with runserver.
+dev-https        Run the development app over SSL with runserver_plus.
 test             Execute tests. Optionally use an argument to define which specific test(s), i.e.: make test app.class.function
 clean            Clean docker stuff.
 env              Print current env.
@@ -89,9 +93,6 @@ switch ($Command) {
         Invoke-Expression "$manage show_urls"
     }
     "build" {
-        $env:BUILD_DATE = $build_date
-        $env:BUILD_REVISION = $build_revision
-        $env:BUILD_VERSION = $build_version
         Invoke-Expression "$dc build"
     }
     "app" {
@@ -104,10 +105,10 @@ switch ($Command) {
         Invoke-Expression "$manage shell"
     }
     "dev" {
-        Invoke-Expression "$run --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key"
-    }
-    "dev-http" {
         Invoke-Expression "$run --service-ports dev python manage.py runserver 0.0.0.0:8000"
+    }
+    "dev-https" {
+        Invoke-Expression "$run --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key"
     }
     "test" {
         if ($Arguments) {
