@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.db.models import ProtectedError, RestrictedError
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
@@ -456,11 +457,19 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.location_property = self.location_property
+        # Added try because location_property field is excluded from the form and unqiue constraint is therefore not handled by modelform
+        try:
+            self.object = form.save()
+        except IntegrityError as err:
+            form.add_error(None, f"'{form.instance.option}' bestaat al in {form.instance.location_property.label}.")
+            return self.form_invalid(form)
         messages.success(self.request, f"Optie '{form.instance.option}' is toegevoegd aan {self.location_property.label}.")
-        return super().form_valid(form)
-    
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_initial(self):
-        return {'location_property': self.location_property}
+        initial = super().get_initial()
+        initial['location_property'] = self.location_property
+        return initial
 
 
 class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
@@ -472,8 +481,14 @@ class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('locations_urls:propertyoption-list', args=[self.object.location_property.id])
 
     def form_valid(self, form):
+        # Added try because location_property field is excluded from the form and unqiue constraint is therefore not handled by modelform
+        try:
+            self.object = form.save()
+        except IntegrityError as err:
+            form.add_error(None, f"'{form.instance.option}' bestaat al in {form.instance.location_property.label}.")
+            return self.form_invalid(form)
         messages.success(self.request, f"Optie '{self.object.option}' is gewijzigd.")
-        return super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_object(self):
         object = get_object_or_404(self.model, id=self.kwargs.get('pk'), location_property=self.kwargs.get('lp_pk'))
