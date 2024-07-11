@@ -33,7 +33,7 @@ def valid_email(value)-> str:
 def valid_geolocation(value)-> str:
     """Validator for Geolocation type location property"""
     # Resolution is up 1mm (8 decimals)
-    geolocation_regex = '^\d{1,2}\.\d{1,8}$'
+    geolocation_regex = r'^\d{1,2}\.\d{1,8}$'
     # Check for geolocation format
     if re.match(geolocation_regex, value):
         return value
@@ -57,7 +57,7 @@ def valid_memo(value)-> str:
 
 def valid_postal_code(value)-> str:
     """Validator for Postal Code type location property"""
-    postal_code_regex = '^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
+    postal_code_regex = r'^[1-9][0-9]{3}\s?(?!SA|SD|SS)[A-Z]{2}$'
     if re.match(postal_code_regex, value):
         return value
     else:
