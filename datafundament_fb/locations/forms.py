@@ -19,7 +19,7 @@ def set_location_property_fields()-> dict:
                 fields[location_property.short_name] = forms.ChoiceField(
                     label=location_property.label,
                     required=location_property.required,
-                    choices=(('Ja', 'Ja'),('Nee','Nee')),
+                    choices=(('', ''), ('Ja', 'Ja'),('Nee','Nee')),
                     validators=[validators.valid_boolean],
                 )
             case 'DATE':
