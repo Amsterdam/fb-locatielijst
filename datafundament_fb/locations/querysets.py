@@ -77,11 +77,8 @@ class LocationQuerySet(QuerySet):
                     )
                 )
                 # When the search_value is an int, we can search in pandcode as well
-                try:
-                    pandcode = int(search_value)
-                except:...
-                else:
-                    qfilter |= Q(pandcode=pandcode)
+                if search_value.isdigit():
+                    qfilter |= Q(pandcode=search_value)
 
         # Filter if archive value
         qfilter &= filter_on_archive(archive_value)
