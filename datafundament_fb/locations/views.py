@@ -319,7 +319,7 @@ class LocationExportView(View):
 
     def post(self, request, *args, **kwargs):
         # Get all Location instances()
-        locations = Location.objects.all()
+        locations = Location.objects.search_filter(params=dict(), user=self.request.user)
         # Set the response with the csv file
         response = get_csv_file_response(request, locations)
         return response

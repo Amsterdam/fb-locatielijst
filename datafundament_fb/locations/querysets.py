@@ -15,11 +15,11 @@ class LocationQuerySet(QuerySet):
 
         # Get request parameters
         property_value = params.get('property', '')
-        # Get existing location and external service properties
-        location_properties = LocationProcessor().location_properties
+        # Get existing location and external service properties for which the requesting user has access to
+        accessible_properties = LocationProcessor().location_properties
         # Set the correct search name when filtering on location property with a choice list
         is_choice_property = LocationProperty.objects.filter(short_name=property_value, property_type='CHOICE').exists()
-        if property_value in location_properties and is_choice_property:
+        if property_value in accessible_properties and is_choice_property:
             search_name = property_value
         else:
             search_name = 'search'
@@ -28,7 +28,8 @@ class LocationQuerySet(QuerySet):
 
         # Build a Q filter for querying the database 
         # Filter when querying for a specific property
-        # Default is full text search when no existing property is queried
+        # Filter for property fields which the user has access to 
+        # Default is full text search when no specific property is queried
         match property_value:
             # Filter on Location.name
             case 'naam':
@@ -36,27 +37,48 @@ class LocationQuerySet(QuerySet):
             # Filter on Location.pandcode
             case 'pandcode' if search_value.isdigit():
                 qfilter = Q(pandcode=search_value)
+            # Filter on a specific location property
             case property_value if property_value:
-                # Filter LocationProperty or ExternalService by short_name
-                qfilter = (
-                    Q(locationdata__location_property__short_name=property_value) |
-                    Q(locationexternalservice__external_service__short_name=property_value))
-                # If the property is of the CHOICE type
                 if is_choice_property:
-                    # Filter PropertyOption on option value
-                    qfilter &= Q(locationdata___property_option__option=search_value)
+                    # Filter for search term and permitted properties in choice lists
+                    qfilter = (
+                        Q(locationdata___property_option__option=search_value) &
+                        Q(locationdata__location_property__short_name__in=accessible_properties)
+                    )
                 else:
-                    # Filter on LocationData or LocationExternalService value
-                    qfilter &= (
-                        Q(locationdata___value__icontains=search_value) |
-                        Q(locationexternalservice__external_location_code__icontains=search_value))
+                    qfilter = (
+                        # Filter for search term and permitted properties in location properties and external services
+                        (
+                            Q(locationdata___value__icontains=search_value) &
+                            Q(locationdata__location_property__short_name=property_value) &
+                            Q(locationdata__location_property__short_name__in=accessible_properties)
+                        ) |
+                        (
+                            Q(locationexternalservice__external_location_code__icontains=search_value) &
+                            Q(locationexternalservice__external_service__short_name=property_value) &
+                            Q(locationexternalservice__external_service__short_name__in=accessible_properties)
+                        )
+                    )
+            # Do a full search on all tables containing location data               
             case _:
-                # Do a full search on all tables containing location data
                 qfilter = (
                     Q(name__icontains=search_value) |
-                    Q(locationdata___value__icontains=search_value) |
-                    Q(locationexternalservice__external_location_code__icontains=search_value) |
-                    Q(locationdata___property_option__option__icontains=search_value))
+                    (
+                        Q(locationdata___value__icontains=search_value) &
+                        Q(locationdata__location_property__short_name__in=accessible_properties)                        
+                    ) |
+                    (
+                        Q(locationdata___property_option__option__icontains=search_value) &
+                        Q(locationdata__location_property__short_name__in=accessible_properties)
+                    ) |
+                    (
+                        Q(locationexternalservice__external_location_code__icontains=search_value) &
+                        Q(locationexternalservice__external_service__short_name__in=accessible_properties)
+                    )
+                )
+                # When the search_value is an int, we can search in pandcode as well
+                if search_value.isdigit():
+                    qfilter |= Q(pandcode=search_value)
 
         # Filter if archive value
         qfilter &= filter_on_archive(archive_value)
@@ -65,14 +87,6 @@ class LocationQuerySet(QuerySet):
         if not user.is_authenticated:
             # Show only active locations
             qfilter &=  Q(is_archived=False)
-
-            # If a field in the resulting query is not part of a public locationdata or locationexternalservice property, then the result should be filtered for that field.
-            # But it should NOT be filtered when there are no related records for locationdata or locationexternalservice,
-            # because a non existing field is never part of a set (and thus the result will always be empty). Hence the XOR in the filter.
-            qfilter &= (
-                (Q(locationdata__location_property__short_name__in=location_properties) ^ Q(locationdata__isnull=True)) &
-                (Q(locationexternalservice__external_service__short_name__in=location_properties) ^ Q(locationexternalservice__isnull=True))
-            )
 
         return self.filter(qfilter).distinct()
 

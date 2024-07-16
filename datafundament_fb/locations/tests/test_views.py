@@ -85,6 +85,8 @@ class TestLocationListView(TestCase):
             ('0042', '', False, '', [24001, 24002]),
             ('10042', '', False, '', [24001]),
             ('prive', '', True, '', [24001, 24004]),
+            ('24001', '', False, '', [24001]),
+            ('24001.1', '', False, '', []),
             # Search name
             ('adhuis', 'naam', False, '', [24001]),
             ('wonin', 'naam', False, '', []),
