@@ -1,11 +1,10 @@
 uwsgi
-Django
+Django==5.0.*
 django-csp
 django-extensions
 psycopg2
 pyodbc
 wfastcgi
-
 azure-core
 azure-identity
 azure-keyvault
