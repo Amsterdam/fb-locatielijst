@@ -11,10 +11,6 @@ services:
     build:
       context: .
       target: app
-      args:
-        - BUILD_DATE
-        - BUILD_REVISION
-        - BUILD_VERSION
     image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-it4c/datafundament}:${VERSION:-latest}
     command: /app/runtime/app/docker-run.sh
     ports:

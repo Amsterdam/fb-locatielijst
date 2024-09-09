@@ -1,7 +1,7 @@
-FROM python:3.12-slim-bookworm as app
+FROM python:3.12.4-slim-bookworm AS app
 
   # build variables.
-  ENV DEBIAN_FRONTEND noninteractive
+  ENV DEBIAN_FRONTEND=noninteractive
 
   # install PostgreSQL requirements.
   RUN apt-get update \
@@ -32,14 +32,9 @@ FROM python:3.12-slim-bookworm as app
   # ENV ENVIRONMENT $NODE_ENV
   RUN python manage.py collectstatic --no-input
 
-  # Build metadata
-  ENV BUILD_DATE=$BUILD_DATE
-  ENV BUILD_REVISION=$BUILD_REVISION
-  ENV BUILD_VERSION=$BUILD_VERSION
-
 
 # stage 2, dev
-FROM app as dev
+FROM app AS dev
 
   USER root
   ADD requirements_dev.txt requirements_dev.txt
@@ -49,11 +44,11 @@ FROM app as dev
 
   # Any process that requires to write in the home dir
   # we write to /tmp since we have no home dir
-  ENV HOME /tmp
+  ENV HOME=/tmp
 
 
 # stage 3, test
-FROM dev as test
+FROM dev AS test
 
   USER ITforCare
 
@@ -64,5 +59,5 @@ FROM dev as test
   CMD ["pytest"]
 
 
-FROM postgres as postgres
+FROM postgres AS postgres
   COPY deploy/db/setup.sql /docker-entrypoint-initdb.d/
