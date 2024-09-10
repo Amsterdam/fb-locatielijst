@@ -7,14 +7,11 @@
 UID:=$(shell id --user)
 GID:=$(shell id --group)
 
-dc = docker-compose
+dc = docker compose
 run = $(dc) run --rm -u ${UID}:${GID}
 manage = $(run) dev python manage.py
 pytest = $(run) test pytest $(ARGS)
-
-build_version := $(shell git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD)
-build_revision := $(shell git rev-parse --short HEAD)
-build_date := $(shell date --iso-8601=seconds)
+pip_compile = pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet
 
 init: clean build migrate loaddata  ## Init clean
 
@@ -27,7 +24,6 @@ pip-tools:
 sync: pip-tools                     ## Sync your local venv with expected state as defined in requirements.txt
 	pip-sync requirements.txt requirements_dev.txt
 
-pip_compile = pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet
 requirements: pip-tools             ## (Re)compile requirements.txt and requirements_dev.txt
 	$(pip_compile) requirements.in
 	$(pip_compile) requirements_dev.in
@@ -46,9 +42,6 @@ migrate:                            ## Migrate
 urls:
 	$(manage) show_urls
 
-build: export BUILD_DATE=$(build_date)
-build: export BUILD_REVISION=$(build_revision)
-build: export BUILD_VERSION=$(build_version)
 build:                              ## Build docker image
 	$(dc) build
 

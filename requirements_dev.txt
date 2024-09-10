@@ -4,27 +4,17 @@
 #
 #    pip-compile --allow-unsafe --strip-extras requirements_dev.in
 #
-asgiref==3.8.1
-    # via django
-cffi==1.16.0
+cffi==1.17.1
     # via cryptography
-cryptography==42.0.8
+cryptography==43.0.1
     # via pyopenssl
-django==5.0.6
-    # via
-    #   -r requirements_dev.in
-    #   django-extensions
-django-extensions==3.2.3
-    # via -r requirements_dev.in
 markupsafe==2.1.5
     # via werkzeug
 parameterized==0.9.0
     # via -r requirements_dev.in
 pycparser==2.22
     # via cffi
-pyopenssl==24.1.0
+pyopenssl==24.2.1
     # via -r requirements_dev.in
-sqlparse==0.5.0
-    # via django
-werkzeug==3.0.3
+werkzeug==3.0.4
     # via -r requirements_dev.in

@@ -6,11 +6,6 @@
 #
 asgiref==3.8.1
     # via django
-azure-common==1.1.28
-    # via
-    #   azure-keyvault-certificates
-    #   azure-keyvault-keys
-    #   azure-keyvault-secrets
 azure-core==1.30.2
     # via
     #   -r requirements.in
@@ -22,27 +17,27 @@ azure-identity==1.17.1
     # via -r requirements.in
 azure-keyvault==4.2.0
     # via -r requirements.in
-azure-keyvault-certificates==4.7.0
+azure-keyvault-certificates==4.8.0
     # via azure-keyvault
-azure-keyvault-keys==4.9.0b3
+azure-keyvault-keys==4.9.0
     # via azure-keyvault
-azure-keyvault-secrets==4.7.0
+azure-keyvault-secrets==4.8.0
     # via
     #   -r requirements.in
     #   azure-keyvault
-certifi==2024.6.2
+certifi==2024.8.30
     # via requests
-cffi==1.16.0
+cffi==1.17.1
     # via cryptography
 charset-normalizer==3.3.2
     # via requests
-cryptography==42.0.8
+cryptography==43.0.1
     # via
     #   azure-identity
     #   azure-keyvault-keys
     #   msal
     #   pyjwt
-django==5.0.6
+django==5.0.9
     # via
     #   -r requirements.in
     #   django-csp
@@ -51,26 +46,26 @@ django-csp==3.8
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
-idna==3.7
+idna==3.8
     # via requests
 isodate==0.6.1
     # via
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
-msal==1.28.0
+msal==1.31.0
     # via
     #   azure-identity
     #   msal-extensions
-msal-extensions==1.2.0b1
+msal-extensions==1.2.0
     # via azure-identity
-portalocker==2.10.0
+portalocker==2.10.1
     # via msal-extensions
 psycopg2==2.9.9
     # via -r requirements.in
 pycparser==2.22
     # via cffi
-pyjwt==2.8.0
+pyjwt==2.9.0
     # via
     #   msal
     #   pyjwt
@@ -84,7 +79,7 @@ six==1.16.0
     # via
     #   azure-core
     #   isodate
-sqlparse==0.5.0
+sqlparse==0.5.1
     # via django
 typing-extensions==4.12.2
     # via
