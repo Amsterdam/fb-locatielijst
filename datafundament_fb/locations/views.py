@@ -26,19 +26,8 @@ def get_csv_file_response(request, locations)-> HttpResponse:
     Method for returning a csv file within an http response object.
     Takes a list of Location objects as it input
     """
-    # Set all location data to a LocationProcessor
-    location_data = []
-    for location in locations:
-        # Get loction data
-        data = LocationProcessor.get(pandcode=location.pandcode).get_dict()
-        # List values will be joined by the pipe '|' character instead of the default comma ','
-        export_dict = dict()
-        for key,value in data.items():
-            if type(value) == list:
-                export_dict[key] = '|'.join(value)
-            else:
-                export_dict[key] = value
-        location_data.append(export_dict)
+    # Retrieve all the data from the locations
+    location_data = LocationProcessor.get_export_data(pandcodes=locations.values_list('pandcode', flat=True))
 
     # Setup the http response with the 
     date = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H.%M')
