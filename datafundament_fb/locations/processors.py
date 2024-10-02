@@ -116,9 +116,34 @@ class LocationProcessor():
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls()
-        object.location_instance = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
+        location = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
 
+        return cls.format_location(location)
+
+    @classmethod
+    def get_export_data(cls, pandcodes: list)-> dict:
+        """
+        Retrieve a list of locations from the database and return it as a dict
+        """
+        # Retrieve all locations in list and prefetch related locationdata 
+        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set')
+        location_list = list()
+        for location in locations:
+            object = cls.format_location(location)
+            # Replace list values with | seperated string for multiple choice location properties
+            object_dict = object.get_dict()
+            for key,value in object_dict.items():
+                if type(value) == list:
+                    object_dict[key] = '|'.join(value)
+            location_list.append(object_dict)
+        
+        return location_list
+
+    @classmethod
+    def format_location(cls, location) -> object:
+        object = cls()
+        object.location_instance = location
+        
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
         setattr(object, 'naam', getattr(object.location_instance, 'name'))
         created_at = timezone.localtime(getattr(object.location_instance, 'created_at')).strftime('%d-%m-%Y')
@@ -228,61 +253,6 @@ class LocationProcessor():
             for external_service in self.external_service_instances:
                 value = getattr(self, external_service.short_name) if getattr(self, external_service.short_name) else None
                 self._save_location_external_service(external_service, value)
-
-    @classmethod
-    def get_export_data(cls, pandcodes: list)-> dict:
-        """
-        Retrieve a list of locations from the database and return it as a dict
-        """
-        # Retrieve all locations in list and prefetch related locationdata 
-        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set')
-        location_list = list()
-        for location in locations:
-            object = cls()
-            object.location_instance = location # TODO in de location_data related set zit alle data ook al is private=False
-
-            setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
-            setattr(object, 'naam', getattr(object.location_instance, 'name'))
-            created_at = timezone.localtime(getattr(object.location_instance, 'created_at')).strftime('%d-%m-%Y')
-            setattr(object, 'aangemaakt', created_at)
-            last_modified = timezone.localtime(getattr(object.location_instance, 'last_modified')).strftime('%d-%m-%Y %H:%M')
-            setattr(object, 'gewijzigd', last_modified)
-            setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
-
-            # Add location properties to the object; filter to include non-public properties
-            if object.user.is_authenticated:
-                location_data_set = object.location_instance.locationdata_set.all()
-            else:
-                location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
-
-            # Set the value from the LocationData as attribute in the object instance
-            for location_data in location_data_set:
-                location_property = location_data.location_property
-                value = None
-
-                # Get value for multiple location data
-                if location_property.multiple:
-                    # Check if a value has already been set
-                    current_value = getattr(object, location_property.short_name)
-                    if not current_value:
-                        value = list([location_data.value])
-                    else:
-                        current_value.append(location_data.value)
-                        value = current_value
-                else:
-                    value = location_data.value
-                
-                # Set the attribute value
-                setattr(object, location_property.short_name, value)
-
-            # Add external services to the object
-            for service in object.location_instance.locationexternalservice_set.all():
-                value = service.external_location_code
-                setattr(object, service.external_service.short_name, value)
-
-            location_list.append(object.get_dict())
-        
-        return location_list
 
     def __repr__(self):
         return f'{self.pandcode}, {self.naam}'
