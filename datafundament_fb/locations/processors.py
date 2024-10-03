@@ -116,9 +116,34 @@ class LocationProcessor():
         """
         Retrieve a location from the database and return it as an instance of this class
         """
-        object = cls()
-        object.location_instance = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
+        location = Location.objects.get(pandcode=pandcode) # TODO in de location_data related set zit alle data ook al is private=False
 
+        return cls.format_location(location)
+
+    @classmethod
+    def get_export_data(cls, pandcodes: list)-> dict:
+        """
+        Retrieve a list of locations from the database and return it as a dict
+        """
+        # Retrieve all locations in list and prefetch related locationdata 
+        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set')
+        location_list = list()
+        for location in locations:
+            object = cls.format_location(location)
+            # Replace list values with | seperated string for multiple choice location properties
+            object_dict = object.get_dict()
+            for key,value in object_dict.items():
+                if type(value) == list:
+                    object_dict[key] = '|'.join(value)
+            location_list.append(object_dict)
+        
+        return location_list
+
+    @classmethod
+    def format_location(cls, location) -> object:
+        object = cls()
+        object.location_instance = location
+        
         setattr(object, 'pandcode', getattr(object.location_instance, 'pandcode'))
         setattr(object, 'naam', getattr(object.location_instance, 'name'))
         created_at = timezone.localtime(getattr(object.location_instance, 'created_at')).strftime('%d-%m-%Y')
