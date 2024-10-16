@@ -22,6 +22,7 @@ from locations.views import (
 )
 
 urlpatterns = [
+    path("oidc/", include("mozilla_django_oidc.urls")),
     path('auth/login', LoginView.as_view(template_name='login.html'), name='login'),
     path('auth/logout', LogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),

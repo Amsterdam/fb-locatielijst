@@ -35,13 +35,17 @@ cryptography==43.0.1
     # via
     #   azure-identity
     #   azure-keyvault-keys
+    #   josepy
+    #   mozilla-django-oidc
     #   msal
     #   pyjwt
+    #   pyopenssl
 django==5.0.9
     # via
     #   -r requirements.in
     #   django-csp
     #   django-extensions
+    #   mozilla-django-oidc
 django-csp==3.8
     # via -r requirements.in
 django-extensions==3.2.3
@@ -53,6 +57,10 @@ isodate==0.6.1
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
+josepy==1.14.0
+    # via mozilla-django-oidc
+mozilla-django-oidc==4.0.1
+    # via -r requirements.in
 msal==1.31.0
     # via
     #   azure-identity
@@ -71,9 +79,12 @@ pyjwt==2.9.0
     #   pyjwt
 pyodbc==5.1.0
     # via -r requirements.in
+pyopenssl==24.2.1
+    # via josepy
 requests==2.32.3
     # via
     #   azure-core
+    #   mozilla-django-oidc
     #   msal
 six==1.16.0
     # via
