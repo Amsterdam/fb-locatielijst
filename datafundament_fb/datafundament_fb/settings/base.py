@@ -177,18 +177,13 @@ CSP_FORM_ACTION = ("'self'")
 # Automatic redirect to HTTPS
 SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
 
-# Authentication backend settings
-AUTHENTICATION_BACKENDS = (
-    # TODO: place in .env??
-    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
-)
-
-## OpenId Connect settings ##
+# Authentication settings
+AUTHENTICATION_BACKENDS = ['mozilla_django_oidc.auth.OIDCAuthenticationBackend',]
 LOGIN_URL = "oidc_authentication_init"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-LOGIN_REDIRECT_URL_FAILURE = "/static/403.html"
 
+## OpenId Connect settings ##
 OIDC_BASE_URL = "https://login.microsoftonline.com/72fca1b1-2c2e-4376-a445-294d80196804"
 OIDC_RP_CLIENT_ID = os.getenv("OIDC_RP_CLIENT_ID",)
 OIDC_RP_CLIENT_SECRET = os.getenv("OIDC_RP_CLIENT_SECRET")
