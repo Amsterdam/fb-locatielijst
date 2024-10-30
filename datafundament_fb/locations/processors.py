@@ -126,7 +126,7 @@ class LocationProcessor():
         Retrieve a list of locations from the database and return it as a dict
         """
         # Retrieve all locations in list and prefetch related locationdata 
-        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set').prefetch_related('externalservice_set')
+        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set').prefetch_related('locationexternalservice_set')
         location_list = list()
         for location in locations:
             object = cls.format_location(location)
