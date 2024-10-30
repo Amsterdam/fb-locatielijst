@@ -75,7 +75,7 @@ class LocationProcessor():
 
         # Get all location properties and add the names to the location properties list
         # List is filtered for private accessibility
-        self.location_property_instances = LocationProperty.objects.all()
+        self.location_property_instances = LocationProperty.objects.all().order_by('group__order', 'order')
         if not self.user.is_authenticated:
             self.location_property_instances =  self.location_property_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
@@ -126,7 +126,7 @@ class LocationProcessor():
         Retrieve a list of locations from the database and return it as a dict
         """
         # Retrieve all locations in list and prefetch related locationdata 
-        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set')
+        locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related('locationdata_set').prefetch_related('externalservice_set')
         location_list = list()
         for location in locations:
             object = cls.format_location(location)
