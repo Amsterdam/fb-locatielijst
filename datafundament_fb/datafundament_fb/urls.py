@@ -29,9 +29,10 @@ if environ.get('ENVIRONMENT') == 'local':
     ]
 else:
     urlpatterns = [
-        path('oidc/login', oidc_login, name='login'),
-        path('oidc/logout', oidc_logout, name='logout'),
         path('oidc/', include("mozilla_django_oidc.urls")),
+        # This will, purposefully, never hit, but will provide a reverse lookup for the logout/login url
+        path('oidc/login', oidc_login, name='login'),
+        path('oidc/logout/', oidc_logout, name='logout'),
     ]
 
 urlpatterns.extend([
