@@ -1,9 +1,5 @@
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend
-from django.contrib.auth.models import Group
-from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
 
 def oidc_login(request, **kwargs):
     oidc_authentication_init = reverse("oidc_authentication_init")
