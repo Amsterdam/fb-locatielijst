@@ -9,3 +9,4 @@ azure-core
 azure-identity
 azure-keyvault
 azure-keyvault-secrets
+mozilla-django-oidc

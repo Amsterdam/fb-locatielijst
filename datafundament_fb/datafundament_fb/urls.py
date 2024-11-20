@@ -14,19 +14,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from os import environ
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path
-from locations.views import (
-    home_page,
-)
+from locations.views import (home_page,)
 
-urlpatterns = [
-    path('auth/login', LoginView.as_view(template_name='login.html'), name='login'),
-    path('auth/logout', LogoutView.as_view(), name='logout'),
+# Local development and tests uses default Django authentication backend 
+if environ.get('ENVIRONMENT') == 'local':
+    urlpatterns = [
+        path('auth/login', LoginView.as_view(template_name='login.html'), name='login'),
+        path('auth/logout', LogoutView.as_view(), name='logout'),
+    ]
+else:
+    urlpatterns = [
+        path('oidc/', include("mozilla_django_oidc.urls")),
+    ]
+
+urlpatterns.extend([
     path('admin/', admin.site.urls),
     path('locaties/', include(('locations.urls', 'locations'), namespace='locations_urls')),
     path('health/', include(('health.urls', 'health'), namespace='health_urls')),
     path('help/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
     path('', home_page, name='home'),
-]
+])

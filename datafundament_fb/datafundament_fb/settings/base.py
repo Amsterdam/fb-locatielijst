@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 3rd party
+    'mozilla_django_oidc',
     'django_extensions',
     # project app
     'locations',
@@ -59,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'shared.middleware.CurrentUserMiddleware',
     'csp.middleware.CSPMiddleware',
+    'mozilla_django_oidc.middleware.SessionRefresh'
 ]
 
 ROOT_URLCONF = 'datafundament_fb.urls'
@@ -74,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'shared.context_processors.authentication_urls',
             ],
         },
     },
@@ -173,3 +177,26 @@ CSP_FORM_ACTION = ("'self'")
 
 # Automatic redirect to HTTPS
 SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
+
+# Authentication settings
+AUTHENTICATION_BACKENDS = ['mozilla_django_oidc.auth.OIDCAuthenticationBackend',]
+LOGIN_URL = "oidc_authentication_init"
+LOGOUT_URL = "oidc_logout"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+## OpenId Connect settings ##
+OIDC_BASE_URL = "https://login.microsoftonline.com/72fca1b1-2c2e-4376-a445-294d80196804"
+OIDC_RP_CLIENT_ID = os.getenv("OIDC_RP_CLIENT_ID",)
+OIDC_RP_CLIENT_SECRET = os.getenv("OIDC_RP_CLIENT_SECRET")
+OIDC_OP_AUTHORIZATION_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/authorize"
+OIDC_OP_TOKEN_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/token"
+OIDC_OP_USER_ENDPOINT = "https://graph.microsoft.com/oidc/userinfo"
+OIDC_OP_JWKS_ENDPOINT = f"{OIDC_BASE_URL}/discovery/v2.0/keys"
+OIDC_OP_LOGOUT_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/logout"
+OIDC_RP_SIGN_ALGO = "RS256"
+OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"prompt": "select_account"}
+OIDC_CREATE_USER = False
+# Turn PKCE on for single-page applications! Because the client_secret is not secure in SPAs. 
+# You cannot turn this on by default because it breaks the authorization code flow for regular web applications.
+OIDC_USE_PKCE = False

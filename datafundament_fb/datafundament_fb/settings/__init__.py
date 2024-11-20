@@ -3,7 +3,9 @@ import os
 # set environment from variable
 environment = os.environ.get('ENVIRONMENT')
 
-if environment == 'development':
+if environment == 'local':
+    from datafundament_fb.settings.local import *
+elif environment == 'development':
     from datafundament_fb.settings.development import *
 elif environment == 'testing':
     from datafundament_fb.settings.testing import *
