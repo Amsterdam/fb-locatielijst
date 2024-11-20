@@ -179,7 +179,7 @@ CSP_FORM_ACTION = ("'self'")
 SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
 
 # Authentication settings
-AUTHENTICATION_BACKENDS = ['mozilla_django_oidc.auth.OIDCAuthenticationBackend',]
+AUTHENTICATION_BACKENDS = ['datafundament_fb.oidc_auth.OIDCAuthenticationBackend',]
 LOGIN_URL = "oidc_authentication_init"
 LOGOUT_URL = "oidc_logout"
 LOGIN_REDIRECT_URL = "/"
