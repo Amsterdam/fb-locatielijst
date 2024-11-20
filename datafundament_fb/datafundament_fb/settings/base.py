@@ -77,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'shared.context_processors.authentication_urls',
             ],
         },
     },
@@ -180,6 +181,7 @@ SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
 # Authentication settings
 AUTHENTICATION_BACKENDS = ['mozilla_django_oidc.auth.OIDCAuthenticationBackend',]
 LOGIN_URL = "oidc_authentication_init"
+LOGOUT_URL = "oidc_logout"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 

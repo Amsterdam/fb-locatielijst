@@ -46,13 +46,13 @@
       <nav>
         <ul>
           {% if user.is_anonymous %}
-          <li><a href="{% url 'login' %}?next={{ request.path }}">Inloggen</a></li>
+          <li><a href="{% url LOGIN_URL %}?next={{ request.path }}">Inloggen</a></li>
           {% endif %}
           {% if user.is_authenticated %}
           <li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>
           <li><a href="{% url 'locations_urls:location-admin' %}">Beheer</a></li>
           <li>
-            <form id="logout-form" method="post" action="{% url 'logout' %}">
+            <form id="logout-form" method="post" action="{% url LOGOUT_URL %}">
               {% csrf_token %}
               <button type="submit">Uitloggen</button>
             </form>

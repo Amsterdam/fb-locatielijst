@@ -18,8 +18,6 @@ from os import environ
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path
-from mozilla_django_oidc.views import OIDCAuthenticationRequestView, OIDCLogoutView
-
 from locations.views import (home_page,)
 
 # Local development and tests uses default Django authentication backend 
@@ -31,9 +29,6 @@ if environ.get('ENVIRONMENT') == 'local':
 else:
     urlpatterns = [
         path('oidc/', include("mozilla_django_oidc.urls")),
-        # This will, purposefully, never hit, but will provide a reverse lookup for the logout/login url
-        path('oidc/authenticate/', OIDCAuthenticationRequestView.as_view(), name='login'),
-        path('oidc/logout/', OIDCLogoutView.as_view(), name='logout'),
     ]
 
 urlpatterns.extend([
