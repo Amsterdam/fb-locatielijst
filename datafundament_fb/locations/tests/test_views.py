@@ -78,7 +78,7 @@ class TestLocationListView(TestCase):
 
 
     @parameterized.expand([
-            # Search all fields; search, location_property, is_authenticated, archive
+            # Search all fields; search, location_property, is_staff, archive
             ('', '', False, '', [24001, 24002, 24004]),
             ('keuze', '', False, '', [24001, 24002, 24004]),
             ('prive', '', False, '', []),
@@ -121,7 +121,7 @@ class TestLocationListView(TestCase):
             ('', '', True, 'archived', [24003]),
             ('', '', True, 'all', [24001, 24002, 24003, 24004]),
     ])
-    def test_search(self, search, location_property, is_authenticated, archive, expected):
+    def test_search(self, search, location_property, is_staff, archive, expected):
         """
         Paramaterized test where the following combinations of conditions are tested:
         Authenticated/Anonymous user
@@ -139,7 +139,7 @@ class TestLocationListView(TestCase):
         }
 
         # Set the correct user
-        if is_authenticated:
+        if is_staff:
             user = self.authenticated_user
         else:
             user = self.anonymous_user

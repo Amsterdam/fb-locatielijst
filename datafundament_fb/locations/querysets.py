@@ -83,8 +83,8 @@ class LocationQuerySet(QuerySet):
         # Filter if archive value
         qfilter &= filter_on_archive(archive_value)
 
-        # Filter the results for non authentiated (public) users
-        if not user.is_authenticated:
+        # Filter the results for when not a staff member
+        if not user.is_staff:
             # Show only active locations
             qfilter &=  Q(is_archived=False)
 
