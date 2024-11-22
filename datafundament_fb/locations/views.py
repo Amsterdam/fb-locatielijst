@@ -18,9 +18,6 @@ from locations.models import Location, Log, LocationProperty, PropertyGroup, Ext
 from locations.processors import LocationProcessor
 
 # Create your views here.
-def home_page(request):
-    return HttpResponseRedirect(reverse('locations_urls:location-list'))
-
 def get_csv_file_response(request, locations)-> HttpResponse:
     """
     Method for returning a csv file within an http response object.

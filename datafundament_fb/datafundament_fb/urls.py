@@ -18,7 +18,7 @@ from os import environ
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path
-from locations.views import (home_page,)
+from django.views.generic import TemplateView
 
 # Local development and tests uses default Django authentication backend 
 if environ.get('ENVIRONMENT') == 'local':
@@ -36,5 +36,5 @@ urlpatterns.extend([
     path('locaties/', include(('locations.urls', 'locations'), namespace='locations_urls')),
     path('health/', include(('health.urls', 'health'), namespace='health_urls')),
     path('help/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
-    path('', home_page, name='home'),
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),
 ])
