@@ -48,9 +48,11 @@
           {% if user.is_anonymous %}
           <li><a href="{% url LOGIN_URL %}?next={{ request.path }}">Inloggen</a></li>
           {% endif %}
-          {% if user.is_authenticated %}
+          {% if user.is_staff %}
           <li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>
           <li><a href="{% url 'locations_urls:location-admin' %}">Beheer</a></li>
+          {% endif %}
+          {% if user.is_authenticated %}
           <li>
             <form id="logout-form" method="post" action="{% url LOGOUT_URL %}">
               {% csrf_token %}
@@ -71,11 +73,13 @@
       <div class="breadcrumbs">
         <a href="/">Home</a>
         {% if user.is_authenticated %}
+        {% if user.is_staff %}
         <span>&rsaquo;</span>
         <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
         {% endif %}
         <span>&rsaquo;</span>
         <a href="{% url 'locations_urls:location-list' %}">Locaties</a>
+        {% endif %}
         {% block extra-breadcrumbs %}{% endblock %}
       </div>
       {% endblock %}
