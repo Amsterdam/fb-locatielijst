@@ -1,0 +1,21 @@
+{% extends "site-base.html" %}
+{% load i18n static utils %}
+{% block title %}
+| Home
+{% endblock %}
+
+{% block nav-breadcrumbs %}
+<nav aria-label="{% translate 'Breadcrumbs' %}">
+    {% block breadcrumbs %}
+    <div class="breadcrumbs">
+        Home
+    </div>
+    {% endblock %}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="btn-container">
+    <a href="/locaties" class="btn btn-primair">Locaties</a>
+</div>
+{% endblock %}

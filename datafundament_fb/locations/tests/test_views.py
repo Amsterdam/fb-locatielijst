@@ -21,8 +21,8 @@ class TestLocationListView(TestCase):
     def setUp(self) -> None:
         # Disable signals called for log events
         disconnect_signals()
-        self.authenticated_user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
-        self.anonymous_user = AnonymousUser()
+        self.staff_user = User.objects.create(username='staffuser', is_superuser=False, is_staff=True)
+        self.plain_user = User.objects.create(username='commonuser', is_superuser=False, is_staff=False)
         LocationProperty.objects.create(
             short_name='public', label='Public property', property_type='STR', public=True)
         LocationProperty.objects.create(
@@ -43,7 +43,7 @@ class TestLocationListView(TestCase):
             pandcode=24003, name='Ambtswoning', is_archived=True )
         Location.objects.create(
             pandcode=24004, name='Kantoor', is_archived=False )
-        current_user.set(self.authenticated_user)
+        current_user.set(self.staff_user)
         LocationProcessor(data={
             'pandcode': '24001',
             'naam': 'Stadhuis',
@@ -78,7 +78,7 @@ class TestLocationListView(TestCase):
 
 
     @parameterized.expand([
-            # Search all fields; search, location_property, is_authenticated, archive
+            # Search all fields; search, location_property, is_staff, archive
             ('', '', False, '', [24001, 24002, 24004]),
             ('keuze', '', False, '', [24001, 24002, 24004]),
             ('prive', '', False, '', []),
@@ -111,7 +111,7 @@ class TestLocationListView(TestCase):
             ('10042', 'external', False, '', [24001]),
             ('30042', 'external', False, '', []),
             ('30042', 'external', True, 'all', [24003]),
-            # Archive property for (non)authenticated users
+            # Archive property for (non)staff users
             ('', '', False, '', [24001, 24002, 24004]),
             ('', '', False, 'active', [24001, 24002, 24004]),
             ('', '', False, 'archived', []),
@@ -121,7 +121,7 @@ class TestLocationListView(TestCase):
             ('', '', True, 'archived', [24003]),
             ('', '', True, 'all', [24001, 24002, 24003, 24004]),
     ])
-    def test_search(self, search, location_property, is_authenticated, archive, expected):
+    def test_search(self, search, location_property, is_staff, archive, expected):
         """
         Paramaterized test where the following combinations of conditions are tested:
         Authenticated/Anonymous user
@@ -139,10 +139,10 @@ class TestLocationListView(TestCase):
         }
 
         # Set the correct user
-        if is_authenticated:
-            user = self.authenticated_user
+        if is_staff:
+            user = self.staff_user
         else:
-            user = self.anonymous_user
+            user = self.plain_user
 
         # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
         # Set current user
@@ -160,8 +160,16 @@ class TestLocationListView(TestCase):
         # Compare the filtered locations against expected locations
         self.assertEqual(pandcodes, set(expected))
     
-    def test_get_view(self):
+    def test_get_view_anonymous(self):
         """Test requesting the LocationListView"""
+        # Request the location list page
+        response = self.client.get(reverse('locations_urls:location-list'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_get_view_as_plain_user(self):
+        """Test requesting the LocationListView"""
+        # Log is as a plain user
+        self.client.force_login(self.plain_user)
         # Request the location list page
         response = self.client.get(reverse('locations_urls:location-list'))
         self.assertEqual(response.status_code, 200)
@@ -202,7 +210,8 @@ class LocationDetailViewTest(TestCase):
     def setUp(self) -> None:
         # Disable signals called for log events
         disconnect_signals()
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+        self.plain_user = User.objects.create(username='plainuser', is_superuser=False, is_staff=False)
+        self.staff_user = User.objects.create(username='staffuser', is_superuser=False, is_staff=True)
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.private_property = LocationProperty.objects.create(
             short_name='private', label='Private property', property_type='NUM', required=True)
@@ -223,11 +232,10 @@ class LocationDetailViewTest(TestCase):
         self.location_data_option2 = LocationData.objects.create(
             location=self.location, location_property=self.multichoice_property, _property_option=self.multichoice_option2)
 
-    def test_get_view_anonymous(self):
-        """Test getting the Location Detail View as an anonymous visitor"""
-        # Log out the user and set the current user to anoymous
-        self.client.logout()
-        current_user.set(AnonymousUser())
+    def test_get_view_as_plain_user(self):
+        """Test getting the Location Detail View as a plain user"""
+        # Login as plain user
+        self.client.force_login(self.plain_user)
         # Request location detail page
         response = self.client.get(reverse('locations_urls:location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -240,11 +248,13 @@ class LocationDetailViewTest(TestCase):
         self.assertEqual(response.context['location_data']['public'], self.public_data.value)
         self.assertIsNone(response.context['location_data'].get('private'))
 
-    def test_get_view_authenticated(self):
+    def test_get_view_as_staff_user(self):
         """
-        Test getting the Location Detail View as an authenticated user,
+        Test getting the Location Detail View as a staff user,
         including a multiple choice location property
         """
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Request location detail page
         response = self.client.get(reverse('locations_urls:location-detail', args=[self.location.pandcode]))
         # Verify the response
@@ -261,7 +271,9 @@ class LocationDetailViewTest(TestCase):
         self.assertEqual(response.context['location_data']['multi'], value)
 
     def test_post_view_to_archive(self):
-        """Test getting the Location Detail View as an anonymous visitor"""
+        """Test getting the Location Detail View as a plain user"""
+        # Login as plain user
+        self.client.force_login(self.plain_user)
         # Verifiy that the location is not archived
         location = Location.objects.get(pandcode=self.location.pandcode)
         self.assertFalse(location.is_archived)
@@ -319,7 +331,8 @@ class LocationCreateViewTest(TestCase):
     def setUp(self) -> None:
         # Disable signals called for log events
         disconnect_signals()
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+        self.plain_user = User.objects.create(username='plainuser', is_superuser=False, is_staff=False)
+        self.staff_user = User.objects.create(username='staffuser', is_superuser=False, is_staff=True)
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.number_property = LocationProperty.objects.create(
@@ -339,8 +352,6 @@ class LocationCreateViewTest(TestCase):
 
     def test_get_view_anonymous(self):
         """Test getting the location create page"""
-        # Log out the user
-        self.client.logout()
         # Requesting the page
         response = self.client.get(reverse('locations_urls:location-create'))
         # Verify the response
@@ -348,8 +359,19 @@ class LocationCreateViewTest(TestCase):
         url = reverse('login') + '?next=' + reverse('locations_urls:location-create')
         self.assertEqual(response.url, url)
 
-    def test_get_view_authenticated(self):
+    def test_get_view_as_plain_user(self):
+        """Test getting the location create page as a plain user"""
+        # Login as plain user
+        self.client.force_login(self.plain_user)
+        # Requesting the page
+        response = self.client.get(reverse('locations_urls:location-create'))
+        # Verify the response
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_view_as_staff_user(self):
         """Test getting the location create page"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Requesting the page
         response = self.client.get(reverse('locations_urls:location-create'))
         # Verify the response
@@ -361,6 +383,8 @@ class LocationCreateViewTest(TestCase):
         
     def test_post_view(self):
         """Test posting the create form"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
 
         # Data for the form        
         data = {'naam': 'Amstel 1', 'property': '10', 'multitype': ['Team 1', 'Team 2']}
@@ -388,6 +412,8 @@ class LocationCreateViewTest(TestCase):
 
     def test_post_view_invalid_form(self):
         """Test posting a form with invalid values"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Setting malformed data
         data = {'naam': 'Amstel 1', 'property': 'Fout'}
         url = reverse('locations_urls:location-create')
@@ -406,6 +432,8 @@ class LocationCreateViewTest(TestCase):
 
     def test_post_view_validation_error(self):
         """Test posting when a validation error occurs in LocationProcessor"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Setting the same name as an existing location
         data = {'naam': 'GGD', 'property': '10'}
         url = reverse('locations_urls:location-create')
@@ -438,7 +466,8 @@ class LocationUpdateViewTest(TestCase):
     def setUp(self) -> None:
         # Disable signals called for log events
         disconnect_signals()
-        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0])
+        self.plain_user = User.objects.create(username='plainuser', is_superuser=False, is_staff=False)
+        self.staff_user = User.objects.create(username='staffuser', is_superuser=False, is_staff=True)
         Location.objects.create(pandcode=24000, name='GGD')
         self.location = Location.objects.create(pandcode=25000, name='Stopera')
         self.number_property = LocationProperty.objects.create(
@@ -458,8 +487,6 @@ class LocationUpdateViewTest(TestCase):
 
     def test_get_view_anonymous(self):
         """Test getting the location update page as an anonymous user"""
-        # Log out the user
-        self.client.logout()
         # Requesting the page
         response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
         # Verify the response
@@ -467,8 +494,19 @@ class LocationUpdateViewTest(TestCase):
         url = reverse('login') + '?next=' + reverse('locations_urls:location-update', args=[self.location.pandcode])
         self.assertEqual(response.url, url)
 
+    def test_get_view_anonymous(self):
+        """Test getting the location update page as an anonymous user"""
+        # Login as plain user
+        self.client.force_login(self.plain_user)
+        # Requesting the page
+        response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
+        # Verify the response
+        self.assertEqual(response.status_code, 403)
+
     def test_get_view_authenticated(self):
         """Test getting the location update page as an authenticated user"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Requesting the page
         response = self.client.get(reverse('locations_urls:location-update', args=[self.location.pandcode]))
         # Verify the response
@@ -480,6 +518,8 @@ class LocationUpdateViewTest(TestCase):
 
     def test_post_view(self):
         """Test posting the update form"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Data for the form
         data = {'naam': 'Stopera', 'property': '11', 'multi': ['Team 1']}
         url = reverse('locations_urls:location-update', args=[self.location.pandcode])
@@ -504,6 +544,8 @@ class LocationUpdateViewTest(TestCase):
 
     def test_post_view_invalid_form(self):
         """Test posting a form with invalid values"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Setting malformed data
         data = {'naam': 'Stopera', 'property': 'Fout'}
         url = reverse('locations_urls:location-update', args=[self.location.pandcode])
@@ -523,6 +565,8 @@ class LocationUpdateViewTest(TestCase):
 
     def test_post_view_validation_error(self):
         """Test posting when a validation error occurs in LocationProcessor"""
+        # Login as staff user
+        self.client.force_login(self.staff_user)
         # Setting the same name as an existing location (case insensitive)
         data = {'naam': 'ggd', 'property': '10'}
         url = reverse('locations_urls:location-update', args=[self.location.pandcode])
@@ -812,10 +856,13 @@ class TestLocationExport(TestCase):
             location=self.location,
             location_property=self.multichoice_property,
             _property_option=self.multichoice_option2)
-        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=True)
+        self.user = User.objects.create(username='testuser', is_superuser=False, is_staff=False)
+        self.staff_user = User.objects.create(username='staffuser', is_superuser=False, is_staff=True)
 
     def test_get_form(self):
         """ Test requesting the csv export page"""
+        # Login as a user
+        self.client.force_login(self.user)
         # Request the download form
         response = self.client.get(reverse('locations_urls:location-export'))
         
@@ -826,6 +873,8 @@ class TestLocationExport(TestCase):
 
     def test_get_form_filtered(self):
         """ Test requesting the csv export page with query parameters"""
+        # Login as a user
+        self.client.force_login(self.user)
         # Request the download form with a random query parameter 
         response = self.client.get(reverse('locations_urls:location-export') + "?param=value")
 
@@ -835,6 +884,8 @@ class TestLocationExport(TestCase):
 
     def test_post_form(self):
         """ Test posting to the the csv export page"""
+        # Login as a user
+        self.client.force_login(self.user)
         # Request the download form with a random query parameter 
         response = self.client.post(reverse('locations_urls:location-export'), {})
 
@@ -842,8 +893,10 @@ class TestLocationExport(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers.get('Content-Type'), 'text/csv, charset=utf-8')
 
-    def test_get_csv_file_response_anonymous(self):
-        """ Test getting the csv http response object as an anonymous user"""
+    def test_get_csv_file_response_as_plain_user(self):
+        """ Test getting the csv http response object as a plain user"""
+         # Login as a user
+        self.client.force_login(self.user)
         # Request the csv file http response
         request = HttpRequest()
         # Current user to anonymous
@@ -873,11 +926,13 @@ class TestLocationExport(TestCase):
         # Verify that floors is not included in the result
         self.assertNotIn('floors', row)
 
-    def test_get_csv_file_response_authenticated(self):
-        """ Test getting the csv http response as an authenticated user; all fields should be in the csv"""        
+    def test_get_csv_file_response_as_staff_user(self):
+        """ Test getting the csv http response as a staff user; all fields should be in the csv"""        
+        # Log in as a staff user
+        self.client.force_login(self.staff_user)
         # Request the csv file http response
         request = HttpRequest()
-        current_user.set(self.user)
+        current_user.set(self.staff_user)
         locations = Location.objects.all()
         # Call the function to get the csv file reponse
         response = get_csv_file_response(request=request, locations=locations)
@@ -915,14 +970,13 @@ class TestLocationExport(TestCase):
 
         # Request the csv file http response
         request = HttpRequest()
-        request.user = self.user
+        current_user.set(self.staff_user)
         locations = Location.objects.all()
         # Call the function to get the csv file reponse
         response = get_csv_file_response(request=request, locations=locations)
 
         # Verify the response
         content = response.content
-        
         # Create a csv dictionary from the list and read the first row 
         data = content.decode('utf-8-sig').splitlines()
         # Set the dialect for the csv by sniffing the first line
@@ -981,6 +1035,11 @@ class TestListViewPaginator(TestCase):
         'location_external_services',
     ]
 
+    def setUp(self):
+        # Disable signals called for log events
+        disconnect_signals()
+        self.client.force_login(User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=False)[0])
+
     @patch('locations.views.LocationListView.paginate_by', new_callable=PropertyMock)
     def test_pagination(self, mock):
         """Test to verify if a page is returned"""
@@ -1023,3 +1082,18 @@ class TestPropertyOptionDeleteView(TestCase):
         error_message = [msg for msg in get_messages(response.wsgi_request)][0].message
         expected_message = f"Optie '{property_option.option}' kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld."
         self.assertEqual(error_message, expected_message)
+
+class TestIsStaffMixin(TestCase):
+    def test_is_staff_user(self):
+        # Request a page as a staff member
+        self.user = User.objects.get_or_create(username='teststaff', is_staff=True)[0]
+        self.client.force_login(self.user)
+        response  = self.client.get(reverse('locations_urls:location-admin'))
+        self.assertEqual(response.context['request'].user, current_user.get())
+
+    def test_plain_user_is_forbidden(self):
+        # Request a restricted, staff only, page as a plain user
+        self.user = User.objects.get_or_create(username='testuser', is_staff=False)[0]
+        self.client.force_login(self.user)
+        response  = self.client.get(reverse('locations_urls:location-create'))
+        self.assertEqual(response.status_code, 403)

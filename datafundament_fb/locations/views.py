@@ -1,7 +1,7 @@
 import csv
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -18,9 +18,6 @@ from locations.models import Location, Log, LocationProperty, PropertyGroup, Ext
 from locations.processors import LocationProcessor
 
 # Create your views here.
-def home_page(request):
-    return HttpResponseRedirect(reverse('locations_urls:location-list'))
-
 def get_csv_file_response(request, locations)-> HttpResponse:
     """
     Method for returning a csv file within an http response object.
@@ -53,7 +50,13 @@ def get_csv_file_response(request, locations)-> HttpResponse:
     return response
 
 
-class LocationListView(ListView):
+class IsStaffMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+# Create your views here.
+class LocationListView(LoginRequiredMixin, ListView):
     model = Location
     template_name = 'locations/location-list.html'
     paginate_by = 50
@@ -102,7 +105,7 @@ class LocationListView(ListView):
         return context
         
 
-class LocationDetailView(View):  
+class LocationDetailView(LoginRequiredMixin, View):  
     form = LocationDataForm
     template = 'locations/location-detail.html'
 
@@ -127,11 +130,11 @@ class LocationDetailView(View):
         return HttpResponseRedirect(reverse('locations_urls:location-detail', args=[pandcode]))
 
 
-class LocationCreateView(LoginRequiredMixin, View):
+class LocationCreateView(LoginRequiredMixin, IsStaffMixin, View):
     model = Location
     form = LocationDataForm
     template = 'locations/location-create.html'
-    
+
     def get(self, request, *args, **kwargs):
         form = self.form()
         context = {'form': form}
@@ -165,7 +168,7 @@ class LocationCreateView(LoginRequiredMixin, View):
         return render(request, template_name=self.template, context=context)
 
 
-class LocationUpdateView(LoginRequiredMixin, View):
+class LocationUpdateView(LoginRequiredMixin, IsStaffMixin, View):
     form = LocationDataForm
     template = 'locations/location-update.html'
 
@@ -205,7 +208,7 @@ class LocationUpdateView(LoginRequiredMixin, View):
         return render(request, template_name=self.template, context=context)
 
 
-class LocationImportView(LoginRequiredMixin, View):
+class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
     form = LocationImportForm
     template_name = 'locations/location-import.html'
 
@@ -290,7 +293,7 @@ class LocationImportView(LoginRequiredMixin, View):
         return render(request, template_name=self.template_name, context=context)        
     
 
-class LocationExportView(View):
+class LocationExportView(LoginRequiredMixin, View):
     template = 'locations/location-export.html'
 
     def get(self, request, *args, **kwargs):
@@ -314,7 +317,7 @@ class LocationExportView(View):
         return response
 
 
-class LocationAdminView(LoginRequiredMixin, View):
+class LocationAdminView(LoginRequiredMixin, IsStaffMixin, View):
     template = 'locations/location-admin.html'
     
     def get(self, request, *args, **kwargs):
@@ -342,7 +345,7 @@ class LocationLogView(LoginRequiredMixin, ListView):
         return context
 
 
-class LocationPropertyListView(LoginRequiredMixin, ListView):
+class LocationPropertyListView(LoginRequiredMixin, IsStaffMixin, ListView):
     model = LocationProperty
     template_name = 'locations/locationproperty-list.html'
     fields = ['label', 'property_type', 'public', 'group', 'order']
@@ -354,7 +357,7 @@ class LocationPropertyListView(LoginRequiredMixin, ListView):
         return context
 
 
-class LocationPropertyCreateView(LoginRequiredMixin, CreateView):
+class LocationPropertyCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
     model = LocationProperty
     template_name = 'locations/generic-create.html'
     fields = ['short_name', 'label', 'property_type', 'required', 'multiple', 'unique', 'public', 'group', 'order',]
@@ -371,7 +374,7 @@ class LocationPropertyCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
+class LocationPropertyUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
     model = LocationProperty
     template_name = 'locations/locationproperty-update.html'
     fields = ['short_name', 'label', 'required', 'multiple', 'unique', 'public', 'group', 'order',]
@@ -387,7 +390,7 @@ class LocationPropertyUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
+class LocationPropertyDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
     model = LocationProperty
     template_name = 'locations/generic-delete.html'
     success_url = reverse_lazy('locations_urls:locationproperty-list')
@@ -403,7 +406,7 @@ class LocationPropertyDeleteView(LoginRequiredMixin, DeleteView):
         return context
 
 
-class PropertyOptionListView(LoginRequiredMixin, ListView):
+class PropertyOptionListView(LoginRequiredMixin, IsStaffMixin, ListView):
     model = PropertyOption
     template_name = 'locations/propertyoption-list.html'
     ordering = ['option']
@@ -426,7 +429,7 @@ class PropertyOptionListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
+class PropertyOptionCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
     model = PropertyOption
     template_name = 'locations/propertyoption-create.html'
     fields = ['option']
@@ -461,7 +464,7 @@ class PropertyOptionCreateView(LoginRequiredMixin, CreateView):
         return initial
 
 
-class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
+class PropertyOptionUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
     model = PropertyOption
     template_name = 'locations/propertyoption-update.html'
     fields = ['option']
@@ -484,7 +487,7 @@ class PropertyOptionUpdateView(LoginRequiredMixin, UpdateView):
         return object
 
 
-class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
+class PropertyOptionDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
     model = PropertyOption
     template_name = 'locations/propertyoption-delete.html'
 
@@ -510,7 +513,7 @@ class PropertyOptionDeleteView(LoginRequiredMixin, DeleteView):
         return context
 
 
-class PropertyGroupListView(LoginRequiredMixin, ListView):
+class PropertyGroupListView(LoginRequiredMixin, IsStaffMixin, ListView):
     model = PropertyGroup
     template_name = 'locations/propertygroup-list.html'
     ordering = ['order']
@@ -520,7 +523,7 @@ class PropertyGroupListView(LoginRequiredMixin, ListView):
         context['model'] = self.model
         return context
 
-class PropertyGroupCreateView(LoginRequiredMixin, CreateView):
+class PropertyGroupCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
     model = PropertyGroup
     fields = ['name', 'order']
     template_name = 'locations/generic-create.html'
@@ -536,7 +539,7 @@ class PropertyGroupCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
+class PropertyGroupUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
     model = PropertyGroup
     fields = ['name', 'order']
     template_name = 'locations/generic-update.html'
@@ -547,7 +550,7 @@ class PropertyGroupUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PropertyGroupDeleteView(LoginRequiredMixin, DeleteView):
+class PropertyGroupDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
     model = PropertyGroup
     template_name = 'locations/generic-delete.html'
     success_url = reverse_lazy('locations_urls:propertygroup-list')
@@ -557,7 +560,7 @@ class PropertyGroupDeleteView(LoginRequiredMixin, DeleteView):
         return super().form_valid(form)
 
 
-class ExternalServivceListView(LoginRequiredMixin, ListView):
+class ExternalServivceListView(LoginRequiredMixin, IsStaffMixin, ListView):
     model = ExternalService
     template_name = 'locations/externalservice-list.html'
     ordering = ['order']
@@ -568,7 +571,7 @@ class ExternalServivceListView(LoginRequiredMixin, ListView):
         return context
 
 
-class ExternalServiceCreateView(LoginRequiredMixin, CreateView):
+class ExternalServiceCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
     model = ExternalService
     fields = ['name', 'short_name', 'public', 'order']
     template_name = 'locations/generic-create.html'
@@ -584,7 +587,7 @@ class ExternalServiceCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
+class ExternalServiceUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
     model = ExternalService
     fields = ['name', 'short_name', 'public', 'order']
     template_name = 'locations/generic-update.html'
@@ -595,7 +598,7 @@ class ExternalServiceUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class ExternalServiceDeleteView(LoginRequiredMixin, DeleteView):
+class ExternalServiceDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
     model = ExternalService
     template_name = 'locations/generic-delete.html'
     success_url = reverse_lazy('locations_urls:externalservice-list')

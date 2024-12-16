@@ -74,16 +74,16 @@ class LocationProcessor():
         self.location_properties = list(['pandcode', 'naam'])
 
         # Get all location properties and add the names to the location properties list
-        # List is filtered for private accessibility
+        # List is filtered for non staff members
         self.location_property_instances = LocationProperty.objects.all()
-        if not self.user.is_authenticated:
+        if not self.user.is_staff:
             self.location_property_instances =  self.location_property_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.location_property_instances])
 
         # Get all external service links
-        # List is filtered for private accessibility
+        # List is filtered for non staff members
         self.external_service_instances = ExternalService.objects.all()
-        if not self.user.is_authenticated:
+        if not self.user.is_staff:
             self.external_service_instances = self.external_service_instances.filter(public=True)
         self.location_properties.extend([obj.short_name for obj in self.external_service_instances])
 
@@ -153,7 +153,7 @@ class LocationProcessor():
         setattr(object, 'archief', getattr(object.location_instance, 'is_archived'))
 
         # Add location properties to the object; filter to include non-public properties
-        if object.user.is_authenticated:
+        if object.user.is_staff:
             location_data_set = object.location_instance.locationdata_set.all()
         else:
             location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
