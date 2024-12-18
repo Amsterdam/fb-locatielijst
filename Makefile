@@ -2,7 +2,7 @@
 # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 #
 # VERSION = 2024.07.01
-.PHONY: help pip-tools sync requirements upgrade test init
+.PHONY: help pip-tools sync requirements upgrade test init check-env
 
 UID:=$(shell id --user)
 GID:=$(shell id --group)
@@ -57,7 +57,7 @@ shell:	                            ## Run a Django shell
 dev-https:                          ## Run the development app over SSL with runserver_plus
 	$(run) --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key
 
-dev:                                ## Run the development app over plain http with runserver
+dev: check-env                       ## Run the development app over plain http with runserver
 	$(run) --service-ports dev python manage.py runserver 0.0.0.0:8000
 
 test:                               ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
@@ -83,4 +83,10 @@ loaddata:                           ## Load $fixtures. Multiple fixtures can be 
 	$(manage) loaddata $(fixtures)
 
 push:                               ## Push to container registry
-	$(dc) push 
+	$(dc) push
+
+check-env:                          ## Check if an .env file exists, otherwise create one.
+	@if [ ! -f .env ]; then \
+		echo "No .env file found. Creating an empty .env file..."; \
+		touch .env; \
+	fi

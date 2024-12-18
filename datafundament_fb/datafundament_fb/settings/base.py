@@ -187,8 +187,8 @@ LOGOUT_REDIRECT_URL = "/"
 
 ## OpenId Connect settings ##
 OIDC_BASE_URL = "https://login.microsoftonline.com/72fca1b1-2c2e-4376-a445-294d80196804"
-OIDC_RP_CLIENT_ID = os.getenv("OIDC_RP_CLIENT_ID",)
-OIDC_RP_CLIENT_SECRET = os.getenv("OIDC_RP_CLIENT_SECRET")
+OIDC_RP_CLIENT_ID = os.getenv("OIDC_RP_CLIENT_ID", '')
+OIDC_RP_CLIENT_SECRET = os.getenv("OIDC_RP_CLIENT_SECRET", '')
 OIDC_OP_AUTHORIZATION_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/authorize"
 OIDC_OP_TOKEN_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/token"
 OIDC_OP_USER_ENDPOINT = "https://graph.microsoft.com/oidc/userinfo"
@@ -196,7 +196,7 @@ OIDC_OP_JWKS_ENDPOINT = f"{OIDC_BASE_URL}/discovery/v2.0/keys"
 OIDC_OP_LOGOUT_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/logout"
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"prompt": "select_account"}
-OIDC_CREATE_USER = False
+OIDC_CREATE_USER = True
 # Turn PKCE on for single-page applications! Because the client_secret is not secure in SPAs. 
 # You cannot turn this on by default because it breaks the authorization code flow for regular web applications.
 OIDC_USE_PKCE = False
