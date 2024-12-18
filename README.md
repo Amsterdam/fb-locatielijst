@@ -3,10 +3,8 @@
 Dit is een repo vor de applicatie datafundament-fb.
 Een applicatie voor het opslaan en inlezen van gegevens van het faciliteiten bureau over de locaties waar zij werkzaamheden doen.
 
-# Demo
+# Development
 Na het klonen kan je de Docker images starten vanuit de makefile:
-- Configureer de environment bestanden
-  > Verwijder de suffix '.example' van beide env bestanden die nodig zijn zodat je de volgende bestanden overhoudt: `.app.env` en `.db.env`
 - Maak de benodigde requirements.txt en requirements_dev.txt aan:
   ```
   make requirements
@@ -28,3 +26,15 @@ Na het klonen kan je de Docker images starten vanuit de makefile:
   ```
   make dev
   ```
+
+# Authenticatie via Entra ID oauth
+Het is mogelijk om op je lokale ontwikkelomgeving gebruik te maken van authenticatie via Entra ID.
+- Configureer de oauth koppeling met Entra ID
+  
+  Maak een `.env` bestand aan en plaats daarin de volgende inhoud en vul de waardes aan uit de keyvault voor datafundament-o:
+  ```
+  OIDC_RP_CLIENT_ID = '<waarde uit oidc_rp_client_id in keyvault>'
+  OIDC_RP_CLIENT_SECRET = '<waarde uit oidc_rp_client_secret in keyvault>'
+  ```
+- Zet in `.app.env` je ENVIRONMENT variabele op `development`.
+  >Let op dit zal je tests breken. Om de tests weer te kunnen draaien moet je deze variabele weer terug op `local` zetten.   
