@@ -40,7 +40,7 @@ cryptography==43.0.1
     #   msal
     #   pyjwt
     #   pyopenssl
-django==5.0.9
+django==5.0.10
     # via
     #   -r requirements.in
     #   django-csp
@@ -94,6 +94,7 @@ sqlparse==0.5.1
     # via django
 typing-extensions==4.12.2
     # via
+    #   asgiref
     #   azure-core
     #   azure-identity
     #   azure-keyvault-certificates
