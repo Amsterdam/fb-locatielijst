@@ -57,11 +57,11 @@ shell:	                            ## Run a Django shell
 dev-https:                          ## Run the development app over SSL with runserver_plus
 	$(run) --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key
 
-dev: check-env                       ## Run the development app over plain http with runserver
+dev: check-env                      ## Run the development app over plain http with runserver
 	$(run) --service-ports dev python manage.py runserver 0.0.0.0:8000
 
-test:                               ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
-	$(manage) test $(test)
+test: check-env                     ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
+	$(run) test python manage.py test $(test)
 
 clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
