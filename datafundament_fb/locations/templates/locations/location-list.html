@@ -8,7 +8,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="/">Home</a>
-    {% if user.is_authenticated %}
+    {% if user.is_staff %}
     <span>&rsaquo;</span>
     <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
     {% endif %}
@@ -33,7 +33,7 @@
                 {{ field }}
             </div>
             {% else %}
-                {% if user.is_authenticated %}
+                {% if user.is_staff %}
                 <div class="filter-option">
                     <label for="{{ field.auto_id }}">{{ field.label }}</label>
                     {{ field }}
@@ -93,7 +93,7 @@
 
     <div class="btn-container">
         <a href="{% url 'locations_urls:location-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
-        {% if user.is_authenticated %}
+        {% if user.is_staff %}
         <a href="{% url 'locations_urls:location-create' %}" class="btn btn-secundair">Toevoegen</a>
         {% endif %}
     </div>

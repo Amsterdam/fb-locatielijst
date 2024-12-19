@@ -11,6 +11,7 @@ datafundament_fb/static/
 #/docs
 #/settings
 .tmp/
+.env
 
 # Certificates
 *.pem

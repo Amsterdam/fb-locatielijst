@@ -53,7 +53,7 @@
     {% endfor %}
 </dl>
 <div class="btn-container">
-    {% if user.is_authenticated %}
+    {% if user.is_staff %}
         {% if not location_data.archief %}
         <a href="{% url 'locations_urls:location-update' location_data.pandcode %}" class="btn btn-primair">Wijzigen</a>
         {% endif %}

@@ -49,15 +49,18 @@ class TestCurrentUserMiddleware(TestCase):
     anonymous user for non authenticated requests.
     """
 
-    def test_authenticated_user(self):
-        # Log in to a restricted page on the website
-        self.user = User.objects.get_or_create(username='testuser', is_superuser=True, is_staff=True)[0]
+    def test_is_plain_user(self):
+        # Request a page as a plain user
+        self.user = User.objects.get_or_create(username='testuser', is_staff=False)[0]
         self.client.force_login(self.user)
-        response  = self.client.get(reverse('locations_urls:location-admin'))
-        self.assertEqual(response.context['request'].user, current_user.get())
-
-    def test_anonymous_user(self):
-        # Request a page as an anonymous user
-        self.client.logout()
         response  = self.client.get(reverse('locations_urls:location-list'))
         self.assertEqual(response.context['request'].user, current_user.get())
+      
+    def test_anonymous_user(self):
+        # Request a page as an anoymous user
+        self.client.logout()
+        login_url = reverse('login')
+        location_url = reverse('locations_urls:location-list')
+        response  = self.client.get(location_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers['Location'], f'{login_url}?next={location_url}')
