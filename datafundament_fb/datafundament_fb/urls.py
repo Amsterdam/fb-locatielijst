@@ -17,8 +17,17 @@ Including another URLconf
 from os import environ
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import include, path
-from django.views.generic import TemplateView
+from django.urls import include, path, reverse
+from django.views.generic import TemplateView, View
+from django.http import HttpResponseRedirect
+
+class AdminLogin(View):
+    def get(self, request, **kwargs):
+        return HttpResponseRedirect(
+            reverse('oidc_authentication_init') + (
+                '?next={}'.format(request.GET['next']) if 'next' in request.GET else ''
+            )
+        )
 
 # Local development and tests uses default Django authentication backend 
 if environ.get('ENVIRONMENT') == 'local':
@@ -29,6 +38,7 @@ if environ.get('ENVIRONMENT') == 'local':
 else:
     urlpatterns = [
         path('oidc/', include("mozilla_django_oidc.urls")),
+        path('admin/login/', AdminLogin.as_view())
     ]
 
 urlpatterns.extend([
