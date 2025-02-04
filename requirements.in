@@ -2,7 +2,7 @@ uwsgi
 Django==5.0.*
 django-csp
 django-extensions
-psycopg2
+psycopg2-binary
 pyodbc
 wfastcgi
 azure-core

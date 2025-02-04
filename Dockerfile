@@ -1,63 +1,89 @@
-FROM python:3.12.4-slim-bookworm AS app
+ARG PYTHON_VERSION=3.13
 
-  # build variables.
-  ENV DEBIAN_FRONTEND=noninteractive
+# Builder
+FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
 
-  # install PostgreSQL requirements.
-  RUN apt-get update \
-  && apt-get -y install libpq-dev gcc
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED 1
 
-  WORKDIR /app/src/datafundament_fb
-  COPY requirements.txt requirements.txt
-  COPY . /app/src/
+RUN set -eux && \
+    python -m ensurepip --upgrade && \
+    apt-get update && apt-get install -y gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-  RUN pip install --upgrade pip
-  RUN pip install -r requirements.txt
+WORKDIR /app/install
 
-  # copy deployment files
-  COPY deploy /app/deploy
-  # RUN chmod +x /app/deploy/wait-for-it.sh
-  # RUN chmod +x /app/deploy/db/entrypoint.sh
-  # RUN chmod +x /app/deploy/db/setup-database.sh
-  
-  # copy runtime files
-  COPY runtime /app/runtime
-  RUN chmod +x /app/runtime/app/docker-run.sh
-
-  # TODO tijdens het draaien van collectstatic moet de env ENVIRONMENT gegeven zijn
-  # anders kan settings\init.py niet de juiste settings laden;
-  # behalve met een work-around waarbij een default settings wordt gezet
-  # dit werkt niet in combinatie met args: - NODE_ENV = development in docker-compose.yml:
-  # ARG NODE_ENV
-  # ENV ENVIRONMENT $NODE_ENV
-  RUN python manage.py collectstatic --no-input
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
-# stage 2, dev
+FROM python:${PYTHON_VERSION}-slim-bookworm AS app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED 1
+
+RUN set -eux && \
+    python -m ensurepip --upgrade && \
+    apt-get update && apt-get install -y \
+        libgeos3.11.1 \
+        gdal-bin && \
+    useradd --user-group --system appuser && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Copy the Python dependencies from the builder stage
+COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
+COPY --from=builder /usr/local/bin/ /usr/local/bin
+
+WORKDIR /app/deploy
+COPY deploy .
+
+WORKDIR /app/src
+COPY src .
+
+ARG SECRET_KEY=not-used
+ARG OIDC_RP_CLIENT_ID=not-used
+ARG OIDC_RP_CLIENT_SECRET=not-used
+RUN python manage.py collectstatic --no-input
+
+USER appuser
+
+CMD ["/app/deploy/docker-run.sh"]
+
+# devserver
 FROM app AS dev
 
-  USER root
-  ADD requirements_dev.txt requirements_dev.txt
-  RUN pip install -r requirements_dev.txt
+USER root
+WORKDIR /app/install
 
-  USER ITforCare
+COPY requirements_dev.txt requirements_dev.txt
 
-  # Any process that requires to write in the home dir
-  # we write to /tmp since we have no home dir
-  ENV HOME=/tmp
+RUN pip install --no-cache-dir -r requirements_dev.txt
 
+WORKDIR /app/src
+USER appuser
 
-# stage 3, test
-FROM dev AS test
+ENV HOME /tmp
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# tests
+FROM dev AS tests
 
-  USER ITforCare
+WORKDIR /app
+#COPY tests tests
+COPY pyproject.toml pyproject.toml
 
-  ENV AUDIT_LOG_ENABLED=false
-  ENV COVERAGE_FILE=/tmp/.coverage
-  ENV PYTHONPATH=/app/src
+USER appuser
 
-  CMD ["pytest"]
+ENV COVERAGE_FILE=/tmp/.coverage
+ENV PYTHONPATH=/src
 
+CMD ["pytest"]
 
-FROM postgres AS postgres
-  COPY deploy/db/setup.sql /docker-entrypoint-initdb.d/
+# linting
+FROM python:${PYTHON_VERSION}-alpine AS linting
+
+WORKDIR /app
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements_linting.txt

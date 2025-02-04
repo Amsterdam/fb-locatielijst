@@ -2,8 +2,13 @@ x-app: &base-app
   build:
     context: .
     target: app
+  volumes:
+    - .:/app/
   env_file: 
     - ./.app.env
+  depends_on:
+    database:
+      condition: service_healthy
 
 services:
   app:
@@ -12,7 +17,7 @@ services:
       context: .
       target: app
     image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/fb-locatielijst}:${VERSION:-latest}
-    command: /app/runtime/app/docker-run.sh
+    command: /app/deploy/docker-run.sh
     ports:
       - "8000:8000"
 
@@ -21,42 +26,47 @@ services:
     build:
       context: .
       target: dev
-    depends_on:
-      postgres:
-        condition: service_healthy
     command: python manage.py runserver 0.0.0.0:8000
     env_file:
       - ./.app.env
       - ./.env
-    volumes:
-      - ./:/app/src
     ports:
       - "8000:8000"
 
   test:
     <<: *base-app
-    build:
-      context: .
-      target: test
-    depends_on:
-      postgres:
-        condition: service_healthy
-    command: python manage.py runserver 0.0.0.0:8000
-
-  postgres:
-    build:
-      context: .
-      target: postgres
     ports:
-      - 5432:5432
+      - "3000:3000"
+    build:
+      context: .
+      target: tests
+    environment:
+      DJANGO_SETTINGS_MODULE: "main.settings"
+      OIDC_RP_CLIENT_ID: tests
+      OIDC_RP_CLIENT_SECRET: tests
+    command:
+      pytest
+
+  linting:
+    build:
+      context: .
+      target: linting
     volumes:
-      - postgresqldata:/data/db
-    env_file:
-      - ./.postgres.env
+      - ./src:/app/src
+  
+  database:
+    image: postgis/postgis:16-3.4-alpine
+    environment:
+      POSTGRES_USER: fbl
+      POSTGRES_PASSWORD: insecure
+      POSTGRES_DB: fbl
+    ports:
+      - "54321:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 5s
-      timeout: 3s
-      retries: 10  
+      test: [ "CMD", "pg_isready", "-q", "-d", "fbl", "-U", "fbl" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   postgresqldata:
