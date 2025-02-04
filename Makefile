@@ -54,8 +54,8 @@ dev-https:                          ## Run the development app over SSL with run
 dev: migrate
 	$(run) --service-ports dev
 
-test: 								## Execute tests.
-	$(run) test pytest $(ARGS)                     
+test: check-env                     ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
+	$(run) test python app/src/manage.py test $(test)                   
 
 clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
