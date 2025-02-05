@@ -46,6 +46,7 @@ ARG SECRET_KEY=not-used
 ARG OIDC_RP_CLIENT_ID=not-used
 ARG OIDC_RP_CLIENT_SECRET=not-used
 RUN python manage.py collectstatic --no-input
+RUN chmod +x /app/deploy/docker-run.sh
 
 USER appuser
 
