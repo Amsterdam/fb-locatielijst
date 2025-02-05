@@ -16,7 +16,7 @@ services:
     build:
       context: .
       target: app
-    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/fb-locatielijst}:${VERSION:-latest}
+    image: ${REGISTRY:-127.0.0.1:5000}/${REPOSITORY:-opdrachten/fb-locatielijst}:${VERSION:-latest}
     command: /app/deploy/docker-run.sh
     ports:
       - "8000:8000"
@@ -41,7 +41,6 @@ services:
       context: .
       target: tests
     environment:
-      DJANGO_SETTINGS_MODULE: "main.settings"
       OIDC_RP_CLIENT_ID: tests
       OIDC_RP_CLIENT_SECRET: tests
     command:
