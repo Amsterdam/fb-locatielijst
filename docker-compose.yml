@@ -11,7 +11,7 @@ services:
     build:
       context: .
       target: app
-    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/fblocatielijst}:${VERSION:-latest}
+    image: ${REGISTRY:-127.0.0.1:5001}/${REPOSITORY:-opdrachten/fb-locatielijst}:${VERSION:-latest}
     command: /app/runtime/app/docker-run.sh
     ports:
       - "8000:8000"
