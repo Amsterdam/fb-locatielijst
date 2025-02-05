@@ -23,6 +23,9 @@ FROM python:3.12.4-slim-bookworm AS app
   # copy runtime files
   COPY runtime /app/runtime
   RUN chmod +x /app/runtime/app/docker-run.sh
+  
+  COPY runtime/app/docker-run.sh /app/deploy/docker-run.sh 
+  RUN chmod +x /app/deploy/docker-run.sh
 
   # TODO tijdens het draaien van collectstatic moet de env ENVIRONMENT gegeven zijn
   # anders kan settings\init.py niet de juiste settings laden;
