@@ -162,8 +162,13 @@ LOGIN_REDIRECT_URL = '/locaties/beheer'
 LOGOUT_REDIRECT_URL = '/'
 
 # Cross Site Request Forgery (CSRF) settings
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
 CSRF_COOKIE_SECURE = bool(int(os.environ.get("CSRF_COOKIE_SECURE", 1)))
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://fblocatielijst.opdr-o.azure.amsterdam.nl",
+    "https://acc.fblocatielijst.amsterdam.nl",
+    "https://fblocatielijst.amsterdam.nl",
+]
 
 # Content Security Policy (CSP) settings
 CSP_DEFAULT_SRC = ("'none'")
