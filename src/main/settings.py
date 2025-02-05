@@ -69,7 +69,7 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'src', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
 DATABASE_NAME = os.getenv("DATABASE_NAME", "dev")
 DATABASE_USER = os.getenv("DATABASE_USER", "dev")
-DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "insecure")
 DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
 DATABASE_OPTIONS = {'sslmode': 'allow', 'connect_timeout': 5}
 
@@ -162,8 +162,14 @@ LOGIN_REDIRECT_URL = '/locaties/beheer'
 LOGOUT_REDIRECT_URL = '/'
 
 # Cross Site Request Forgery (CSRF) settings
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
 CSRF_COOKIE_SECURE = bool(int(os.environ.get("CSRF_COOKIE_SECURE", 1)))
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://fblocatielijst.opdr-o.azure.amsterdam.nl",
+    "https://acc.fblocatielijst.amsterdam.nl",
+    "https://fblocatielijst.amsterdam.nl",
+]
+
 
 # Content Security Policy (CSP) settings
 CSP_DEFAULT_SRC = ("'none'")
