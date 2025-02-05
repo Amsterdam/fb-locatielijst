@@ -1,4 +1,4 @@
-from typing import Self
+from typing_extensions import Self
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db import transaction
