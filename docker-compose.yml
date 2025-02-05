@@ -12,7 +12,7 @@ services:
       context: .
       target: app
     image: ${REGISTRY:-127.0.0.1:5001}/${REPOSITORY:-opdrachten/fb-locatielijst}:${VERSION:-latest}
-    command: /app/runtime/app/docker-run.sh
+    command: /app/deploy/docker-run.sh
     ports:
       - "8000:8000"
 
@@ -27,7 +27,6 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     env_file:
       - ./.app.env
-      - ./.env
     volumes:
       - ./:/app/src
     ports:
