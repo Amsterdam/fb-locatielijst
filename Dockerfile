@@ -27,7 +27,8 @@ RUN set -eux && \
     python -m ensurepip --upgrade && \
     apt-get update && apt-get install -y \
         libgeos3.11.1 \
-        gdal-bin && \
+        gdal-bin \
+        curl && \
     useradd --user-group --system appuser && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
