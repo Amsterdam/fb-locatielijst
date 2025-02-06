@@ -44,7 +44,7 @@ else:
 urlpatterns.extend([
     path('admin/', admin.site.urls),
     path('locaties/', include(('locations.urls', 'locations'), namespace='locations_urls')),
-    path('status/', include(('health.urls', 'health'), namespace='health_urls')),
+    path("status/", include("health.urls")),
     path('help/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
 ])

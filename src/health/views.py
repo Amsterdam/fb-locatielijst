@@ -9,18 +9,10 @@ log = logging.getLogger(__name__)
 def health(request):
     try:
         with connection.cursor() as cursor:
-            cursor.execute('select 1')
+            cursor.execute("SELECT 1")
             assert cursor.fetchone()
-    except Exception:
-        log.exception('Database connectivity failed')
-        return HttpResponse(
-            'Database connectivity failed',
-            content_type='text/plain',
-            status=500,
-        )
+    except Exception as e:
+        log.exception(f"Database connectivity failed: {str(e)}")
+        return HttpResponse("Database connectivity failed", content_type="text/plain", status=500)
 
-    return HttpResponse(
-        'Connectivity OK',
-        content_type='text/plain',
-        status=200,
-    )
+    return HttpResponse("Connectivity OK", content_type="text/plain", status=200)
