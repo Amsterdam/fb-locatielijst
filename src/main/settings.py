@@ -30,12 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
-ALLOWED_HOSTS = [
-    "http://localhost:3000",
-    "https://fblocatielijst.opdr-o.azure.amsterdam.nl",
-    "https://acc.fblocatielijst.amsterdam.nl",
-    "https://fblocatielijst.amsterdam.nl",
-]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
