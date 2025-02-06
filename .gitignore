@@ -1,6 +1,6 @@
 # project folders
 .git-ignore/
-main/static/
+src/static/
 
 # project files
 *.sqlite3
