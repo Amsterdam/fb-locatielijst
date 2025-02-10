@@ -21,13 +21,21 @@ from django.urls import include, path, reverse
 from django.views.generic import TemplateView, View
 from django.http import HttpResponseRedirect
 
+from main.view_403 import permissiondenied403
+
 class AdminLogin(View):
     def get(self, request, **kwargs):
-        return HttpResponseRedirect(
-            reverse('oidc_authentication_init') + (
-                '?next={}'.format(request.GET['next']) if 'next' in request.GET else ''
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(
+                reverse('oidc_authentication_init') + (
+                    f'?next={request.GET.get("next", "/admin/")}'
+                )
             )
-        )
+
+        if not request.user.is_staff:
+            return HttpResponseRedirect('/403/')
+        
+        return HttpResponseRedirect(reverse('admin:index'))
 
 # Local development and tests uses default Django authentication backend 
 if environ.get('ENVIRONMENT') == 'local':
@@ -45,6 +53,7 @@ urlpatterns.extend([
     path('admin/', admin.site.urls),
     path('locaties/', include(('locations.urls', 'locations'), namespace='locations_urls')),
     path("status/", include("health.urls")),
+    path("403/", permissiondenied403),
     path('help/', include(('help_docs.urls', 'help_docs'), namespace='help_docs_urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
 ])
