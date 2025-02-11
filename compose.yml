@@ -40,6 +40,8 @@ services:
     environment:
       OIDC_RP_CLIENT_ID: tests
       OIDC_RP_CLIENT_SECRET: tests
+      ENVIRONMENT: 'local'
+      DEBUG: '1'
     command:
       pytest
 
