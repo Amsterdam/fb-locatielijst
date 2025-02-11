@@ -4,8 +4,6 @@ x-app: &base-app
     target: app
   volumes:
     - .:/app/
-  env_file: 
-    - ./.app.env
   depends_on:
     database:
       condition: service_healthy
