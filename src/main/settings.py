@@ -90,8 +90,8 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
-DATABASE_NAME = os.getenv("DATABASE_NAME", "dev")
-DATABASE_USER = os.getenv("DATABASE_USER", "dev")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "fbl")
+DATABASE_USER = os.getenv("DATABASE_USER", "fbl")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "insecure")
 DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
 DATABASE_OPTIONS = {'sslmode': 'allow', 'connect_timeout': 5}
@@ -182,7 +182,7 @@ CSP_FRAME_ANCESTORS = ("'none'")
 CSP_FORM_ACTION = ("'self'")
 
 # Automatic redirect to HTTPS
-SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', 1)))
+SECURE_SSL_REDIRECT = bool(int(os.getenv('SECURE_SSL_REDIRECT', "0")))
 
 # Authentication settings
 AUTHENTICATION_BACKENDS = ['mozilla_django_oidc.auth.OIDCAuthenticationBackend',]
