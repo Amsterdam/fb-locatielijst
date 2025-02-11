@@ -92,3 +92,4 @@ data/
 
 # webserver
 *web.config
+.app.env
