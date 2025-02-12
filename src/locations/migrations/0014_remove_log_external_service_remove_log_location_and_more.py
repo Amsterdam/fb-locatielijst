@@ -8,63 +8,69 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('locations', '0013_remove_externalservice_last_modified_by_and_more'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("locations", "0013_remove_externalservice_last_modified_by_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='log',
-            name='external_service',
+            model_name="log",
+            name="external_service",
         ),
         migrations.RemoveField(
-            model_name='log',
-            name='location',
+            model_name="log",
+            name="location",
         ),
         migrations.RemoveField(
-            model_name='log',
-            name='location_property',
+            model_name="log",
+            name="location_property",
         ),
         migrations.RemoveField(
-            model_name='log',
-            name='property_option',
+            model_name="log",
+            name="property_option",
         ),
         migrations.RemoveField(
-            model_name='log',
-            name='target',
+            model_name="log",
+            name="target",
         ),
         migrations.AddField(
-            model_name='log',
-            name='action',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'create'), (1, 'read'), (2, 'update'), (3, 'delete')], default=1),
+            model_name="log",
+            name="action",
+            field=models.PositiveSmallIntegerField(
+                choices=[(0, "create"), (1, "read"), (2, "update"), (3, "delete")], default=1
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='log',
-            name='content_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='contenttypes.contenttype'),
+            model_name="log",
+            name="content_type",
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to="contenttypes.contenttype"
+            ),
         ),
         migrations.AddField(
-            model_name='log',
-            name='field',
+            model_name="log",
+            name="field",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='log',
-            name='object_id',
-            field=models.IntegerField(default=0, verbose_name='Id'),
+            model_name="log",
+            name="object_id",
+            field=models.IntegerField(default=0, verbose_name="Id"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='log',
-            name='object_name',
-            field=models.CharField(default='', max_length=100, verbose_name='Object'),
+            model_name="log",
+            name="object_name",
+            field=models.CharField(default="", max_length=100, verbose_name="Object"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='log',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="log",
+            name="user",
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

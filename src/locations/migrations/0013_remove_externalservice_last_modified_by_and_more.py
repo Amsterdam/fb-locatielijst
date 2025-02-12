@@ -6,32 +6,32 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0012_alter_propertyoption_options'),
+        ("locations", "0012_alter_propertyoption_options"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='externalservice',
-            name='last_modified_by',
+            model_name="externalservice",
+            name="last_modified_by",
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='last_modified_by',
+            model_name="location",
+            name="last_modified_by",
         ),
         migrations.RemoveField(
-            model_name='locationdata',
-            name='last_modified_by',
+            model_name="locationdata",
+            name="last_modified_by",
         ),
         migrations.RemoveField(
-            model_name='locationexternalservice',
-            name='last_modified_by',
+            model_name="locationexternalservice",
+            name="last_modified_by",
         ),
         migrations.RemoveField(
-            model_name='locationproperty',
-            name='last_modified_by',
+            model_name="locationproperty",
+            name="last_modified_by",
         ),
         migrations.RemoveField(
-            model_name='propertyoption',
-            name='last_modified_by',
+            model_name="propertyoption",
+            name="last_modified_by",
         ),
     ]

@@ -1,12 +1,13 @@
 from django.db.models import Q
 
-def filter_on_archive(archive)-> Q:
+
+def filter_on_archive(archive) -> Q:
     match archive:
-        case 'active':
+        case "active":
             qfilter = Q(is_archived=False)
-        case 'archived':
+        case "archived":
             qfilter = Q(is_archived=True)
-        case 'all':
+        case "all":
             qfilter = Q()
         case _:
             qfilter = Q(is_archived=False)

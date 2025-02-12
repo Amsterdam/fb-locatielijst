@@ -6,16 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0001_initial'),
+        ("locations", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='locationdata',
-            name='either_field_filled',
+            model_name="locationdata",
+            name="either_field_filled",
         ),
         migrations.AddConstraint(
-            model_name='locationdata',
-            constraint=models.CheckConstraint(check=models.Q(('property_option__isnull', False), ('value__isnull', False), _negated=True), name='either_field_filled', violation_error_message='Either option or value must be filled.'),
+            model_name="locationdata",
+            constraint=models.CheckConstraint(
+                check=models.Q(("property_option__isnull", False), ("value__isnull", False), _negated=True),
+                name="either_field_filled",
+                violation_error_message="Either option or value must be filled.",
+            ),
         ),
     ]

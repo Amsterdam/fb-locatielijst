@@ -7,34 +7,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0008_location_created_at_locationdata_created_at_and_more'),
+        ("locations", "0008_location_created_at_locationdata_created_at_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PropertyGroup',
+            name="PropertyGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=20, verbose_name='Groepsnaam')),
-                ('order', models.IntegerField(blank=True, null=True, verbose_name='Volgorde')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=20, verbose_name="Groepsnaam")),
+                ("order", models.IntegerField(blank=True, null=True, verbose_name="Volgorde")),
             ],
             options={
-                'verbose_name': 'Eigenschap groep',
-                'verbose_name_plural': 'Eigenschap groepen',
+                "verbose_name": "Eigenschap groep",
+                "verbose_name_plural": "Eigenschap groepen",
             },
         ),
         migrations.AddField(
-            model_name='externalservice',
-            name='order',
-            field=models.IntegerField(blank=True, null=True, verbose_name='Volgorde'),
+            model_name="externalservice",
+            name="order",
+            field=models.IntegerField(blank=True, null=True, verbose_name="Volgorde"),
         ),
         migrations.AddConstraint(
-            model_name='propertygroup',
-            constraint=models.UniqueConstraint(fields=('name',), name='unique_group_name'),
+            model_name="propertygroup",
+            constraint=models.UniqueConstraint(fields=("name",), name="unique_group_name"),
         ),
         migrations.AddField(
-            model_name='locationproperty',
-            name='group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='locations.propertygroup', verbose_name='Groeperen in'),
+            model_name="locationproperty",
+            name="group",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="locations.propertygroup",
+                verbose_name="Groeperen in",
+            ),
         ),
     ]

@@ -6,13 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0006_location_is_archived'),
+        ("locations", "0006_location_is_archived"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='locationproperty',
-            name='property_type',
-            field=models.CharField(choices=[('BOOL', 'Boolean'), ('DATE', 'Datum'), ('EMAIL', 'E-mail'), ('GEO', 'Geolocatie'), ('NUM', 'Numeriek'), ('MEMO', 'Memo'), ('POST', 'Postcode'), ('STR', 'Tekst'), ('URL', 'Url'), ('CHOICE', 'Keuzelijst')], max_length=10, verbose_name='Gegevens type'),
+            model_name="locationproperty",
+            name="property_type",
+            field=models.CharField(
+                choices=[
+                    ("BOOL", "Boolean"),
+                    ("DATE", "Datum"),
+                    ("EMAIL", "E-mail"),
+                    ("GEO", "Geolocatie"),
+                    ("NUM", "Numeriek"),
+                    ("MEMO", "Memo"),
+                    ("POST", "Postcode"),
+                    ("STR", "Tekst"),
+                    ("URL", "Url"),
+                    ("CHOICE", "Keuzelijst"),
+                ],
+                max_length=10,
+                verbose_name="Gegevens type",
+            ),
         ),
     ]

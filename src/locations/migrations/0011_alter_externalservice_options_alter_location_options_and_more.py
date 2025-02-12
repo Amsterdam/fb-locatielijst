@@ -8,90 +8,163 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0010_remove_locationdata_either_field_filled_and_more'),
+        ("locations", "0010_remove_locationdata_either_field_filled_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='externalservice',
-            options={'ordering': ['order'], 'verbose_name': 'Externe koppeling', 'verbose_name_plural': 'Externe koppelingen'},
+            name="externalservice",
+            options={
+                "ordering": ["order"],
+                "verbose_name": "Externe koppeling",
+                "verbose_name_plural": "Externe koppelingen",
+            },
         ),
         migrations.AlterModelOptions(
-            name='location',
-            options={'ordering': ['pandcode'], 'verbose_name': 'Locatie'},
+            name="location",
+            options={"ordering": ["pandcode"], "verbose_name": "Locatie"},
         ),
         migrations.AlterModelOptions(
-            name='locationdata',
-            options={'ordering': ['id'], 'verbose_name': 'Locatie gegeven', 'verbose_name_plural': 'Locatie gegevens'},
+            name="locationdata",
+            options={"ordering": ["id"], "verbose_name": "Locatie gegeven", "verbose_name_plural": "Locatie gegevens"},
         ),
         migrations.AlterModelOptions(
-            name='locationproperty',
-            options={'ordering': [models.OrderBy(models.F('group__order'), nulls_last=True), 'order'], 'verbose_name': 'Locatie eigenschap', 'verbose_name_plural': 'Locatie eigenschappen'},
+            name="locationproperty",
+            options={
+                "ordering": [models.OrderBy(models.F("group__order"), nulls_last=True), "order"],
+                "verbose_name": "Locatie eigenschap",
+                "verbose_name_plural": "Locatie eigenschappen",
+            },
         ),
         migrations.RemoveField(
-            model_name='locationdata',
-            name='created_at',
+            model_name="locationdata",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='locationdata',
-            name='last_modified',
+            model_name="locationdata",
+            name="last_modified",
         ),
         migrations.RemoveField(
-            model_name='locationexternalservice',
-            name='created_at',
+            model_name="locationexternalservice",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='locationexternalservice',
-            name='last_modified',
+            model_name="locationexternalservice",
+            name="last_modified",
         ),
         migrations.AddField(
-            model_name='externalservice',
-            name='last_modified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Laatst gewijzigd door'),
+            model_name="externalservice",
+            name="last_modified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Laatst gewijzigd door",
+            ),
         ),
         migrations.AddField(
-            model_name='location',
-            name='last_modified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Laatst gewijzigd door'),
+            model_name="location",
+            name="last_modified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Laatst gewijzigd door",
+            ),
         ),
         migrations.AddField(
-            model_name='locationdata',
-            name='last_modified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Laatst gewijzigd door'),
+            model_name="locationdata",
+            name="last_modified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Laatst gewijzigd door",
+            ),
         ),
         migrations.AddField(
-            model_name='locationexternalservice',
-            name='last_modified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Laatst gewijzigd door'),
+            model_name="locationexternalservice",
+            name="last_modified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Laatst gewijzigd door",
+            ),
         ),
         migrations.AddField(
-            model_name='locationproperty',
-            name='last_modified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Laatst gewijzigd door'),
+            model_name="locationproperty",
+            name="last_modified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Laatst gewijzigd door",
+            ),
         ),
         migrations.AddField(
-            model_name='propertyoption',
-            name='last_modified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Laatst gewijzigd door'),
+            model_name="propertyoption",
+            name="last_modified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Laatst gewijzigd door",
+            ),
         ),
         migrations.CreateModel(
-            name='Log',
+            name="Log",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('target', models.CharField(max_length=100)),
-                ('message', models.CharField(max_length=1000)),
-                ('external_service', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='locations.externalservice')),
-                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='locations.location')),
-                ('location_property', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='locations.locationproperty')),
-                ('property_option', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='locations.propertyoption')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                ("target", models.CharField(max_length=100)),
+                ("message", models.CharField(max_length=1000)),
+                (
+                    "external_service",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="locations.externalservice",
+                    ),
+                ),
+                (
+                    "location",
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to="locations.location"
+                    ),
+                ),
+                (
+                    "location_property",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="locations.locationproperty",
+                    ),
+                ),
+                (
+                    "property_option",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="locations.propertyoption",
+                    ),
+                ),
+                ("user", models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Datafundament log',
-                'verbose_name_plural': 'Datafundament logs',
-                'ordering': ['-timestamp'],
+                "verbose_name": "Datafundament log",
+                "verbose_name_plural": "Datafundament logs",
+                "ordering": ["-timestamp"],
             },
         ),
     ]
