@@ -6,4 +6,4 @@ class LocationsConfig(AppConfig):
     name = "locations"
 
     def ready(self):
-        pass
+        import locations.signals  # noqa: F401
