@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0005_alter_locationexternalservice_options_and_more'),
+        ("locations", "0005_alter_locationexternalservice_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='location',
-            name='is_archived',
-            field=models.BooleanField(default=False, verbose_name='Archief'),
+            model_name="location",
+            name="is_archived",
+            field=models.BooleanField(default=False, verbose_name="Archief"),
         ),
     ]

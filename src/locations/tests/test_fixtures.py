@@ -1,20 +1,29 @@
 from django.test import TestCase
-from locations.models import Location, LocationProperty, PropertyOption, LocationData, ExternalService, LocationExternalService
+
+from locations.models import (
+    ExternalService,
+    Location,
+    LocationData,
+    LocationExternalService,
+    LocationProperty,
+    PropertyOption,
+)
 from shared.context import set_current_user
+
 
 class TestFixtures(TestCase):
     """
     Test to verify that the fixtures still work after, for instance, a migration
     """
-    
+
     fixtures = [
-        'locations',
-        'property_groups',
-        'location_properties',
-        'property_options',
-        'location_data',
-        'external_services',
-        'location_external_services',
+        "locations",
+        "property_groups",
+        "location_properties",
+        "property_options",
+        "location_data",
+        "external_services",
+        "location_external_services",
     ]
 
     # while loading the fixtures the contextvar current_user should be set to None

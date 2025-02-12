@@ -7,36 +7,42 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0007_alter_locationproperty_property_type'),
+        ("locations", "0007_alter_locationproperty_property_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='location',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now, verbose_name='Aanmaakdatum'),
+            model_name="location",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now, verbose_name="Aanmaakdatum"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='locationdata',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now, verbose_name='Aanmaakdatum'),
+            model_name="locationdata",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now, verbose_name="Aanmaakdatum"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='locationexternalservice',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now, verbose_name='Aanmaakdatum'),
+            model_name="locationexternalservice",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now, verbose_name="Aanmaakdatum"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='locationexternalservice',
-            name='last_modified',
-            field=models.DateTimeField(auto_now=True, verbose_name='Laatste wijziging'),
+            model_name="locationexternalservice",
+            name="last_modified",
+            field=models.DateTimeField(auto_now=True, verbose_name="Laatste wijziging"),
         ),
         migrations.AlterField(
-            model_name='locationdata',
-            name='last_modified',
-            field=models.DateTimeField(auto_now=True, verbose_name='Laatste wijziging'),
+            model_name="locationdata",
+            name="last_modified",
+            field=models.DateTimeField(auto_now=True, verbose_name="Laatste wijziging"),
         ),
     ]

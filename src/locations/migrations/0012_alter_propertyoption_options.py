@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0011_alter_externalservice_options_alter_location_options_and_more'),
+        ("locations", "0011_alter_externalservice_options_alter_location_options_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='propertyoption',
-            options={'ordering': ['option'], 'verbose_name': 'Eigenschap optie', 'verbose_name_plural': 'Eigenschappen opties'},
+            name="propertyoption",
+            options={
+                "ordering": ["option"],
+                "verbose_name": "Eigenschap optie",
+                "verbose_name_plural": "Eigenschappen opties",
+            },
         ),
     ]

@@ -1,6 +1,8 @@
-from locations.models import Log
 from django.contrib.contenttypes.models import ContentType
+
+from locations.models import Log
 from shared.context import current_user
+
 
 def reorder_grouped_objects(sender, instance, raw, **kwargs):
     """
@@ -10,16 +12,16 @@ def reorder_grouped_objects(sender, instance, raw, **kwargs):
     # Don't run when a fixture is loaded (=raw)
     if not raw:
         # Get order of the modified instance
-        instance_order = getattr(instance, 'order', None)
+        instance_order = getattr(instance, "order", None)
         # Set index to 1
         index = 1
 
         # Get the model objects depending on the model
         match sender.__name__:
-            case 'LocationProperty':
-                objects = sender.objects.filter(group=instance.group).order_by('order')
+            case "LocationProperty":
+                objects = sender.objects.filter(group=instance.group).order_by("order")
             case _:
-                objects = sender.objects.all().order_by('order')
+                objects = sender.objects.all().order_by("order")
 
         for object in objects:
             # skip if the current object is the instance and order has been filled
@@ -32,7 +34,8 @@ def reorder_grouped_objects(sender, instance, raw, **kwargs):
 
             # update the object with the index and add 1 for the next iteration
             sender.objects.filter(id=object.id).update(order=index)
-            index += 1    
+            index += 1
+
 
 def add_log(instance, action, field, message):
     """
@@ -47,28 +50,36 @@ def add_log(instance, action, field, message):
         object_name=str(instance),
         object_id=instance.id,
         field=field,
-        message=message
+        message=message,
     )
 
-def get_log_parameters(instance)-> list:
+
+def get_log_parameters(instance) -> list:
     """
     Return a list of dictionaries containing the field that is modified (attribute_name) and the name the field will have in the log field.
     The name of the field will default to the verbose_name of the model field,
-    but if a tuple is given than the referenced object is used as a name 
+    but if a tuple is given than the referenced object is used as a name
     """
     match instance.__class__.__name__:
-        case 'LocationData':
-            parameters = [('value', instance.location_property.label)]
-        case 'LocationExternalService':
-            parameters = [('external_location_code', instance.external_service.name)]
-        case 'Location':
-            parameters = ['pandcode', 'name', 'is_archived']
-        case 'LocationProperty':
-            parameters = ['short_name', 'label', 'required', 'multiple', 'unique', 'public',]
-        case 'PropertyOption':
-            parameters = ['option']
-        case 'ExternalService':
-            parameters = ['name', 'short_name', 'public']
+        case "LocationData":
+            parameters = [("value", instance.location_property.label)]
+        case "LocationExternalService":
+            parameters = [("external_location_code", instance.external_service.name)]
+        case "Location":
+            parameters = ["pandcode", "name", "is_archived"]
+        case "LocationProperty":
+            parameters = [
+                "short_name",
+                "label",
+                "required",
+                "multiple",
+                "unique",
+                "public",
+            ]
+        case "PropertyOption":
+            parameters = ["option"]
+        case "ExternalService":
+            parameters = ["name", "short_name", "public"]
 
     log_parameters = []
     for param in parameters:
@@ -78,9 +89,11 @@ def get_log_parameters(instance)-> list:
         else:
             attribute_name = param
             display_name = instance._meta.get_field(param).verbose_name
-        log_parameters.append({
-            'attribute_name': attribute_name,
-            'display_name': display_name,
-        })
+        log_parameters.append(
+            {
+                "attribute_name": attribute_name,
+                "display_name": display_name,
+            }
+        )
 
     return log_parameters

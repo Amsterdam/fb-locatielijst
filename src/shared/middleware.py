@@ -1,9 +1,11 @@
 from .context import current_user
 
+
 class CurrentUserMiddleware:
     """
     Middleware to capture the logged in user associated with a request and save the user in a context var.
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 

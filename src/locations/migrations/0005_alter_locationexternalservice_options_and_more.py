@@ -7,17 +7,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0004_externalservice_public_locationproperty_public'),
+        ("locations", "0004_externalservice_public_locationproperty_public"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='locationexternalservice',
-            options={'verbose_name': 'Locatie koppeling', 'verbose_name_plural': 'Locatie koppelingen'},
+            name="locationexternalservice",
+            options={"verbose_name": "Locatie koppeling", "verbose_name_plural": "Locatie koppelingen"},
         ),
         migrations.AlterField(
-            model_name='locationdata',
-            name='property_option',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, to='locations.propertyoption', verbose_name='Optie'),
+            model_name="locationdata",
+            name="property_option",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.RESTRICT,
+                to="locations.propertyoption",
+                verbose_name="Optie",
+            ),
         ),
     ]

@@ -61,14 +61,14 @@ clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
 
 lintfix:                            ## Execute lint fixes
-	$(run) linting black /app/src/$(APP) /app/tests/$(APP)
+	$(run) linting black /app/src/$(APP)
 	$(run) linting autoflake /app/src --recursive --in-place --remove-unused-variables --remove-all-unused-imports --quiet
-	$(run) linting isort /app/src/$(APP) /app/tests/$(APP)
+	$(run) linting isort /app/src/$(APP)
 
 lint:                               ## Execute lint checks
-	$(run) linting black --diff /app/src/$(APP) /app/tests/$(APP)
+	$(run) linting black --diff /app/src/$(APP)
 	$(run) linting autoflake /app/src --check --recursive --quiet
-	$(run) linting isort --diff --check /app/src/$(APP) /app/tests/$(APP)
+	$(run) linting isort --diff --check /app/src/$(APP)
 
 superuser:                          ## Create a superuser (user with admin rights)
 	$(manage) createsuperuser
