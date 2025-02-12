@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 from .azure_settings import Azure
 
@@ -97,7 +98,8 @@ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "insecure")
 DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
 DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
 
-if "azure.com" in DATABASE_HOST:
+host = urlparse(DATABASE_HOST).hostname
+if host and host.endswith(".azure.com"):
     DATABASE_PASSWORD = azure.auth.db_password
     DATABASE_OPTIONS["sslmode"] = "require"
 
