@@ -8,10 +8,8 @@ UID:=$(shell id --user)
 GID:=$(shell id --group)
 
 dc = docker compose
-run = $(dc) run --rm -u ${UID}:${GID}
+run = $(dc) run --remove-orphans --rm -u ${UID}:${GID}
 manage = $(run) dev python manage.py
-pytest = $(run) test pytest $(ARGS)
-pip_compile = pip-compile --allow-unsafe --strip-extras --resolver=backtracking --quiet
 
 init: clean build migrate loaddata  ## Init clean
 
@@ -21,16 +19,12 @@ help:                               ## Show this help.
 pip-tools:
 	pip install pip-tools
 
-sync: pip-tools                     ## Sync your local venv with expected state as defined in requirements.txt
-	pip-sync requirements.txt requirements_dev.txt
+requirements: pip-tools             ## Upgrade requirements (in requirements.in) to latest versions and compile requirements.txt
+	pip-compile --upgrade --output-file requirements.txt --allow-unsafe requirements.in
+	pip-compile --upgrade --output-file requirements_linting.txt --allow-unsafe requirements_linting.in
+	pip-compile --upgrade --output-file requirements_dev.txt --allow-unsafe requirements_dev.in
 
-requirements: pip-tools             ## (Re)compile requirements.txt and requirements_dev.txt
-	$(pip_compile) requirements.in
-	$(pip_compile) requirements_dev.in
-
-upgrade:                            ## Upgrade the requirements.txt files, adhering to the constraints in the requirements.in files.
-	$(pip_compile) --upgrade requirements.in
-	$(pip_compile) --upgrade requirements_dev.in
+upgrade: requirements install       ## Run 'requirements' and 'install' targets
 
 migrations:                         ## Make migrations
 	$(manage) makemigrations $(ARGS)
@@ -57,17 +51,24 @@ shell:	                            ## Run a Django shell
 dev-https:                          ## Run the development app over SSL with runserver_plus
 	$(run) --service-ports dev python manage.py runserver_plus 0.0.0.0:8000 --cert-file cert.crt --key-file cert.key
 
-dev: check-env                      ## Run the development app over plain http with runserver
-	$(run) --service-ports dev python manage.py runserver 0.0.0.0:8000
+dev: migrate
+	$(run) --service-ports dev
 
-test: check-env                     ## Execute tests. Optionally use test= to define which specific test, i.e. test=app.tests.test_models
-	$(run) test python manage.py test $(test)
+test:                               ## Run tests
+	$(run) test pytest $(ARGS)                
 
 clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
 
-env:                                ## Print current env
-	$(run) dev env | sort
+lintfix:                            ## Execute lint fixes
+	$(run) linting black /app/src/$(APP) /app/tests/$(APP)
+	$(run) linting autoflake /app/src --recursive --in-place --remove-unused-variables --remove-all-unused-imports --quiet
+	$(run) linting isort /app/src/$(APP) /app/tests/$(APP)
+
+lint:                               ## Execute lint checks
+	$(run) linting black --diff /app/src/$(APP) /app/tests/$(APP)
+	$(run) linting autoflake /app/src --check --recursive --quiet
+	$(run) linting isort --diff --check /app/src/$(APP) /app/tests/$(APP)
 
 superuser:                          ## Create a superuser (user with admin rights)
 	$(manage) createsuperuser

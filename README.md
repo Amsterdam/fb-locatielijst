@@ -1,11 +1,11 @@
-# Datafundament-fb
+# FB-Locatielijst
 
-Dit is een repo vor de applicatie datafundament-fb.
+Dit is een repo vor de applicatie FB-Locatielijst.
 Een applicatie voor het opslaan en inlezen van gegevens van het faciliteiten bureau over de locaties waar zij werkzaamheden doen.
 
 # Development
 Na het klonen kan je de Docker images starten vanuit de makefile:
-- Maak de benodigde requirements.txt en requirements_dev.txt aan:
+- Maak de benodigde requirements.txt, requirements_dev.txt en requirements_linting aan:
   ```
   make requirements
   ```

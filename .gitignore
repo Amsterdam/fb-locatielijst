@@ -1,6 +1,6 @@
 # project folders
 .git-ignore/
-datafundament_fb/static/
+src/static/
 
 # project files
 *.sqlite3
@@ -92,3 +92,5 @@ data/
 
 # webserver
 *web.config
+.app.env
+.app.env

@@ -1,0 +1,30 @@
+[tool.isort]
+profile = "black"
+[tool.autoflake]
+ignore_init_module_imports = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "src.main.settings"
+pythonpath = [".", "./src", "./tests"]
+addopts = "--cov --cov-report term-missing --no-cov-on-fail"
+
+[tool.coverage.run]
+source = ["./src"]
+
+[tool.coverage.report]
+fail_under = 75  # Bring to 80% when we have more tests
+skip_covered = true
+show_missing = true
+sort = "Cover"
+
+[tool.black]
+line-length = 120
+target-version = ['py313']
+exclude = '''
+/(
+    \.git
+  | \.env
+  | \.venv
+  | venv
+)/
+'''
