@@ -35,9 +35,10 @@ def get_csv_file_response(request, locations) -> HttpResponse:
     Method for returning a csv file within an http response object.
     Takes a list of Location objects as it input
     """
+    print("processing")
     # Retrieve all the data from the locations
     location_data = LocationProcessor.get_export_data(pandcodes=locations.values_list("pandcode", flat=True))
-
+    print("processed")
     # Setup the http response with the
     date = timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H.%M")
     response = HttpResponse(
@@ -47,7 +48,7 @@ def get_csv_file_response(request, locations) -> HttpResponse:
 
     # Add BOM to the file; because otherwise Excel won't know what's happening
     response.write("\ufeff".encode("utf-8"))
-
+    print("written BOM")
     # Based on Locations presently in the database return the headers for the CSV file
     if location_data:
         headers = location_data[0].keys()
@@ -58,7 +59,7 @@ def get_csv_file_response(request, locations) -> HttpResponse:
     writer = csv.DictWriter(response, fieldnames=headers, delimiter=";")
     writer.writeheader()
     writer.writerows(location_data)
-
+    print("written rows and headers")
     return response
 
 

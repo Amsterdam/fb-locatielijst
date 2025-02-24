@@ -132,10 +132,13 @@ class LocationProcessor:
         """
         Retrieve a list of locations from the database and return it as a dict
         """
+        print("exporting1")
         # Retrieve all locations in list and prefetch related locationdata
         locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related("locationdata_set")
         location_list = list()
+        print("exporting2")
         for location in locations:
+            print("exporting3")
             object = cls.format_location(location)
             # Replace list values with | seperated string for multiple choice location properties
             object_dict = object.get_dict()
@@ -143,7 +146,7 @@ class LocationProcessor:
                 if type(value) == list:
                     object_dict[key] = "|".join(value)
             location_list.append(object_dict)
-
+        print("exporting4")
         return location_list
 
     @classmethod
