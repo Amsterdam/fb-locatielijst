@@ -307,6 +307,7 @@ class LocationExportView(LoginRequiredMixin, View):
     template = "locations/location-export.html"
 
     def get(self, request, *args, **kwargs):
+        print("on the export page")
         # when a query is given, return the csv file not the webpage
         if request.GET:
             # Get a QuerySet of filtered locations
@@ -318,10 +319,13 @@ class LocationExportView(LoginRequiredMixin, View):
         return response
 
     def post(self, request, *args, **kwargs):
+        print("requested export")
         # Get all Location instances()
         locations = Location.objects.search_filter(params=dict(), user=self.request.user)
+        print("found locations")
         # Set the response with the csv file
         response = get_csv_file_response(request, locations)
+        print("returning response")
         return response
 
 
