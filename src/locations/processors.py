@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -139,7 +141,11 @@ class LocationProcessor:
         print("exporting2")
         for location in locations:
             print("exporting3")
+            
+            start = time.time()
             object = cls.format_location(location)
+            end = time.time()
+            print("exporting done: ", end - start)
             # Replace list values with | seperated string for multiple choice location properties
             object_dict = object.get_dict()
             for key, value in object_dict.items():
@@ -151,9 +157,12 @@ class LocationProcessor:
 
     @classmethod
     def format_location(cls, location) -> object:
+        start = time.time()
         object = cls()
         object.location_instance = location
-
+        end = time.time()
+        print("init cls: ", end - start)
+        start = time.time()
         setattr(object, "pandcode", getattr(object.location_instance, "pandcode"))
         setattr(object, "naam", getattr(object.location_instance, "name"))
         created_at = timezone.localtime(getattr(object.location_instance, "created_at")).strftime("%d-%m-%Y")
@@ -163,7 +172,8 @@ class LocationProcessor:
         )
         setattr(object, "gewijzigd", last_modified)
         setattr(object, "archief", getattr(object.location_instance, "is_archived"))
-
+        end = time.time()
+        print("set attributes: ", end - start)
         # Add location properties to the object; filter to include non-public properties
         if object.user.is_staff:
             location_data_set = object.location_instance.locationdata_set.all()
