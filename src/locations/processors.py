@@ -183,11 +183,14 @@ class LocationProcessor:
         # Set the value from the LocationData as attribute in the object instance
         start = time.time()
         for location_data in location_data_set:
+            start = time.time()
             location_property = location_data.location_property
             value = None
-
+            end = time.time()
+            print("init location property var: ", end - start)
             # Get value for multiple location data
             if location_property.multiple:
+                start = time.time()
                 # Check if a value has already been set
                 current_value = getattr(object, location_property.short_name)
                 if not current_value:
@@ -195,11 +198,19 @@ class LocationProcessor:
                 else:
                     current_value.append(location_data.value)
                     value = current_value
+                end = time.time()
+                print("if statement: ", end - start)
             else:
+                start = time.time()
                 value = location_data.value
+                end = time.time()
+                print("else statement: ", end - start)
 
             # Set the attribute value
+            start = time.time()
             setattr(object, location_property.short_name, value)
+            end = time.time()
+            print("set attribute value: ", end - start)
         end = time.time()
         print("set location values: ", end - start)
         print("amount of location values: ", len(location_data_set))
