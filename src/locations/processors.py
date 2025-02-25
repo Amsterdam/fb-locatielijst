@@ -135,12 +135,13 @@ class LocationProcessor:
         Retrieve a list of locations from the database and return it as a dict
         """
         print("exporting1")
+        start1 = time.time()
         # Retrieve all locations in list and prefetch related locationdata
         locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related("locationdata_set")
         location_list = list()
         print("exporting2")
         for location in locations:
-            print("exporting3")
+            print("exporting3", len(locations))
             
             start = time.time()
             object = cls.format_location(location)
@@ -152,7 +153,9 @@ class LocationProcessor:
                 if type(value) == list:
                     object_dict[key] = "|".join(value)
             location_list.append(object_dict)
-        print("exporting4")
+        print("exporting4", len(locations))
+        end1 = time.time()
+        print("export duration: ", end1-start1)
         return location_list
 
     @classmethod
@@ -181,38 +184,31 @@ class LocationProcessor:
             location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
 
         # Set the value from the LocationData as attribute in the object instance
-        start = time.time()
+        start2 = time.time()
         for location_data in location_data_set:
-            start = time.time()
-            location_property = location_data.location_property
             value = None
-            end = time.time()
-            print("init location property var: ", end - start)
             # Get value for multiple location data
-            if location_property.multiple:
-                start = time.time()
+            if location_data.location_property.multiple:
                 # Check if a value has already been set
-                current_value = getattr(object, location_property.short_name)
+                current_value = getattr(object, location_data.location_property.short_name)
                 if not current_value:
                     value = list([location_data.value])
                 else:
                     current_value.append(location_data.value)
                     value = current_value
-                end = time.time()
-                print("if statement: ", end - start)
             else:
-                start = time.time()
                 value = location_data.value
-                end = time.time()
-                print("else statement: ", end - start)
+            end = time.time()
+            print("finished loop: ", end - start)
+            print(value)
 
             # Set the attribute value
             start = time.time()
-            setattr(object, location_property.short_name, value)
+            setattr(object, location_data.location_property.short_name, value)
             end = time.time()
             print("set attribute value: ", end - start)
-        end = time.time()
-        print("set location values: ", end - start)
+        end2 = time.time()
+        print("set location values: ", end2 - start2)
         print("amount of location values: ", len(location_data_set))
         # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
