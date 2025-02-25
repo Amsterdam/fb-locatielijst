@@ -181,6 +181,7 @@ class LocationProcessor:
             location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
 
         # Set the value from the LocationData as attribute in the object instance
+        start = time.time()
         for location_data in location_data_set:
             location_property = location_data.location_property
             value = None
@@ -199,7 +200,9 @@ class LocationProcessor:
 
             # Set the attribute value
             setattr(object, location_property.short_name, value)
-
+        end = time.time()
+        print("set location values: ", end - start)
+        print("amount of location values: ", len(location_data_set))
         # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
             value = service.external_location_code
