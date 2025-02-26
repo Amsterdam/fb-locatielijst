@@ -143,12 +143,14 @@ class LocationProcessor:
                 if type(value) == list:
                     object_dict[key] = "|".join(value)
             location_list.append(object_dict)
+
         return location_list
 
     @classmethod
     def format_location(cls, location) -> object:
         object = cls()
         object.location_instance = location
+
         setattr(object, "pandcode", getattr(object.location_instance, "pandcode"))
         setattr(object, "naam", getattr(object.location_instance, "name"))
         created_at = timezone.localtime(getattr(object.location_instance, "created_at")).strftime("%d-%m-%Y")
@@ -158,6 +160,7 @@ class LocationProcessor:
         )
         setattr(object, "gewijzigd", last_modified)
         setattr(object, "archief", getattr(object.location_instance, "is_archived"))
+
         # Add location properties to the object; filter to include non-public properties
         if object.user.is_staff:
             location_data_set = object.location_instance.locationdata_set.all()
@@ -166,11 +169,13 @@ class LocationProcessor:
 
         # Set the value from the LocationData as attribute in the object instance
         for location_data in location_data_set:
+            location_property = location_data.location_property
             value = None
+
             # Get value for multiple location data
-            if location_data.location_property.multiple:
+            if location_property.multiple:
                 # Check if a value has already been set
-                current_value = getattr(object, location_data.location_property.short_name)
+                current_value = getattr(object, location_property.short_name)
                 if not current_value:
                     value = list([location_data.value])
                 else:
@@ -180,7 +185,8 @@ class LocationProcessor:
                 value = location_data.value
 
             # Set the attribute value
-            setattr(object, location_data.location_property.short_name, value)
+            setattr(object, location_property.short_name, value)
+
         # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
             value = service.external_location_code
