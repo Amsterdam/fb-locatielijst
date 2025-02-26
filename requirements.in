@@ -1,5 +1,5 @@
 uwsgi
-Django==5.0.*
+Django
 django-csp
 django-extensions
 psycopg2-binary
