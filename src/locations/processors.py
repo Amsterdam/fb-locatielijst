@@ -134,38 +134,23 @@ class LocationProcessor:
         """
         Retrieve a list of locations from the database and return it as a dict
         """
-        print("exporting1")
-        start1 = time.time()
         # Retrieve all locations in list and prefetch related locationdata
         locations = Location.objects.filter(pandcode__in=pandcodes).prefetch_related("locationdata_set")
         location_list = list()
-        print("exporting2")
         for location in locations:
-            print("exporting3", len(locations))
-            
-            start = time.time()
             object = cls.format_location(location)
-            end = time.time()
-            print("exporting done: ", end - start)
             # Replace list values with | seperated string for multiple choice location properties
             object_dict = object.get_dict()
             for key, value in object_dict.items():
                 if type(value) == list:
                     object_dict[key] = "|".join(value)
             location_list.append(object_dict)
-        print("exporting4", len(locations))
-        end1 = time.time()
-        print("export duration: ", end1-start1)
         return location_list
 
     @classmethod
     def format_location(cls, location) -> object:
-        start = time.time()
         object = cls()
         object.location_instance = location
-        end = time.time()
-        print("init cls: ", end - start)
-        start = time.time()
         setattr(object, "pandcode", getattr(object.location_instance, "pandcode"))
         setattr(object, "naam", getattr(object.location_instance, "name"))
         created_at = timezone.localtime(getattr(object.location_instance, "created_at")).strftime("%d-%m-%Y")
@@ -175,8 +160,6 @@ class LocationProcessor:
         )
         setattr(object, "gewijzigd", last_modified)
         setattr(object, "archief", getattr(object.location_instance, "is_archived"))
-        end = time.time()
-        print("set attributes: ", end - start)
         # Add location properties to the object; filter to include non-public properties
         if object.user.is_staff:
             location_data_set = object.location_instance.locationdata_set.all()
@@ -184,7 +167,6 @@ class LocationProcessor:
             location_data_set = object.location_instance.locationdata_set.filter(location_property__public=True)
 
         # Set the value from the LocationData as attribute in the object instance
-        start2 = time.time()
         for location_data in location_data_set:
             value = None
             # Get value for multiple location data
@@ -198,18 +180,9 @@ class LocationProcessor:
                     value = current_value
             else:
                 value = location_data.value
-            end = time.time()
-            print("finished loop: ", end - start)
-            print(value)
 
             # Set the attribute value
-            start = time.time()
             setattr(object, location_data.location_property.short_name, value)
-            end = time.time()
-            print("set attribute value: ", end - start)
-        end2 = time.time()
-        print("set location values: ", end2 - start2)
-        print("amount of location values: ", len(location_data_set))
         # Add external services to the object
         for service in object.location_instance.locationexternalservice_set.all():
             value = service.external_location_code
