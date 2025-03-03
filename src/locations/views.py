@@ -230,15 +230,11 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
 
     def post(self, request):
         form = self.form(request.POST, request.FILES)
-        print("RECEIVED")
         if form.is_valid():
-            print("isvalid")
             location_added = 0
             csv_file = form.cleaned_data.get("csv_file")
-            print("1")
             if csv_file.name.endswith(".csv"):
                 try:
-                    print("2")
                     # Read the file as an utf-8 file
                     csv_reader = csv_file.read().decode("utf-8-sig").splitlines()
                     # Set the correct format for the csv by 'sniffing' the first line of the csv data and setting the delimiter
@@ -323,7 +319,6 @@ class LocationExportView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         # Get all Location instances()
         locations = Location.objects.search_filter(params=dict(), user=self.request.user)
-
         # Set the response with the csv file
         response = get_csv_file_response(request, locations)
         return response
