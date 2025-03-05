@@ -39,7 +39,7 @@ cryptography==44.0.1
     #   mozilla-django-oidc
     #   msal
     #   pyjwt
-django==5.0.12
+django==5.1.6
     # via
     #   -r requirements.in
     #   django-csp

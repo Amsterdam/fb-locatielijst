@@ -37,7 +37,7 @@ def get_csv_file_response(request, locations) -> HttpResponse:
     """
     # Retrieve all the data from the locations
     location_data = LocationProcessor.get_export_data(pandcodes=locations.values_list("pandcode", flat=True))
-
+    
     # Setup the http response with the
     date = timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H.%M")
     response = HttpResponse(
@@ -230,7 +230,6 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
 
     def post(self, request):
         form = self.form(request.POST, request.FILES)
-
         if form.is_valid():
             location_added = 0
             csv_file = form.cleaned_data.get("csv_file")
