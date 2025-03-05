@@ -210,7 +210,7 @@ OIDC_OP_JWKS_ENDPOINT = f"{OIDC_BASE_URL}/discovery/v2.0/keys"
 OIDC_OP_LOGOUT_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/logout"
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"prompt": "select_account"}
-OIDC_CREATE_USER = True
+OIDC_CREATE_USER = False
 # Turn PKCE on for single-page applications! Because the client_secret is not secure in SPAs.
 # You cannot turn this on by default because it breaks the authorization code flow for regular web applications.
 OIDC_USE_PKCE = False
