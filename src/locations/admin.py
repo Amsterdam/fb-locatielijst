@@ -121,6 +121,6 @@ class LogAdmin(admin.ModelAdmin):
 
 
 # Custom names
-admin.site.site_header = "Datafundament Facilitair Bureau"
+admin.site.site_header = "FB Locatielijst"
 admin.site.index_title = "Beheer"
-admin.site.site_title = "Datafundament Facilitair Bureau - Beheer"
+admin.site.site_title = "FB Locatielijst - Beheer"
