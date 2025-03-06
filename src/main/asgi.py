@@ -1,5 +1,5 @@
 """
-ASGI config for datafundament_fb project.
+ASGI config for FB Locatielijst project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

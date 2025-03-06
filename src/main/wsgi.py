@@ -1,5 +1,5 @@
 """
-WSGI config for datafundament_fb project.
+WSGI config for FB Locatielijst project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
