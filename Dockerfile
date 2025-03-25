@@ -46,6 +46,7 @@ COPY src .
 ARG SECRET_KEY=not-used
 ARG OIDC_RP_CLIENT_ID=not-used
 ARG OIDC_RP_CLIENT_SECRET=not-used
+ENV DJANGO_SETTINGS_MODULE=main.settings
 RUN python manage.py collectstatic --no-input
 RUN chmod +x /app/deploy/docker-run.sh
 

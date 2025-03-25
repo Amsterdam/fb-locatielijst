@@ -1,0 +1,19 @@
+services:
+  database:
+    ports:
+      - "54321:5432"
+    volumes:
+      - postgresqldata:/var/lib/postgresql/data
+
+  app:
+    ports:
+      - "8000:8000"
+    user: 1000:1000
+
+  dev:
+    ports:
+      - "8001:8000"
+    user: 1000:1000
+
+  test:
+    user: 1000:1000

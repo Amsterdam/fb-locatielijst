@@ -2,11 +2,15 @@ x-app: &base-app
   build:
     context: .
     target: app
+  environment: &base-app-env
+    OIDC_BASE_URL:
+    OIDC_RP_CLIENT_ID:
+    OIDC_RP_CLIENT_SECRET:
+    OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_REQUEST: ".*"
+    OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_RESPONSE: ".*"
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
   volumes:
     - .:/app/
-  depends_on:
-    database:
-      condition: service_healthy
 
 services:
   app:
@@ -18,6 +22,11 @@ services:
     command: /app/deploy/docker-run.sh
     ports:
       - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
 
   dev:
     <<: *base-app
@@ -26,15 +35,19 @@ services:
       target: dev
     command: python manage.py runserver 0.0.0.0:8000
     environment:
+      <<: *base-app-env
       ENVIRONMENT: 'local'
       DEBUG: '1'
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
 
   test:
     <<: *base-app
-    ports:
-      - "3000:3000"
     build:
       context: .
       target: tests
@@ -43,8 +56,12 @@ services:
       OIDC_RP_CLIENT_SECRET: tests
       ENVIRONMENT: 'local'
       DEBUG: '1'
+      OTEL_EXPORTER: "none"
     command:
       pytest
+    depends_on:
+      database:
+        condition: service_healthy
 
   linting:
     build:
@@ -66,6 +83,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  otel-collector:
+    build:
+      context: otel-collector
+    depends_on:
+      jaeger:
+        condition: service_started
+    ports:
+      - "4317:4317"
+
+  jaeger:
+    image: jaegertracing/jaeger:2.2.0
+    ports:
+      # ui
+      - "16686:16686"
+      # grpc
+      - "14317:4317"
+    environment:
+      LOG_LEVEL: debug
 
 volumes:
   postgresqldata:

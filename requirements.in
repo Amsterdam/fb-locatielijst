@@ -10,3 +10,10 @@ azure-identity
 azure-keyvault
 azure-keyvault-secrets
 mozilla-django-oidc
+
+# OTEL
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-django
+opentelemetry-instrumentation-psycopg2
+opentelemetry-instrumentation-logging
+opentelemetry-instrumentation-requests
