@@ -37,7 +37,7 @@ def get_csv_file_response(request, locations) -> HttpResponse:
     """
     # Retrieve all the data from the locations
     location_data = LocationProcessor.get_export_data(pandcodes=locations.values_list("pandcode", flat=True))
-    
+
     # Setup the http response with the
     date = timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H.%M")
     response = HttpResponse(

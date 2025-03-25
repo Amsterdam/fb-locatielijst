@@ -200,7 +200,7 @@ if os.environ.get("ENVIRONMENT") == "local":
     LOGOUT_URL = "logout"
 
 ## OpenId Connect settings ##
-OIDC_BASE_URL = "https://login.microsoftonline.com/72fca1b1-2c2e-4376-a445-294d80196804"
+OIDC_BASE_URL = os.getenv("OIDC_BASE_URL", "https://login.microsoftonline.com/72fca1b1-2c2e-4376-a445-294d80196804")
 OIDC_RP_CLIENT_ID = os.getenv("OIDC_RP_CLIENT_ID", "")
 OIDC_RP_CLIENT_SECRET = os.getenv("OIDC_RP_CLIENT_SECRET", "")
 OIDC_OP_AUTHORIZATION_ENDPOINT = f"{OIDC_BASE_URL}/oauth2/v2.0/authorize"
@@ -214,3 +214,30 @@ OIDC_CREATE_USER = True
 # Turn PKCE on for single-page applications! Because the client_secret is not secure in SPAs.
 # You cannot turn this on by default because it breaks the authorization code flow for regular web applications.
 OIDC_USE_PKCE = False
+
+
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+resource = Resource(attributes={"service.name": "fblocatielijst"})
+
+trace.set_tracer_provider(TracerProvider(resource=resource))
+tracer = trace.get_tracer(__name__)
+
+exporter_name = os.environ.get("OTEL_EXPORTER", "otlp")
+if exporter_name == "otlp":
+    otlp_exporter = OTLPSpanExporter()
+    span_processor = BatchSpanProcessor(otlp_exporter)
+    trace.get_tracer_provider().add_span_processor(span_processor)
+else:
+    pass
+
+DjangoInstrumentor().instrument()
+Psycopg2Instrumentor().instrument()
+RequestsInstrumentor().instrument()

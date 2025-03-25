@@ -10,7 +10,7 @@ Dockerfile
 docker
 compose.yml
 compose.override.yml
-compose.override.yml.example
+compose.override.example.yml
 *.env
 *.venv
 venv
