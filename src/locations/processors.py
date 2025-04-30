@@ -96,6 +96,12 @@ class LocationProcessor:
         for property in self.location_properties:
             setattr(self, property, None)
 
+    @staticmethod
+    def _escape_csv_entry(entry):
+        if isinstance(entry, str) and entry.startswith(("=", "+", "-", "@")):
+            return "'" + entry + "'"
+        return entry
+
     def __init__(self, data: dict = None):
         """
         Initiate the object with all location property fields and,
@@ -114,6 +120,10 @@ class LocationProcessor:
         if data:
             for key, value in data.items():
                 if key in self.location_properties:
+                    if isinstance(value, list):
+                        value = [self._escape_csv_entry(entry) for entry in value]
+                    else:
+                        value = self._escape_csv_entry(value)
                     setattr(self, key, value)
 
     @classmethod
@@ -141,7 +151,8 @@ class LocationProcessor:
             object_dict = object.get_dict()
             for key, value in object_dict.items():
                 if type(value) == list:
-                    object_dict[key] = "|".join(value)
+                    value = "|".join(value)
+                object_dict[key] = cls._escape_csv_entry(value)
             location_list.append(object_dict)
 
         return location_list
