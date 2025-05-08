@@ -99,7 +99,8 @@ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "insecure")
 DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
 DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
 
-if "azure.com" in DATABASE_HOST:
+# Check if we are using Azure Database for PostgreSQL, if so additional options are required
+if DATABASE_HOST and DATABASE_HOST.endswith(".azure.com"):
     DATABASE_PASSWORD = azure.auth.db_password
     DATABASE_OPTIONS["sslmode"] = "require"
 
