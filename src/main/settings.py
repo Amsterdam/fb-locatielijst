@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # 3rd party
     "mozilla_django_oidc",
     "django_extensions",
+    "storages",
     # project app
     "locations",
     "help_docs",
@@ -170,6 +171,30 @@ CSRF_TRUSTED_ORIGINS = [
     "https://acc.fblocatielijst.amsterdam.nl",
     "https://fblocatielijst.amsterdam.nl",
 ]
+
+# Django-storages for Django > 4.2
+STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+if os.getenv("AZURE_FEDERATED_TOKEN_FILE"):
+    credential = WorkloadIdentityCredential()
+    STORAGE_AZURE = {
+        "pgdump": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+                "token_credential": credential,
+                "account_name": os.getenv("AZURE_STORAGE_ACCOUNT_NAME"),
+                "azure_container": "fbl-export",
+            },
+        },
+    }
+    STORAGES |= STORAGE_AZURE #update storages with storage_azure
 
 
 # Content Security Policy (CSP) settings
