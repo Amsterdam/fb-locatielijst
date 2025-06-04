@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+from csp.constants import NONCE, NONE, SELF
+
 from .azure_settings import Azure
 
 # Starts an azure class in which we can retrieve azure identity tokens to connect to azure resources like the database.
@@ -97,7 +99,8 @@ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "insecure")
 DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
 DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
 
-if "azure.com" in DATABASE_HOST:
+# Check if we are using Azure Database for PostgreSQL, if so additional options are required
+if DATABASE_HOST and DATABASE_HOST.endswith(".azure.com"):
     DATABASE_PASSWORD = azure.auth.db_password
     DATABASE_OPTIONS["sslmode"] = "require"
 
@@ -173,14 +176,19 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 # Content Security Policy (CSP) settings
-CSP_DEFAULT_SRC = "'none'"
-CSP_STYLE_SRC = "'self'"
-CSP_SCRIPT_SRC = "'self'"
-CSP_CONNECT_SRC = "'self'"
-CSP_IMG_SRC = "'self'"
-CSP_FONT_SRC = "'self'"
-CSP_FRAME_ANCESTORS = "'none'"
-CSP_FORM_ACTION = "'self'"
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [NONE],
+        "frame-ancestors": [NONE],
+        "form-action": [SELF],
+        "script-src": [SELF, NONCE],
+        "img-src": [SELF],
+        "font-src": [SELF],
+        "style-src": [SELF, NONCE],
+        "connect-src": [SELF],
+    },
+}
+
 
 # Automatic redirect to HTTPS
 SECURE_SSL_REDIRECT = bool(int(os.getenv("SECURE_SSL_REDIRECT", "0")))
