@@ -36,7 +36,7 @@ class OverwriteStorage:
 class Command(BaseCommand):
     help = "Export all models in specified apps to CSV files, compress them into a ZIP, and upload to Azure Storage."
 
-    TMP_DIRECTORY = "tmp_pgdump"
+    TMP_DIRECTORY = "/tmp/tmp_pgdump"
 
     def handle(self, *args, **kwargs):
         app_names = kwargs.get("apps", ["locations"])
