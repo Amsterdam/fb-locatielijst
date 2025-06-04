@@ -49,7 +49,7 @@ deprecated==1.2.18
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-semantic-conventions
-django==5.2.1
+django==5.2.2
     # via
     #   -r requirements.in
     #   django-csp

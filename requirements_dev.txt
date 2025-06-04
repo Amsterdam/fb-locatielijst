@@ -4,16 +4,22 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements_dev.txt requirements_dev.in
 #
+asgiref==3.8.1
+    # via django
 cffi==1.17.1
     # via cryptography
 coverage[toml]==7.8.2
     # via pytest-cov
 cryptography==45.0.3
     # via pyopenssl
+django==5.2.2
+    # via model-bakery
 iniconfig==2.1.0
     # via pytest
 markupsafe==3.0.2
     # via werkzeug
+model-bakery==1.20.4
+    # via -r requirements_dev.in
 packaging==25.0
     # via pytest
 parameterized==0.9.0
@@ -36,6 +42,8 @@ pytest-django==4.11.1
     # via -r requirements_dev.in
 pytest-mock==3.14.1
     # via -r requirements_dev.in
+sqlparse==0.5.3
+    # via django
 typing-extensions==4.14.0
     # via pyopenssl
 werkzeug==3.1.3
