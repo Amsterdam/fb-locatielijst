@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 from .azure_settings import Azure
+from azure.identity import WorkloadIdentityCredential
 
 # Starts an azure class in which we can retrieve azure identity tokens to connect to azure resources like the database.
 azure = Azure()
