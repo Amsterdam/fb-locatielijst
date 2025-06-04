@@ -89,7 +89,7 @@ class Command(BaseCommand):
         zip_filepath = os.path.join(self.TMP_DIRECTORY, "pgdump.zip")
 
         with open(zip_filepath, "rb") as f:
-            storage.save_without_postfix(name=os.path.join("pgdump", "pgdump.zip"), content=f)
+            storage.save_without_postfix(name= "pgdump.zip", content=f)
 
         self.stdout.write(f"Successfully uploaded {zip_filepath} to Azure Storage.")
 
