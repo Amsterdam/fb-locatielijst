@@ -189,6 +189,14 @@ STORAGES = {
 if os.getenv("AZURE_FEDERATED_TOKEN_FILE"):
     credential = WorkloadIdentityCredential()
     STORAGE_AZURE = {
+        "default": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+                "token_credential": credential,
+                "account_name": os.getenv("AZURE_STORAGE_ACCOUNT_NAME"),
+                "azure_container": "django",
+            },
+        },
         "pgdump": {
             "BACKEND": "storages.backends.azure_storage.AzureStorage",
             "OPTIONS": {
