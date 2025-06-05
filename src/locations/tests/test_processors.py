@@ -150,14 +150,37 @@ class TestLocationProcessor(TestCase):
 
     def test_init_with_data(self):
         """
-        Test if an instancve of LocationProcessor is created
+        Test if an instance of LocationProcessor is created
         and if the attributes have the correct value
         """
         location_processor = LocationProcessor(data=self.location_data_dict)
 
-        # Verifiy the instance and the attribute values
+        # Verify the instance and the attribute values
         self.assertIsInstance(location_processor, LocationProcessor)
         self.assertEqual(location_processor.pandcode, self.location_data_dict["pandcode"])
+        self.assertEqual(location_processor.occupied, self.location_data_dict["occupied"])
+        self.assertEqual(location_processor.build, self.location_data_dict["build"])
+        self.assertEqual(location_processor.mail, self.location_data_dict["mail"])
+        self.assertEqual(location_processor.floors, self.location_data_dict["floors"])
+        self.assertEqual(location_processor.note, self.location_data_dict["note"])
+        self.assertEqual(location_processor.postcode, self.location_data_dict["postcode"])
+        self.assertEqual(location_processor.color, self.location_data_dict["color"])
+        self.assertEqual(location_processor.url, self.location_data_dict["url"])
+        self.assertEqual(location_processor.type, self.location_data_dict["type"])
+        self.assertEqual(location_processor.multitype, self.location_data_dict["multitype"])
+        self.assertEqual(location_processor.geo, self.location_data_dict["geo"])
+
+    def test_init_with_malicious_data(self):
+        """
+        Test if an instance of LocationProcessor is created
+        and if the attributes are sanitized correctly
+        """
+        self.location_data_dict["pandcode"] = "=maliciousFormula"
+        location_processor = LocationProcessor(data=self.location_data_dict)
+
+        # Verify the instance and that the malicious formula is wrapped in quotation marks
+        self.assertIsInstance(location_processor, LocationProcessor)
+        self.assertEqual(location_processor.pandcode, "'=maliciousFormula'")
         self.assertEqual(location_processor.occupied, self.location_data_dict["occupied"])
         self.assertEqual(location_processor.build, self.location_data_dict["build"])
         self.assertEqual(location_processor.mail, self.location_data_dict["mail"])

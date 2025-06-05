@@ -269,7 +269,7 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                         messages.add_message(request, messages.WARNING, message)
                         continue
 
-                    # Initiatie a location processor with the row data
+                    # Initiate a location processor with the row data
                     location = LocationProcessor(data=row)
                     try:
                         # Save the locationprocessor instance
