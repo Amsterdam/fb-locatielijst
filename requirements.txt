@@ -49,7 +49,7 @@ deprecated==1.2.18
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-semantic-conventions
-django==5.2.2
+django==5.2.1
     # via
     #   -r requirements.in
     #   django-csp
@@ -168,7 +168,7 @@ six==1.17.0
     # via azure-core
 sqlparse==0.5.3
     # via django
-typing-extensions==4.14.0
+typing-extensions==4.13.2
     # via
     #   azure-core
     #   azure-identity
