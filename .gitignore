@@ -60,3 +60,4 @@ compose.override.yml
 secrets.env
 
 */static/
+src/pgdump/pgdump.zip

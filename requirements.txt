@@ -15,6 +15,8 @@ azure-core==1.34.0
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
+    #   azure-storage-blob
+    #   django-storages
 azure-identity==1.23.0
     # via -r requirements.in
 azure-keyvault==4.2.0
@@ -27,6 +29,8 @@ azure-keyvault-secrets==4.9.0
     # via
     #   -r requirements.in
     #   azure-keyvault
+azure-storage-blob==12.25.1
+    # via django-storages
 certifi==2025.4.26
     # via requests
 cffi==1.17.1
@@ -37,6 +41,7 @@ cryptography==45.0.3
     # via
     #   azure-identity
     #   azure-keyvault-keys
+    #   azure-storage-blob
     #   josepy
     #   mozilla-django-oidc
     #   msal
@@ -46,15 +51,18 @@ deprecated==1.2.18
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-semantic-conventions
-django==5.2.1
+django==5.2.2
     # via
     #   -r requirements.in
     #   django-csp
     #   django-extensions
+    #   django-storages
     #   mozilla-django-oidc
 django-csp==4.0
     # via -r requirements.in
 django-extensions==4.1
+    # via -r requirements.in
+django-storages[azure]==1.14.6
     # via -r requirements.in
 googleapis-common-protos==1.70.0
     # via opentelemetry-exporter-otlp-proto-grpc
@@ -69,6 +77,7 @@ isodate==0.7.2
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
+    #   azure-storage-blob
 josepy==2.0.0
     # via mozilla-django-oidc
 mozilla-django-oidc==4.0.1
@@ -161,13 +170,14 @@ six==1.17.0
     # via azure-core
 sqlparse==0.5.3
     # via django
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via
     #   azure-core
     #   azure-identity
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
+    #   azure-storage-blob
     #   opentelemetry-sdk
 urllib3==2.4.0
     # via requests
