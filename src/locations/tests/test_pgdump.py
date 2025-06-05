@@ -41,13 +41,11 @@ class TestPgDumpCommand:
         """
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
 
-        # Create test data for the Location model
         baker.make(Location, _quantity=5)
 
         command = PgDumpCommand()
         filepath = command._dump_model_to_csv(Location)
 
-        # Assert the file exists
         assert os.path.isfile(filepath)
 
         # Read the CSV file and verify its contents
@@ -81,17 +79,13 @@ class TestPgDumpCommand:
         command = PgDumpCommand()
         command.upload_to_blob()
 
-        # Debugging: Check if the mocked method was called
-        print(f"Mock called: {mock_save.called}")
-        print(f"Call args: {mock_save.call_args}")
-
-        # Assert the save_without_postfix method was called
         mock_save.assert_called_once()
-        args, kwargs = mock_save.call_args
-        assert args[0] == "pgdump.zip"  # The name of the file being uploaded
-        assert isinstance(args[1], MagicMock)  # The content being uploaded
 
-        # Cleanup
+        # Access keyword arguments instead of positional arguments
+        _, kwargs = mock_save.call_args
+        assert kwargs["name"] == "pgdump.zip", f"Expected 'pgdump.zip', got {kwargs['name']}"
+        assert hasattr(kwargs["content"], "read"), "The content argument is not a file-like object."
+
         shutil.rmtree(self.TMP_DIRECTORY)
 
     def test_remove_dump(self):
@@ -111,10 +105,8 @@ class TestPgDumpCommand:
         """
         Test the entire pgdump command end-to-end.
         """
-        # Create test data for the Location model
         baker.make(Location, name="TEST")
 
-        # Call the pgdump command
         call_command("pgdump")
 
         # Assert the temporary directory was removed
