@@ -67,25 +67,32 @@ class TestPgDumpCommand:
     @patch("locations.management.commands.pgdump.OverwriteStorage.save_without_postfix")
     def test_upload_to_blob(self, mock_save):
         """
-        Test that upload_to_blob uploads the ZIP file to Azure Storage.
+        Test that upload_to_blob uploads each CSV file directly to the root of Azure Storage.
         """
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
 
-        # Create a dummy ZIP file
-        zip_filepath = os.path.join(self.TMP_DIRECTORY, "pgdump.zip")
-        with open(zip_filepath, "w") as f:
-            f.write("dummy data")
+        # Create dummy CSV files
+        csv_files = ["Location.csv", "PropertyGroup.csv"]
+        for file_name in csv_files:
+            file_path = os.path.join(self.TMP_DIRECTORY, file_name)
+            with open(file_path, "w") as f:
+                f.write("dummy data")
 
         command = PgDumpCommand()
         command.upload_to_blob()
 
-        mock_save.assert_called_once()
+        assert mock_save.call_count == len(csv_files)
 
-        # Access keyword arguments instead of positional arguments
-        _, kwargs = mock_save.call_args
-        assert kwargs["name"] == "pgdump.zip", f"Expected 'pgdump.zip', got {kwargs['name']}"
-        assert hasattr(kwargs["content"], "read"), "The content argument is not a file-like object."
+        for file_name in csv_files:
+            found = False
+            for call in mock_save.call_args_list:
+                kwargs = call.kwargs
+                if kwargs["name"] == file_name and hasattr(kwargs["content"], "read"):
+                    found = True
+                    break
+            assert found, f"save_without_postfix was not called with name='{file_name}'"
 
+        # Cleanup
         shutil.rmtree(self.TMP_DIRECTORY)
 
     def test_remove_dump(self):
@@ -101,7 +108,8 @@ class TestPgDumpCommand:
         assert not os.path.exists(self.TMP_DIRECTORY)
 
     @pytest.mark.django_db
-    def test_pg_dump_command(self):
+    @patch("locations.management.commands.pgdump.OverwriteStorage.save_without_postfix")
+    def test_pg_dump_command(self, mock_save):
         """
         Test the entire pgdump command end-to-end.
         """

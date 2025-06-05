@@ -1,8 +1,6 @@
 import os
 import shutil
 import csv
-import zipfile
-from io import StringIO
 from django.apps import apps
 from django.conf import settings
 from django.utils.module_loading import import_string as get_storage_class
@@ -51,15 +49,13 @@ class Command(BaseCommand):
 
     def start_dump(self, app_names):
         """
-        Dump all models in the specified apps to CSV files and compress them into a ZIP archive.
+        Dump all models in the specified apps to CSV files.
         """
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
 
-        with zipfile.ZipFile(os.path.join(self.TMP_DIRECTORY, "pgdump.zip"), "w") as zip_file:
-            for app in app_names:
-                for model in apps.get_app_config(app).get_models():
-                    csv_filepath = self._dump_model_to_csv(model)
-                    zip_file.write(csv_filepath, os.path.basename(csv_filepath))
+        for app in app_names:
+            for model in apps.get_app_config(app).get_models():
+                self._dump_model_to_csv(model)
 
     def _dump_model_to_csv(self, model):
         """
@@ -83,15 +79,18 @@ class Command(BaseCommand):
 
     def upload_to_blob(self):
         """
-        Upload the ZIP file to Azure Storage.
+        Upload each CSV file to Azure Storage.
         """
         storage = OverwriteStorage()
-        zip_filepath = os.path.join(self.TMP_DIRECTORY, "pgdump.zip")
 
-        with open(zip_filepath, "rb") as f:
-            storage.save_without_postfix(name= "pgdump.zip", content=f)
+        for file_name in os.listdir(self.TMP_DIRECTORY):
+            file_path = os.path.join(self.TMP_DIRECTORY, file_name)
 
-        self.stdout.write(f"Successfully uploaded {zip_filepath} to Azure Storage.")
+            # Upload each file to Azure Storage
+            with open(file_path, "rb") as f:
+                storage.save_without_postfix(name=file_name, content=f)
+
+            self.stdout.write(f"Successfully uploaded {file_name} to Azure Storage.")
 
     def remove_dump(self):
         """
