@@ -10,7 +10,9 @@ azure-core
 azure-identity
 azure-keyvault
 azure-keyvault-secrets
-mozilla-django-oidc
+
+# Amsterdam packages
+amsterdam-django-oidc
 
 # OTEL
 opentelemetry-exporter-otlp-proto-grpc
