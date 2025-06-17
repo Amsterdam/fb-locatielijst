@@ -1,6 +1,7 @@
 import os
 import shutil
 import csv
+import time
 from django.apps import apps
 from django.conf import settings
 from django.utils.module_loading import import_string as get_storage_class
@@ -54,7 +55,9 @@ class Command(BaseCommand):
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
 
         for app in app_names:
+            print("dumping " + app)
             for model in apps.get_app_config(app).get_models():
+                print("dumping" + str(model))
                 self._dump_model_to_csv(model)
 
     def _dump_model_to_csv(self, model):
@@ -64,6 +67,8 @@ class Command(BaseCommand):
         table_name = model._meta.db_table
         filepath = os.path.join(self.TMP_DIRECTORY, f"{table_name}.csv")
 
+        print(len(model.objects.all()))
+        startTime = time.time()
         with open(filepath, "w", newline="", encoding="utf-8") as csv_file:
             writer = csv.writer(csv_file)
 
@@ -74,6 +79,7 @@ class Command(BaseCommand):
             # Write data rows
             for instance in model.objects.all():
                 writer.writerow([getattr(instance, field) for field in fields])
+        print("Done" + str(time.time() - startTime))
 
         return filepath
 
