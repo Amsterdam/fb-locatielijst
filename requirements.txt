@@ -17,7 +17,7 @@ azure-core==1.35.0
     #   azure-keyvault-secrets
     #   azure-storage-blob
     #   django-storages
-azure-identity==1.23.1
+azure-identity==1.24.0
     # via -r requirements.in
 azure-keyvault==4.2.0
     # via -r requirements.in
@@ -31,13 +31,13 @@ azure-keyvault-secrets==4.10.0
     #   azure-keyvault
 azure-storage-blob==12.26.0
     # via django-storages
-certifi==2025.7.14
+certifi==2025.8.3
     # via requests
 cffi==1.17.1
     # via cryptography
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
-cryptography==45.0.5
+cryptography==45.0.6
     # via
     #   azure-identity
     #   azure-keyvault-keys
@@ -46,7 +46,7 @@ cryptography==45.0.5
     #   mozilla-django-oidc
     #   msal
     #   pyjwt
-django==5.2.4
+django==5.2.5
     # via
     #   -r requirements.in
     #   django-csp
@@ -142,7 +142,7 @@ packaging==25.0
     # via
     #   django-csp
     #   opentelemetry-instrumentation
-protobuf==6.31.1
+protobuf==6.32.0
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -156,7 +156,7 @@ pyjwt[crypto]==2.10.1
     #   pyjwt
 pyodbc==5.2.0
     # via -r requirements.in
-requests==2.32.4
+requests==2.32.5
     # via
     #   azure-core
     #   mozilla-django-oidc
@@ -165,7 +165,7 @@ six==1.17.0
     # via azure-core
 sqlparse==0.5.3
     # via django
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   azure-core
     #   azure-identity
@@ -183,7 +183,7 @@ uwsgi==2.0.30
     # via -r requirements.in
 wfastcgi==3.0.0
     # via -r requirements.in
-wrapt==1.17.2
+wrapt==1.17.3
     # via
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-dbapi
