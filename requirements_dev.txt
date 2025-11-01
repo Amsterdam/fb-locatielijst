@@ -4,17 +4,17 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements_dev.txt requirements_dev.in
 #
-asgiref==3.9.2
+asgiref==3.10.0
     # via django
 cffi==2.0.0
     # via cryptography
-coverage[toml]==7.10.7
+coverage[toml]==7.11.0
     # via pytest-cov
-cryptography==46.0.2
+cryptography==46.0.3
     # via pyopenssl
 django==5.2.7
     # via model-bakery
-iniconfig==2.1.0
+iniconfig==2.3.0
     # via pytest
 markupsafe==3.0.3
     # via werkzeug
