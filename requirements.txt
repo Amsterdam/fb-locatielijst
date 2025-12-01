@@ -6,7 +6,7 @@
 #
 amsterdam-django-oidc==0.2.2
     # via -r requirements.in
-asgiref==3.10.0
+asgiref==3.11.0
     # via django
 azure-core==1.36.0
     # via
@@ -31,7 +31,7 @@ azure-keyvault-secrets==4.10.0
     #   azure-keyvault
 azure-storage-blob==12.27.1
     # via django-storages
-certifi==2025.10.5
+certifi==2025.11.12
     # via requests
 cffi==2.0.0
     # via cryptography
@@ -59,7 +59,7 @@ django-extensions==4.1
     # via -r requirements.in
 django-storages[azure]==1.14.6
     # via -r requirements.in
-googleapis-common-protos==1.71.0
+googleapis-common-protos==1.72.0
     # via opentelemetry-exporter-otlp-proto-grpc
 grpcio==1.76.0
     # via opentelemetry-exporter-otlp-proto-grpc
@@ -142,7 +142,7 @@ packaging==25.0
     # via
     #   django-csp
     #   opentelemetry-instrumentation
-protobuf==6.33.0
+protobuf==6.33.1
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -161,7 +161,7 @@ requests==2.32.5
     #   azure-core
     #   mozilla-django-oidc
     #   msal
-sqlparse==0.5.3
+sqlparse==0.5.4
     # via django
 typing-extensions==4.15.0
     # via
