@@ -37,24 +37,29 @@ DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # 3rd party
+    ]
+THIRD_PARTY_APPS = [
     "mozilla_django_oidc",
     "django_extensions",
     "storages",
-    # project app
+    ]
+LOCAL_APPS = [
     "locations",
     "help_docs",
     "shared",
     "health",
+    "referentie_tabellen",
+    "fblocatie"
 ]
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
