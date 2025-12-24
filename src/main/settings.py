@@ -52,7 +52,7 @@ THIRD_PARTY_APPS = [
     ]
 LOCAL_APPS = [
     "locations",
-    "help_docs",
+    #"help_docs",
     "shared",
     "health",
     "referentie_tabellen",

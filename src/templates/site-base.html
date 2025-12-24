@@ -50,7 +50,7 @@
           <li><a href="{% url LOGIN_URL %}?next={{ request.path }}">Inloggen</a></li>
           {% endif %}
           {% if user.is_staff %}
-          <li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>
+          {#<li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>#}
           <li><a href="{% url 'locations_urls:location-admin' %}">Beheer</a></li>
           {% endif %}
           {% if user.is_authenticated %}
