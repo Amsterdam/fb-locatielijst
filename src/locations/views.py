@@ -28,6 +28,7 @@ from locations.models import (
 )
 from locations.processors import LocationProcessor
 
+from fblocatie.importer import ImporterProcessCSV
 
 # Create your views here.
 def get_csv_file_response(request, locations) -> HttpResponse:
@@ -256,6 +257,7 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                 messages.add_message(request, messages.INFO, message)
 
                 # Process the rows from the import file
+                importer = ImporterProcessCSV()
                 for i, row in enumerate(csv_dict):
                     # Check if a row is missing a value/column
                     if "missing" in row.values():
@@ -270,23 +272,19 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                         continue
 
                     # Initiate a location processor with the row data
-                    location = LocationProcessor(data=row)
+                    #location = LocationProcessor(data=row)
                     try:
-                        # Save the locationprocessor instance
-                        location.save()
-                        location_added += 1
+                        importer.main(row)
+                    # 
+                    #     # Save the locationprocessor instance
+                    #     location.save()
+                    #    location_added += 1
 
                     except ValidationError as err:
-                        if getattr(err, "error_list", None):
-                            error_messages = [error.message for error in err.error_list]
-                        elif getattr(err, "error_dict", None):
-                            error_messages = []
-                            for error_list in err.error_dict.values():
-                                # Unpredictable fix, because there is a self reference in error_list
-                                error_messages.extend([error.messages for error in error_list])
-                        else:
-                            error_messages = err.message
-                        message = f"Fout bij het importeren voor locatie {row['naam']}: {error_messages}"
+                        importer.errors['main'] = f'Error in main: {err}'
+
+                    if importer.errors !={}:
+                        message = f"Fout importeren locatie {importer.locatie_id}: {importer.errors}"
                         messages.add_message(request, messages.ERROR, message)
             else:
                 message = f"{csv_file.name} is geen gelding CSV bestand."
