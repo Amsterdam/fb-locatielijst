@@ -1,5 +1,5 @@
 uwsgi
-Django
+Django<6  # Do not upgrade to Django 6 yet!
 django-csp
 django-extensions
 django-storages[azure]

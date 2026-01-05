@@ -1,3 +1,4 @@
+Django<6  # Do not upgrade to Django 6 yet!
 pytest<8  # 8 breaks pytest-django with error on /root/__init__.py
 pytest-cov
 pytest-django
