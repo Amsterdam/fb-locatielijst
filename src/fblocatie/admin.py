@@ -12,20 +12,47 @@ class LocatieAdmin(admin.ModelAdmin):
     search_help_text = "zoek op afkorting, naam of pandcode"
 
     list_filter = ("is_archived", "vastgoed__bezit", "locatieteam")
+    readonly_fields = ["pandcode",]
+
+    def get_fieldsets(self, request, obj=None):
+            all_fields = [field.name for field in self.model._meta.get_fields() if getattr(field, 'editable', False)]
+
+            controlled_fields = self.readonly_fields
+            koppel_fields = ["pas_loc", "anet_loc", "emobj", "po"]
+            closing_fields = ["notitie"]
+            remaining_fields = [field for field in all_fields if field not in (controlled_fields + closing_fields + koppel_fields)]
+            print(remaining_fields)
+            fieldsets = (
+                (None, {
+                    'fields': controlled_fields,
+                }),
+                (None, {
+                    'fields': remaining_fields,
+                }),
+                (None, {
+                    'fields': closing_fields,
+                }),
+                ('Koppelvelden', {
+                    'fields': koppel_fields,
+                }),
+            )
+            return fieldsets
+
 
 @admin.register(LocatieTeam)
 class LocatieTeamAdmin(admin.ModelAdmin):
-    list_display = ("nummer","id")
+    list_display = ("nummer", "email", "loc_manager", "id")
     ordering = ("id",)
 
 
 @admin.register(Adres)
 class AdresAdmin(admin.ModelAdmin):
-    list_display = ("bag_id","id")
-    ordering = ("id",)    
-
+    list_display = ("bag_id", "postcode", "straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id")
+    ordering = ("straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id",)
+    readonly_fields = ("lat", "lon", "map_url")
 
 @admin.register(Vastgoed)
 class VastgoedAdmin(admin.ModelAdmin):
-    list_display = ("GV_key","id")
-    ordering = ("id",)     
+    list_display = ("GV_key", "bezit", "bouwjaar","id")
+    ordering = ("id",)
+    list_filter = ("bezit",)

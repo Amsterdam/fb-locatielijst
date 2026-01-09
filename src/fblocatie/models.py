@@ -1,7 +1,9 @@
 from django.db import models
 from django.db.models import Max
+from django.contrib.gis.geos import Point
 
-from referentie_tabellen.models import Directie, LocatieSoort, DienstverleningsKader, Voorziening, Persoon, LocatieBezit, MonumentStatus, GelieerdePartij
+
+from referentie_tabellen.models import Directie, LocatieSoort, DienstverleningsKader, Voorziening, Persoon, LocatieBezit, MonumentStatus, GelieerdePartij, Contract
 
 
 class TimeStampMixin(models.Model):
@@ -25,8 +27,14 @@ class LocatieTeam(TimeStampMixin):
     perceel_installateur= models.ForeignKey(Persoon, verbose_name="E&W perceel installateur", related_name="perceel_installateur", blank=True, null=True, on_delete=models.RESTRICT)
 
     def __str__(self):
-        return str(self.nummer)
+        return f"Team {str(self.nummer)} '{self.email}'"
     
+
+def calc_lat_lon_from_geometry(rd_x, rd_y) -> dict:
+    """Calculate Point latitude and longitude (srid=4326; WGS coordinates) from given geometry in srid=28992 (RD-coordinates)"""
+    point_rd = Point(rd_x, rd_y, srid=28992)
+    point_wgs84 = point_rd.transform(4326, clone=True)
+    return {"lat": point_wgs84.y, "lon": point_wgs84.x}
 
 # voor toekomstige BAG koppeling: in nummeraanduidingen zijn de koppelsleutels voor verblijfobjecten en openbareuruimtes te vinden
 class Adres(models.Model):
@@ -37,17 +45,30 @@ class Adres(models.Model):
     huisletter = models.CharField(max_length=41, blank=True, null=True) #kan opgehaald via /v1/bag/nummeraanduidingen/
     huisnummertoevoeging = models.CharField(max_length=4, blank=True, null=True) #kan opgehaald via /v1/bag/nummeraanduidingen/
     woonplaats = models.CharField(max_length=50) #kan opgehaald via /v1/bag/openbareruimtes
+    rd_x = models.FloatField(verbose_name="RD_x", blank=True, null=True)
+    rd_y = models.FloatField(verbose_name="RD_y", blank=True, null=True)
     lat = models.FloatField(verbose_name="Latitude", blank=True, null=True)
-    long = models.FloatField(verbose_name="Longitude", blank=True, null=True)
+    lon = models.FloatField(verbose_name="Longitude", blank=True, null=True)
     # geometry kan opgehaald via /v1/bag/verblijfsobjecten
     map_url = models.URLField(max_length=200)
 
     def save(self, *args, **kwargs):
-        if self.lat is not None and self.long is not None:
-            self.map_url = f"https://maps.google.com/?q={self.long},{self.lat}"
+        if None not in (self.rd_x, self.rd_y):
+            rd_x = float(self.rd_x)
+            rd_y = float(self.rd_y)
+            pnt = calc_lat_lon_from_geometry(rd_x, rd_y)
+            self.lat = round(pnt["lat"], 6)
+            self.lon = round(pnt["lon"], 6)   
+            self.map_url = f"https://maps.google.com/?q={self.lat},{self.lon}"
 
         super().save(*args, **kwargs)
-    
+
+    def __str__(self):
+        adres_str = f"{self.straat} {str(self.huisnummer)}"
+        adres_str += f"{self.huisletter}" if self.huisletter else ""
+        adres_str += f"{self.huisnummertoevoeging}" if self.huisnummertoevoeging else ""
+        return adres_str
+        
     class Meta:
         verbose_name_plural = "Adressen"
 
@@ -64,6 +85,9 @@ class Vastgoed(models.Model):
     asset_manager =models.ForeignKey(Persoon, verbose_name="Assetmanager/contract vastgoed", related_name="asset_manager", blank=True, null=True, on_delete=models.RESTRICT)
     pl_gv=models.ForeignKey(Persoon, verbose_name="Projectleider Gemeentelijk Vastgoed", related_name="pl_gv", blank=True, null=True, on_delete=models.RESTRICT)
 
+    def __str__(self):
+        return f"{self.GV_key} {self.bezit}"
+    
     class Meta:
         verbose_name_plural = "Vastgoed" 
 
@@ -75,12 +99,13 @@ class Locatie(TimeStampMixin):
     """
     Base class for the location
     """
-    afkorting = models.CharField(verbose_name="Afkorting", primary_key=True, max_length= 15) # uniek en identificeerbaar, gelijk aan pandcode in https://hoofdstad.sharepoint.com/sites/in-dga-pa
-    pandcode = models.IntegerField(verbose_name="FB pandcode", default=compute_pandcode) #leidend voor externe leveranciers en datakoppelingen
+    pandcode = models.IntegerField(verbose_name="FB pandcode", primary_key=True, default=compute_pandcode) #leidend voor externe leveranciers en datakoppelingen
+    afkorting = models.CharField(verbose_name="Afkorting", max_length= 15) # uniek en identificeerbaar, gelijk aan pandcode in https://hoofdstad.sharepoint.com/sites/in-dga-pa
     naam = models.CharField(verbose_name="Naam", unique=True, max_length=100)
     is_archived = models.BooleanField(verbose_name="Archief", default=False)
-    beschrijving = models.TextField(verbose_name="Beschrijving", blank=True, default="")
+    beschrijving = models.TextField(verbose_name="Beschrijving", blank=True, null=True)
     adres = models.ForeignKey(Adres, related_name="locatie_adres", on_delete=models.RESTRICT)
+    bezoekadres = models.ForeignKey(Adres, related_name="bezoek_adres", on_delete=models.RESTRICT, blank=True, null=True)
     vastgoed = models.ForeignKey(Vastgoed, related_name='locatie_vastgoed', on_delete=models.RESTRICT)
     locatie_soort = models.ForeignKey(LocatieSoort, on_delete=models.RESTRICT)
     dienstverleningskader = models.ForeignKey(DienstverleningsKader, on_delete=models.RESTRICT)
@@ -89,15 +114,18 @@ class Locatie(TimeStampMixin):
     routecode = models.CharField(max_length= 15, default="FB") #dit zijn opties in de huidige db?? gek - location_property_id=14???
     pand_directies = models.ManyToManyField(Directie, related_name="locatie_pand_directies")
     voorzieningen =  models.ManyToManyField(Voorziening)
+    contracten = models.ManyToManyField(Contract)
     werkplekken = models.IntegerField(blank=True, null=True)
     locatieteam = models.ForeignKey(LocatieTeam, blank=True, null=True, on_delete=models.RESTRICT)
     gelieerd = models.ForeignKey(GelieerdePartij, blank=True, null=True, on_delete=models.RESTRICT)
+    kantoorkast = models.CharField(verbose_name= "Kantoorartikelkast", max_length=50, blank=True, null=True)
+    notitie = models.TextField(blank=True, null=True)
 
     # externe koppelvelden
     pas_loc = models.CharField(verbose_name="1s1p locatie", blank=True, null=True) 
     anet_loc = models.CharField(verbose_name="A-net locatie", max_length=3, blank=True, null=True) 
     emobj = models.IntegerField(verbose_name="Energiemissie object", blank=True, null=True) 
-    po = models.IntegerField(verbose_name= "P&O locatie code", blank=True, null=True) 
+    po = models.IntegerField(verbose_name= "P&O locatie code", blank=True, null=True)
 
     def __str__(self):
         return f"{self.pandcode}, {self.naam}"

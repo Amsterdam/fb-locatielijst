@@ -1,5 +1,5 @@
 from django.contrib import admin
-from referentie_tabellen.models import DienstverleningsKader, Directie, LocatieBezit, LocatieSoort, Persoon, GelieerdePartij, MonumentStatus, Voorziening
+from referentie_tabellen.models import DienstverleningsKader, Directie, LocatieBezit, LocatieSoort, Persoon, GelieerdePartij, MonumentStatus, Voorziening, Contract
 
 @admin.register(DienstverleningsKader)
 class DienstverleningsKaderAdmin(admin.ModelAdmin):
@@ -47,3 +47,8 @@ class MonumentStatusAdmin(admin.ModelAdmin):
 class VoorzieningAdmin(admin.ModelAdmin):
     list_display = ("id", "name",)
     ordering = ("name",)          
+
+@admin.register(Contract)
+class ContractAdmin(admin.ModelAdmin):
+    list_display = ("id", "name",)
+    ordering = ("name",)        
