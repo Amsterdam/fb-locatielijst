@@ -21,7 +21,7 @@ class LocatieAdmin(admin.ModelAdmin):
             koppel_fields = ["pas_loc", "anet_loc", "emobj", "po"]
             closing_fields = ["notitie"]
             remaining_fields = [field for field in all_fields if field not in (controlled_fields + closing_fields + koppel_fields)]
-            print(remaining_fields)
+
             fieldsets = (
                 (None, {
                     'fields': controlled_fields,
@@ -53,6 +53,6 @@ class AdresAdmin(admin.ModelAdmin):
 
 @admin.register(Vastgoed)
 class VastgoedAdmin(admin.ModelAdmin):
-    list_display = ("GV_key", "bezit", "bouwjaar","id")
+    list_display = ("GV_key", "adres", "bezit", "bouwjaar","id")
     ordering = ("id",)
     list_filter = ("bezit",)

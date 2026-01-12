@@ -1,11 +1,15 @@
+import logging
 from django.apps import apps
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 
 from fblocatie.models import Adres, Vastgoed, LocatieTeam, Locatie
-from referentie_tabellen.models import LocatieBezit, MonumentStatus, Persoon, LocatieSoort, GelieerdePartij, DienstverleningsKader, Directie, Voorziening
+from referentie_tabellen.models import LocatieBezit, MonumentStatus, Persoon, LocatieSoort, GelieerdePartij, DienstverleningsKader, Directie, Voorziening, Contract
 
 from typing import Union
+
+log = logging.getLogger(__name__)
+
 
 class ImporterProcessCSV:
     
@@ -34,10 +38,10 @@ class ImporterProcessCSV:
             'huisletter': 'huisletter', 
             'huisnummertoevoeging': 'numtoeg', 
             'woonplaats': 'plaats', 
-            'long': 'longitude', 
-            'lat': 'latitude', 
+            'rd_x': 'rd_x', 
+            'rd_y': 'rd_y', 
         }
-        data = {key: row.get(value) for key, value in adres_mapping.items() if value in row}
+        data = {key: row.pop(value) for key, value in adres_mapping.items() if value in row}
         adres_data = self.set_empty_to_none(data)
 
         match_keys = ['postcode', 'huisnummer', 'huisletter', 'huisnummertoevoeging']
@@ -48,7 +52,6 @@ class ImporterProcessCSV:
         try:
             obj, _ = Adres.objects.update_or_create(defaults = update_fields, **match_adres)
         except Exception as e:
-            print(e)
             self.error_list.append(e)
             obj = None   
 
@@ -78,7 +81,7 @@ class ImporterProcessCSV:
     def get_referentietabellen_fields(self, referentie_tabellen: list, data: dict ) -> list:
 
         for field, model in referentie_tabellen:
-            if data[field] is None:
+            if data.get(field) is None:
                 continue
             try:
                 if model == Persoon:
@@ -109,8 +112,12 @@ class ImporterProcessCSV:
         }
         referentie_tabellen = [('bezit', LocatieBezit), ('monumentstatus', MonumentStatus), ('asset_manager', Persoon), ('pl_gv', Persoon)]
 
-        data = {key: row.get(value) for key, value in vg_mapping.items() if value in row}
+        data = {key: row.pop(value) for key, value in vg_mapping.items() if value in row}
         vg_data = self.set_empty_to_none(data)
+
+        for k in ['vvo', 'bvo']:
+            if vg_data.get(k) is not None:
+                vg_data[k] = vg_data[k].replace(',','.')
 
         # set adres onetoonefield
         vg_data['adres'] = self.adres_obj
@@ -154,7 +161,7 @@ class ImporterProcessCSV:
         referentie_tabellen = [('loc_manager', Persoon), ('loc_coordinator', Persoon), ('contact_directie', Persoon), ('tom', Persoon), 
                             ('tsc', Persoon), ('beveiliging', Persoon), ('veiligheid', Persoon), ('perceel_installateur', Persoon)]
 
-        data = {key: row.get(value) for key, value in locatieteam_mapping.items() if value in row}
+        data = {key: row.pop(value) for key, value in locatieteam_mapping.items() if value in row}
         lt_data = self.set_empty_to_none(data)
 
         # get referentie fields
@@ -198,7 +205,7 @@ class ImporterProcessCSV:
         self.errors = {}
 
         with transaction.atomic():
-            
+            print('start row: ', row)
             # model : row
             locatie_mapping = {
                 'afkorting': 'afkorting',
@@ -212,17 +219,20 @@ class ImporterProcessCSV:
                 'routecode': 'routecode',
                 'pand_directies': 'vlekken',
                 'voorzieningen': 'voorz',
+                'kantoorkast': 'kantoorart',
                 'werkplekken': 'werkplek',
                 'gelieerd': 'gelieerd',
+                'contracten': 'contract',
+                'notitie': 'notitie',
                 'pas_loc': 'pas_loc',
                 'anet_loc': 'anet_loc',
                 'emobj': 'emobj',
                 'po': 'po',
             }
-            many_to_many_fields = [('pand_directies', Directie), ('voorzieningen', Voorziening)]
+            many_to_many_fields = [('pand_directies', Directie), ('voorzieningen', Voorziening), ('contracten', Contract)]
             referentie_tabellen = [('locatie_soort', LocatieSoort), ('dienstverleningskader', DienstverleningsKader), ('budgethouder', Directie), ('gelieerd', GelieerdePartij)]
 
-            data = {key: row.get(value) for key, value in locatie_mapping.items() if value in row}
+            data = {key: row.pop(value) for key, value in locatie_mapping.items() if value in row}
             loc_data = self.set_empty_to_none(data)
 
             self.locatie_id = loc_data['afkorting']
@@ -238,10 +248,6 @@ class ImporterProcessCSV:
             for field, func in field_model_ids:
                 func(row)
                 loc_data[field] = getattr(self, field + '_obj')
-
-            print(self.adres_obj)
-            print('loc ',loc_data['adres'])
-            print(self.locatie_id)
 
             # update or create locatie
             match_keys = ['pandcode', 'afkorting']
@@ -268,6 +274,6 @@ class ImporterProcessCSV:
                 self.errors['locatie'] = self.error_list
 
             print(self.errors)
-            print(row)
+            print('niet uitgelezen: ', row)
 
             

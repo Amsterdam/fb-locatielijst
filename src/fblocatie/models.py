@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Max
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 
 
 from referentie_tabellen.models import Directie, LocatieSoort, DienstverleningsKader, Voorziening, Persoon, LocatieBezit, MonumentStatus, GelieerdePartij, Contract
@@ -72,7 +73,7 @@ class Adres(models.Model):
     class Meta:
         verbose_name_plural = "Adressen"
 
-
+# voor toekomstige koppeling met Gemeentelijk Vastgoed
 class Vastgoed(models.Model):
     adres = models.OneToOneField(Adres, on_delete=models.CASCADE, related_name='adres_extension')
     GV_key = models.CharField(verbose_name="GV(planon)", blank=True, null=True) 
@@ -86,7 +87,8 @@ class Vastgoed(models.Model):
     pl_gv=models.ForeignKey(Persoon, verbose_name="Projectleider Gemeentelijk Vastgoed", related_name="pl_gv", blank=True, null=True, on_delete=models.RESTRICT)
 
     def __str__(self):
-        return f"{self.GV_key} {self.bezit}"
+        #return f"{self.GV_key} {self.bezit}"
+        return f"Vastgoed {self.adres}"
     
     class Meta:
         verbose_name_plural = "Vastgoed" 
@@ -106,7 +108,7 @@ class Locatie(TimeStampMixin):
     beschrijving = models.TextField(verbose_name="Beschrijving", blank=True, null=True)
     adres = models.ForeignKey(Adres, related_name="locatie_adres", on_delete=models.RESTRICT)
     bezoekadres = models.ForeignKey(Adres, related_name="bezoek_adres", on_delete=models.RESTRICT, blank=True, null=True)
-    vastgoed = models.ForeignKey(Vastgoed, related_name='locatie_vastgoed', on_delete=models.RESTRICT)
+    vastgoed = models.ForeignKey(Vastgoed, related_name='locatie_vastgoed', on_delete=models.RESTRICT, blank=True, null=True)
     locatie_soort = models.ForeignKey(LocatieSoort, on_delete=models.RESTRICT)
     dienstverleningskader = models.ForeignKey(DienstverleningsKader, on_delete=models.RESTRICT)
     # navragen: budgethouder directie zelfde opties als pand directies??
@@ -130,9 +132,24 @@ class Locatie(TimeStampMixin):
     def __str__(self):
         return f"{self.pandcode}, {self.naam}"
 
+    def clean(self):
+            super().clean()
+            # Validate form input that the selected vastgoed matches the selected adres
+            if self.vastgoed and self.vastgoed.adres != self.adres:
+                raise ValidationError("Het geselecteerde vastgoed behoort niet tot het geselecteerde adres.")
+
     def save(self, *args, **kwargs):
+        # set default routecode
         if self.routecode is None:
             self.routecode = "FB" 
+
+        # Automatic set the vastgoed based on the adres else None
+        if self.adres:
+            try:
+                self.vastgoed = Vastgoed.objects.get(adres=self.adres)
+            except Vastgoed.DoesNotExist:
+                self.vastgoed = None
+
         super().save(*args, **kwargs)
 
     class Meta:
