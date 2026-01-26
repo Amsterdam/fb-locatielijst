@@ -150,16 +150,8 @@ class ImporterProcessCSV:
             'nummer': 'lt', 
             'email': 'lt_mail',
             'loc_manager': 'lm', 
-            'loc_coordinator': 'lc', 
-            'contact_directie': 'contact', 
-            'tom': 'tom', 
-            'tsc': 'tsc', 
-            'beveiliging': 'beveiligng', 
-            'veiligheid': 'veiligheid', 
-            'perceel_installateur': 'ew', 
         }
-        referentie_tabellen = [('loc_manager', Persoon), ('loc_coordinator', Persoon), ('contact_directie', Persoon), ('tom', Persoon), 
-                            ('tsc', Persoon), ('beveiliging', Persoon), ('veiligheid', Persoon), ('perceel_installateur', Persoon)]
+        referentie_tabellen = [('loc_manager', Persoon), ]
 
         data = {key: row.pop(value) for key, value in locatieteam_mapping.items() if value in row}
         lt_data = self.set_empty_to_none(data)
@@ -206,6 +198,7 @@ class ImporterProcessCSV:
 
         with transaction.atomic():
             print('start row: ', row)
+            self.error_list = []
             # model : row
             locatie_mapping = {
                 'afkorting': 'afkorting',
@@ -221,6 +214,13 @@ class ImporterProcessCSV:
                 'voorzieningen': 'voorz',
                 'kantoorkast': 'kantoorart',
                 'werkplekken': 'werkplek',
+                'loc_coordinator': 'lc', 
+                'contact_directie': 'contact', 
+                'tom': 'tom', 
+                'tsc': 'tsc', 
+                'beveiliging': 'beveiligng', 
+                'veiligheid': 'veiligheid', 
+                'perceel_installateur': 'ew', 
                 'gelieerd': 'gelieerd',
                 'contracten': 'contract',
                 'notitie': 'notitie',
@@ -230,16 +230,15 @@ class ImporterProcessCSV:
                 'po': 'po',
             }
             many_to_many_fields = [('pand_directies', Directie), ('voorzieningen', Voorziening), ('contracten', Contract)]
-            referentie_tabellen = [('locatie_soort', LocatieSoort), ('dienstverleningskader', DienstverleningsKader), ('budgethouder', Directie), ('gelieerd', GelieerdePartij)]
+            referentie_tabellen = [('locatie_soort', LocatieSoort), ('dienstverleningskader', DienstverleningsKader), ('budgethouder', Directie), ('gelieerd', GelieerdePartij),
+                                ('loc_coordinator', Persoon), ('contact_directie', Persoon), ('tom', Persoon), 
+                                ('tsc', Persoon), ('beveiliging', Persoon), ('veiligheid', Persoon), ('perceel_installateur', Persoon)]
 
             data = {key: row.pop(value) for key, value in locatie_mapping.items() if value in row}
             loc_data = self.set_empty_to_none(data)
 
             self.locatie_id = loc_data['afkorting']
             self.pandcode = loc_data['pandcode']
-
-            # get referentie fields
-            self.get_referentietabellen_fields(referentie_tabellen, loc_data)
 
             # connect models in right order
             field_model_ids = [('adres', self.process_adres), 
@@ -248,6 +247,9 @@ class ImporterProcessCSV:
             for field, func in field_model_ids:
                 func(row)
                 loc_data[field] = getattr(self, field + '_obj')
+
+            # get referentie fields location
+            self.get_referentietabellen_fields(referentie_tabellen, loc_data)
 
             # update or create locatie
             match_keys = ['pandcode', 'afkorting']
@@ -272,6 +274,7 @@ class ImporterProcessCSV:
             
             if self.error_list !=[]:
                 self.errors['locatie'] = self.error_list
+                self.error_list=[]
 
             print(self.errors)
             print('niet uitgelezen: ', row)

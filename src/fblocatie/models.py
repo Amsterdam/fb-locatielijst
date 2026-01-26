@@ -19,13 +19,6 @@ class LocatieTeam(TimeStampMixin):
     nummer = models.IntegerField(verbose_name="Locatieteam", blank=True, null=True)
     email = models.EmailField(verbose_name="Mailadres", blank=True, null=True)
     loc_manager = models.ForeignKey(Persoon, verbose_name="Locatiemanager", related_name="loc_manager", blank=True, null=True, on_delete=models.RESTRICT)
-    loc_coordinator= models.ForeignKey(Persoon, verbose_name="Locatiecoordinator", related_name="loc_coordinator", blank=True, null=True, on_delete=models.RESTRICT)
-    contact_directie =models.ForeignKey(Persoon, verbose_name="Contactpersoon vanuit directies", related_name="contact_directie", blank=True, null=True, on_delete=models.RESTRICT)
-    tom = models.ForeignKey(Persoon, verbose_name="Technisch ojectmanager (TOM)", related_name="tom", blank=True, null=True, on_delete=models.RESTRICT)
-    tsc = models.ForeignKey(Persoon, verbose_name="Technisch service coordinator (TSC)", related_name="tsc", blank=True, null=True,  on_delete=models.RESTRICT)
-    beveiliging = models.ForeignKey(Persoon, verbose_name="Adviseur beveiliging", related_name="beveiliging", blank=True, null=True, on_delete=models.RESTRICT)
-    veiligheid= models.ForeignKey(Persoon, verbose_name="Adviseur veiligheid", related_name="veiligheid", blank=True, null=True, on_delete=models.RESTRICT)
-    perceel_installateur= models.ForeignKey(Persoon, verbose_name="E&W perceel installateur", related_name="perceel_installateur", blank=True, null=True, on_delete=models.RESTRICT)
 
     def __str__(self):
         return f"Team {str(self.nummer)} '{self.email}'"
@@ -115,10 +108,20 @@ class Locatie(TimeStampMixin):
     budgethouder = models.ForeignKey(Directie, related_name="budgethouder", blank=True, null=True, on_delete=models.RESTRICT)
     routecode = models.CharField(max_length= 15, default="FB") #dit zijn opties in de huidige db?? gek - location_property_id=14???
     pand_directies = models.ManyToManyField(Directie, related_name="locatie_pand_directies")
-    voorzieningen =  models.ManyToManyField(Voorziening)
-    contracten = models.ManyToManyField(Contract)
+    voorzieningen =  models.ManyToManyField(Voorziening, blank=True, null=True)
+    contracten = models.ManyToManyField(Contract, blank=True, null=True)
     werkplekken = models.IntegerField(blank=True, null=True)
     locatieteam = models.ForeignKey(LocatieTeam, blank=True, null=True, on_delete=models.RESTRICT)
+
+    # contactpersonen
+    loc_coordinator= models.ForeignKey(Persoon, verbose_name="Locatiecoordinator", related_name="loc_coordinator", blank=True, null=True, on_delete=models.RESTRICT)
+    contact_directie =models.ForeignKey(Persoon, verbose_name="Contactpersoon vanuit directies", related_name="contact_directie", blank=True, null=True, on_delete=models.RESTRICT)
+    tom = models.ForeignKey(Persoon, verbose_name="Technisch ojectmanager (TOM)", related_name="tom", blank=True, null=True, on_delete=models.RESTRICT)
+    tsc = models.ForeignKey(Persoon, verbose_name="Technisch service coordinator (TSC)", related_name="tsc", blank=True, null=True,  on_delete=models.RESTRICT)
+    beveiliging = models.ForeignKey(Persoon, verbose_name="Adviseur beveiliging", related_name="beveiliging", blank=True, null=True, on_delete=models.RESTRICT)
+    veiligheid= models.ForeignKey(Persoon, verbose_name="Adviseur veiligheid", related_name="veiligheid", blank=True, null=True, on_delete=models.RESTRICT)
+    perceel_installateur= models.ForeignKey(Persoon, verbose_name="E&W perceel installateur", related_name="perceel_installateur", blank=True, null=True, on_delete=models.RESTRICT)
+
     gelieerd = models.ForeignKey(GelieerdePartij, blank=True, null=True, on_delete=models.RESTRICT)
     kantoorkast = models.CharField(verbose_name= "Kantoorartikelkast", max_length=50, blank=True, null=True)
     notitie = models.TextField(blank=True, null=True)
