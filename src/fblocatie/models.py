@@ -4,7 +4,7 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 
 
-from referentie_tabellen.models import Directie, LocatieSoort, DienstverleningsKader, Voorziening, Persoon, LocatieBezit, MonumentStatus, GelieerdePartij, Contract
+from referentie_tabellen.models import Directie, LocatieSoort, DienstverleningsKader, Voorziening, Persoon, LocatieBezit, MonumentStatus, GelieerdePartij, Contract, ThemaPortefeuille, Leverancier1s1p
 
 
 class TimeStampMixin(models.Model):
@@ -32,7 +32,8 @@ def calc_lat_lon_from_geometry(rd_x, rd_y) -> dict:
 
 # voor toekomstige BAG koppeling: in nummeraanduidingen zijn de koppelsleutels voor verblijfobjecten en openbareuruimtes te vinden
 class Adres(models.Model):
-    bag_id = models.CharField(verbose_name="BAG id", max_length=16, blank=True, null=True) 
+    pand_id = models.CharField(verbose_name="Pand identificatie", max_length=16, blank=True, null=True)
+    vot_id = models.CharField(verbose_name="Verblijfsobject identificatie", max_length=16, blank=True, null=True)
     straat = models.CharField(max_length=80) ##kan opgehaald via /v1/bag/openbareruimtes 
     postcode = models.CharField(max_length=6) #kan opgehaald via /v1/bag/nummeraanduidingen/
     huisnummer = models.IntegerField() #kan opgehaald via /v1/bag/nummeraanduidingen/
@@ -45,6 +46,15 @@ class Adres(models.Model):
     lon = models.FloatField(verbose_name="Longitude", blank=True, null=True)
     # geometry kan opgehaald via /v1/bag/verblijfsobjecten
     map_url = models.URLField(max_length=200)
+
+    def clean(self):
+        super().clean()
+        # Validate form input identification
+        if self.pand_id and self.pand_id[4:5]!= "10": #positie 5-6: 10 = een pand 
+            raise ValidationError("{self.pand_id} is geen geldige pandidentificatie.")
+        if self.vot_id and self.vot_id[4:5]!= "01": #positie 5-6: 01 = een verblijfsobject
+            raise ValidationError("{self.vot_id} is geen geldige verblijfsobjectidentificatie.")
+
 
     def save(self, *args, **kwargs):
         if None not in (self.rd_x, self.rd_y):
@@ -70,12 +80,15 @@ class Adres(models.Model):
 class Vastgoed(models.Model):
     adres = models.OneToOneField(Adres, on_delete=models.CASCADE, related_name='adres_extension')
     GV_key = models.CharField(verbose_name="GV(planon)", blank=True, null=True) 
+    gv_id =  models.CharField(verbose_name="BRES ID", blank=True, null=True) 
     bezit=models.ForeignKey(LocatieBezit, verbose_name="Eigendom / Huur", on_delete=models.RESTRICT)
     bouwjaar= models.IntegerField(verbose_name="Bouwjaar", blank=True, null=True)
     vvo = models.DecimalField(verbose_name="Verhuurbaar vloeroppervlak (VVO)", max_digits=10, decimal_places=2, blank=True, null=True)
     bvo = models.DecimalField(verbose_name="Bruto vloeroppervlakte (BVO)", max_digits=10, decimal_places=2, blank=True, null=True)
     energielabel = models.CharField(verbose_name="Energielabel",max_length=5, blank=True, null=True)
-    monumentstatus = models.ForeignKey(MonumentStatus, verbose_name="Monument status Amsterdam", on_delete=models.RESTRICT, blank=True, null=True)
+    monument_gem = models.ForeignKey(MonumentStatus, verbose_name="Monument status Amsterdam", related_name="monument_gem", on_delete=models.RESTRICT, blank=True, null=True)
+    monument_brkpb = models.ForeignKey(MonumentStatus, verbose_name="Monument status landelijk", related_name="monument_land", on_delete=models.RESTRICT, blank=True, null=True)
+    themagv = models.ForeignKey(ThemaPortefeuille, verbose_name="Themaportefeuille", on_delete=models.RESTRICT, blank=True, null=True)
     asset_manager =models.ForeignKey(Persoon, verbose_name="Assetmanager/contract vastgoed", related_name="asset_manager", blank=True, null=True, on_delete=models.RESTRICT)
     pl_gv=models.ForeignKey(Persoon, verbose_name="Projectleider Gemeentelijk Vastgoed", related_name="pl_gv", blank=True, null=True, on_delete=models.RESTRICT)
 
@@ -101,15 +114,21 @@ class Locatie(TimeStampMixin):
     beschrijving = models.TextField(verbose_name="Beschrijving", blank=True, null=True)
     adres = models.ForeignKey(Adres, related_name="locatie_adres", on_delete=models.RESTRICT)
     bezoekadres = models.ForeignKey(Adres, related_name="bezoek_adres", on_delete=models.RESTRICT, blank=True, null=True)
+    bezoekadres_functie = models.CharField(verbose_name="Functie afwijkend adres", max_length=100, blank=True, null=True)
     vastgoed = models.ForeignKey(Vastgoed, related_name='locatie_vastgoed', on_delete=models.RESTRICT, blank=True, null=True)
     locatie_soort = models.ForeignKey(LocatieSoort, on_delete=models.RESTRICT)
+
+    afstoten = models.DateField(blank=True, null=True)
+    ambtenaar = models.BooleanField(verbose_name="Primair huisvesting voor ambtenaren", default=False)
+
     dienstverleningskader = models.ForeignKey(DienstverleningsKader, on_delete=models.RESTRICT)
+    dienstverleningskader_nr = models.IntegerField(blank=True, null=True)
     # navragen: budgethouder directie zelfde opties als pand directies??
     budgethouder = models.ForeignKey(Directie, related_name="budgethouder", blank=True, null=True, on_delete=models.RESTRICT)
     routecode = models.CharField(max_length= 15, default="FB") #dit zijn opties in de huidige db?? gek - location_property_id=14???
     pand_directies = models.ManyToManyField(Directie, related_name="locatie_pand_directies")
-    voorzieningen =  models.ManyToManyField(Voorziening, blank=True, null=True)
-    contracten = models.ManyToManyField(Contract, blank=True, null=True)
+    voorzieningen =  models.ManyToManyField(Voorziening, blank=True)
+    contracten = models.ManyToManyField(Contract, blank=True)
     werkplekken = models.IntegerField(blank=True, null=True)
     locatieteam = models.ForeignKey(LocatieTeam, blank=True, null=True, on_delete=models.RESTRICT)
 
@@ -127,19 +146,21 @@ class Locatie(TimeStampMixin):
     notitie = models.TextField(blank=True, null=True)
 
     # externe koppelvelden
-    pas_loc = models.CharField(verbose_name="1s1p locatie", blank=True, null=True) 
-    anet_loc = models.CharField(verbose_name="A-net locatie", max_length=3, blank=True, null=True) 
+    pas_loc = models.CharField(verbose_name="1s1p locatie", blank=True, null=True)
+    pas_lc = models.ForeignKey(Leverancier1s1p, verbose_name="leverancier van 1s1p", blank=True, null=True, on_delete=models.RESTRICT)
+    anet_loc = models.CharField(verbose_name="A-net afkorting locatie", max_length=3, blank=True, null=True) 
     emobj = models.IntegerField(verbose_name="Energiemissie object", blank=True, null=True) 
     po = models.IntegerField(verbose_name= "P&O locatie code", blank=True, null=True)
+    priva_gbs = models.CharField(verbose_name= "Locatie Priva GBS", max_length=200, blank=True, null=True)
 
     def __str__(self):
         return f"{self.pandcode}, {self.naam}"
 
     def clean(self):
-            super().clean()
-            # Validate form input that the selected vastgoed matches the selected adres
-            if self.vastgoed and self.vastgoed.adres != self.adres:
-                raise ValidationError("Het geselecteerde vastgoed behoort niet tot het geselecteerde adres.")
+        super().clean()
+        # Validate form input that the selected vastgoed matches the selected adres
+        if self.vastgoed and self.vastgoed.adres != self.adres:
+            raise ValidationError("Het geselecteerde vastgoed behoort niet tot het geselecteerde adres.")
 
     def save(self, *args, **kwargs):
         # set default routecode
@@ -152,6 +173,10 @@ class Locatie(TimeStampMixin):
                 self.vastgoed = Vastgoed.objects.get(adres=self.adres)
             except Vastgoed.DoesNotExist:
                 self.vastgoed = None
+
+        # Convert "Ja" and "Nee" to boolean if keuze is a string
+        if isinstance(self.ambtenaar, str):
+            self.ambtenaar = self.ambtenaar.lower() == "ja"
 
         super().save(*args, **kwargs)
 

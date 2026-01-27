@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 
 from fblocatie.models import Adres, Vastgoed, LocatieTeam, Locatie
-from referentie_tabellen.models import LocatieBezit, MonumentStatus, Persoon, LocatieSoort, GelieerdePartij, DienstverleningsKader, Directie, Voorziening, Contract
+from referentie_tabellen.models import LocatieBezit, MonumentStatus, Persoon, LocatieSoort, GelieerdePartij, DienstverleningsKader, Directie, Voorziening, Contract, ThemaPortefeuille, Leverancier1s1p
 
 from typing import Union
 
@@ -31,7 +31,8 @@ class ImporterProcessCSV:
         self.error_list = []
         # model : row
         adres_mapping = {
-            'bag_id': 'bag_id',
+            'pand_id': 'bag_id',
+            'vot_id': 'vbo_id',
             'straat': 'straat', 
             'postcode': 'postcode', 
             'huisnummer': 'huisnummer', 
@@ -101,16 +102,19 @@ class ImporterProcessCSV:
         # model : row
         vg_mapping = {
             'GV_key': 'gv',
+            'gv_id': 'gv_id',
             'bezit': 'bezit', 
             'bouwjaar': 'bouwjaar', 
             'vvo': 'vvo', 
             'bvo': 'bvo', 
             'energielabel': 'energielbl', 
-            'monumentstatus': 'mon_gem', 
+            'monument_gem': 'mon_gem', 
+            'monument_brkpb': 'mon_brkpb', 
+            'themagv': 'themagv',
             'asset_manager': 'am_gv', 
             'pl_gv': 'plgv', 
         }
-        referentie_tabellen = [('bezit', LocatieBezit), ('monumentstatus', MonumentStatus), ('asset_manager', Persoon), ('pl_gv', Persoon)]
+        referentie_tabellen = [('bezit', LocatieBezit), ('monument_gem', MonumentStatus), ('monument_brkpb', MonumentStatus), ('themagv', ThemaPortefeuille), ('asset_manager', Persoon), ('pl_gv', Persoon)]
 
         data = {key: row.pop(value) for key, value in vg_mapping.items() if value in row}
         vg_data = self.set_empty_to_none(data)
@@ -206,8 +210,12 @@ class ImporterProcessCSV:
                 'naam': 'naam',
                 'is_archived': 'archief',
                 'beschrijving': 'beschrving',
+                'bezoekadres_functie': 'adres2_rol',
+                'afstoten': 'afstoten',
+                'ambtenaar': 'ambtenaar',
                 'locatie_soort': 'soort',
                 'dienstverleningskader': 'dvk_naam',
+                'dienstverleningskader_nr': 'dvk_nr',
                 'budgethouder': 'budget_dir',
                 'routecode': 'routecode',
                 'pand_directies': 'vlekken',
@@ -225,14 +233,17 @@ class ImporterProcessCSV:
                 'contracten': 'contract',
                 'notitie': 'notitie',
                 'pas_loc': 'pas_loc',
+                'pas_lc': 'pas',
                 'anet_loc': 'anet_loc',
                 'emobj': 'emobj',
                 'po': 'po',
+                'priva_gbs': 'priva_gbs',
             }
             many_to_many_fields = [('pand_directies', Directie), ('voorzieningen', Voorziening), ('contracten', Contract)]
             referentie_tabellen = [('locatie_soort', LocatieSoort), ('dienstverleningskader', DienstverleningsKader), ('budgethouder', Directie), ('gelieerd', GelieerdePartij),
                                 ('loc_coordinator', Persoon), ('contact_directie', Persoon), ('tom', Persoon), 
-                                ('tsc', Persoon), ('beveiliging', Persoon), ('veiligheid', Persoon), ('perceel_installateur', Persoon)]
+                                ('tsc', Persoon), ('beveiliging', Persoon), ('veiligheid', Persoon), ('perceel_installateur', Persoon),
+                                ('pas_lc', Leverancier1s1p)]
 
             data = {key: row.pop(value) for key, value in locatie_mapping.items() if value in row}
             loc_data = self.set_empty_to_none(data)

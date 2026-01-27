@@ -18,7 +18,7 @@ class LocatieAdmin(admin.ModelAdmin):
             all_fields = [field.name for field in self.model._meta.get_fields() if getattr(field, 'editable', False)]
 
             controlled_fields = self.readonly_fields
-            koppel_fields = ["pas_loc", "anet_loc", "emobj", "po"]
+            koppel_fields = ["pas_loc", "pas_lc", "anet_loc", "emobj", "po", "priva_gbs"]
             closing_fields = ["notitie"]
             remaining_fields = [field for field in all_fields if field not in (controlled_fields + closing_fields + koppel_fields)]
 
@@ -47,7 +47,7 @@ class LocatieTeamAdmin(admin.ModelAdmin):
 
 @admin.register(Adres)
 class AdresAdmin(admin.ModelAdmin):
-    list_display = ("bag_id", "postcode", "straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id")
+    list_display = ("vot_id", "postcode", "straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id")
     ordering = ("straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id",)
     readonly_fields = ("lat", "lon", "map_url")
 

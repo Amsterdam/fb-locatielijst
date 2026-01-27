@@ -86,3 +86,17 @@ class Persoon(models.Model):
         constraints = [
                 models.UniqueConstraint(fields=['voornaam', 'achternaam'], name='unique_voornaam_achternaam')
             ]
+        
+
+class ThemaPortefeuille(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+   
+class Leverancier1s1p(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name    
