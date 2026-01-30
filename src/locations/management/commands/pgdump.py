@@ -1,16 +1,16 @@
+import csv
 import os
 import shutil
-import csv
+
 from django.apps import apps
 from django.conf import settings
-from django.utils.module_loading import import_string as get_storage_class
 from django.core.management.base import BaseCommand
-from storages.backends.azure_storage import AzureStorage
+from django.utils.module_loading import import_string as get_storage_class
 
 
 class OverwriteStorage:
-    """ Set storage to pgdump container
-        and overwrite existing files instead of using hash postfixes."""
+    """Set storage to pgdump container
+    and overwrite existing files instead of using hash postfixes."""
 
     def __init__(self, *args, **kwargs):
         if hasattr(settings, "STORAGES") and "pgdump" in settings.STORAGES:

@@ -13,10 +13,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+from azure.identity import WorkloadIdentityCredential
 from csp.constants import NONCE, NONE, SELF
 
 from .azure_settings import Azure
-from azure.identity import WorkloadIdentityCredential
 
 # Starts an azure class in which we can retrieve azure identity tokens to connect to azure resources like the database.
 azure = Azure()
@@ -44,19 +44,19 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    ]
+]
 THIRD_PARTY_APPS = [
     "mozilla_django_oidc",
     "django_extensions",
     "storages",
-    ]
+]
 LOCAL_APPS = [
     "locations",
-    #"help_docs",
+    # "help_docs",
     "shared",
     "health",
     "referentie_tabellen",
-    "fblocatie"
+    "fblocatie",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -185,13 +185,13 @@ SESSION_COOKIE_SECURE = True
 
 # Django-storages for Django > 4.2
 STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 if os.getenv("AZURE_FEDERATED_TOKEN_FILE"):
     credential = WorkloadIdentityCredential()
@@ -213,7 +213,7 @@ if os.getenv("AZURE_FEDERATED_TOKEN_FILE"):
             },
         },
     }
-    STORAGES |= STORAGE_AZURE #update storages with storage_azure
+    STORAGES |= STORAGE_AZURE  # update storages with storage_azure
 
 
 # Content Security Policy (CSP) settings

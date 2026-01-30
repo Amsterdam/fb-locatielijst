@@ -15,6 +15,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView, View
 
+from fblocatie.importer import ImporterProcessCSV
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
 from locations.models import (
     ExternalService,
@@ -28,7 +29,6 @@ from locations.models import (
 )
 from locations.processors import LocationProcessor
 
-from fblocatie.importer import ImporterProcessCSV
 
 # Create your views here.
 def get_csv_file_response(request, locations) -> HttpResponse:
@@ -272,18 +272,18 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                         continue
 
                     # Initiate a location processor with the row data
-                    #location = LocationProcessor(data=row)
+                    # location = LocationProcessor(data=row)
                     try:
                         importer.main(row)
-                    # 
+                    #
                     #     # Save the locationprocessor instance
                     #     location.save()
                     #    location_added += 1
 
                     except ValidationError as err:
-                        importer.errors['main'] = f'Error in main: {err}'
+                        importer.errors["main"] = f"Error in main: {err}"
 
-                    if importer.errors !={}:
+                    if importer.errors != {}:
                         message = f"Fout importeren locatie {importer.locatie_id}: {importer.errors}"
                         messages.add_message(request, messages.ERROR, message)
             else:

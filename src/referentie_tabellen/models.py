@@ -13,7 +13,7 @@ class LocatieSoort(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name_plural = "Locatiesoorten"
 
@@ -23,6 +23,7 @@ class GelieerdePartij(models.Model):
 
     def __str__(self):
         return self.name
+
     class Meta:
         verbose_name_plural = "GelieerdePartijen"
 
@@ -32,14 +33,14 @@ class DienstverleningsKader(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class LocatieBezit(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name_plural = "Locatiebezit"
 
@@ -49,7 +50,7 @@ class MonumentStatus(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name_plural = "Monumentstatussen"
 
@@ -69,24 +70,22 @@ class Contract(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name_plural = "Contracten"
-    
+
 
 class Persoon(models.Model):
-    voornaam = models.CharField(max_length= 50)
-    achternaam = models.CharField(max_length = 50)
+    voornaam = models.CharField(max_length=50)
+    achternaam = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.voornaam} {self.achternaam}"
 
     class Meta:
         verbose_name_plural = "Personen"
-        constraints = [
-                models.UniqueConstraint(fields=['voornaam', 'achternaam'], name='unique_voornaam_achternaam')
-            ]
-        
+        constraints = [models.UniqueConstraint(fields=["voornaam", "achternaam"], name="unique_voornaam_achternaam")]
+
 
 class ThemaPortefeuille(models.Model):
     name = models.CharField(max_length=50)
@@ -94,9 +93,9 @@ class ThemaPortefeuille(models.Model):
     def __str__(self):
         return self.name
 
-   
+
 class Leverancier1s1p(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.name    
+        return self.name

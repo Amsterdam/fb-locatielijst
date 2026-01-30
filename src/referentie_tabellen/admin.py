@@ -1,27 +1,53 @@
 from django.contrib import admin
-from referentie_tabellen.models import DienstverleningsKader, Directie, LocatieBezit, LocatieSoort, Persoon, GelieerdePartij, MonumentStatus, Voorziening, Contract, ThemaPortefeuille, Leverancier1s1p
+
+from referentie_tabellen.models import (
+    Contract,
+    DienstverleningsKader,
+    Directie,
+    GelieerdePartij,
+    Leverancier1s1p,
+    LocatieBezit,
+    LocatieSoort,
+    MonumentStatus,
+    Persoon,
+    ThemaPortefeuille,
+    Voorziening,
+)
+
 
 @admin.register(DienstverleningsKader)
 class DienstverleningsKaderAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
+    list_display = (
+        "id",
+        "name",
+    )
     ordering = ("name",)
 
 
 @admin.register(Directie)
 class DirectieAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
+    list_display = (
+        "id",
+        "name",
+    )
     ordering = ("name",)
 
 
 @admin.register(LocatieBezit)
 class LocatieBezitAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
+    list_display = (
+        "id",
+        "name",
+    )
     ordering = ("name",)
 
 
 @admin.register(LocatieSoort)
 class LocatieSoortAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
+    list_display = (
+        "id",
+        "name",
+    )
     ordering = ("name",)
 
 
@@ -36,32 +62,53 @@ class PersoonAdmin(admin.ModelAdmin):
 
 @admin.register(GelieerdePartij)
 class GelieerdePartijAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
-    ordering = ("name",)                
+    list_display = (
+        "id",
+        "name",
+    )
+    ordering = ("name",)
 
 
 @admin.register(MonumentStatus)
 class MonumentStatusAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
-    ordering = ("name",)  
+    list_display = (
+        "id",
+        "name",
+    )
+    ordering = ("name",)
 
 
 @admin.register(Voorziening)
 class VoorzieningAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
-    ordering = ("name",)          
+    list_display = (
+        "id",
+        "name",
+    )
+    ordering = ("name",)
+
 
 @admin.register(Contract)
 class ContractAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
+    list_display = (
+        "id",
+        "name",
+    )
     ordering = ("name",)
+
 
 @admin.register(ThemaPortefeuille)
 class ThemaPortefeuilleAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
-    ordering = ("name",)          
+    list_display = (
+        "id",
+        "name",
+    )
+    ordering = ("name",)
+
 
 @admin.register(Leverancier1s1p)
 class Leverancier1s1pAdmin(admin.ModelAdmin):
-    list_display = ("id", "name",)
-    ordering = ("name",)      
+    list_display = (
+        "id",
+        "name",
+    )
+    ordering = ("name",)

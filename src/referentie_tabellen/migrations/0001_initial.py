@@ -7,108 +7,109 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Contract',
+            name="Contract",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'Contracten',
+                "verbose_name_plural": "Contracten",
             },
         ),
         migrations.CreateModel(
-            name='DienstverleningsKader',
+            name="DienstverleningsKader",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Directie',
+            name="Directie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='GelieerdePartij',
+            name="GelieerdePartij",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'GelieerdePartijen',
+                "verbose_name_plural": "GelieerdePartijen",
             },
         ),
         migrations.CreateModel(
-            name='Leverancier1s1p',
+            name="Leverancier1s1p",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='LocatieBezit',
+            name="LocatieBezit",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'Locatiebezit',
+                "verbose_name_plural": "Locatiebezit",
             },
         ),
         migrations.CreateModel(
-            name='LocatieSoort',
+            name="LocatieSoort",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'Locatiesoorten',
+                "verbose_name_plural": "Locatiesoorten",
             },
         ),
         migrations.CreateModel(
-            name='MonumentStatus',
+            name="MonumentStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'Monumentstatussen',
+                "verbose_name_plural": "Monumentstatussen",
             },
         ),
         migrations.CreateModel(
-            name='ThemaPortefeuille',
+            name="ThemaPortefeuille",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Voorziening',
+            name="Voorziening",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'Voorzieningen',
+                "verbose_name_plural": "Voorzieningen",
             },
         ),
         migrations.CreateModel(
-            name='Persoon',
+            name="Persoon",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('voornaam', models.CharField(max_length=50)),
-                ('achternaam', models.CharField(max_length=50)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("voornaam", models.CharField(max_length=50)),
+                ("achternaam", models.CharField(max_length=50)),
             ],
             options={
-                'verbose_name_plural': 'Personen',
-                'constraints': [models.UniqueConstraint(fields=('voornaam', 'achternaam'), name='unique_voornaam_achternaam')],
+                "verbose_name_plural": "Personen",
+                "constraints": [
+                    models.UniqueConstraint(fields=("voornaam", "achternaam"), name="unique_voornaam_achternaam")
+                ],
             },
         ),
     ]
