@@ -64,6 +64,16 @@ class Voorziening(models.Model):
         verbose_name_plural = "Voorzieningen"
 
 
+class Contract(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name_plural = "Contracten"
+    
+
 class Persoon(models.Model):
     voornaam = models.CharField(max_length= 50)
     achternaam = models.CharField(max_length = 50)
@@ -76,3 +86,17 @@ class Persoon(models.Model):
         constraints = [
                 models.UniqueConstraint(fields=['voornaam', 'achternaam'], name='unique_voornaam_achternaam')
             ]
+        
+
+class ThemaPortefeuille(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+   
+class Leverancier1s1p(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name    
