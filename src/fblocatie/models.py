@@ -50,7 +50,7 @@ class Adres(models.Model):
 
     def clean(self):
         super().clean()
-        # Validate form input identification
+        # Validate form input
         if self.pand_id and self.pand_id[4:6]!= "10": #positie 5-6: 10 = een pand 
             raise ValidationError(f"{self.pand_id} is geen geldige pandidentificatie.")
         if self.vot_id and self.vot_id[4:6]!= "01": #positie 5-6: 01 = een verblijfsobject

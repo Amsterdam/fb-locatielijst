@@ -51,6 +51,9 @@ class AdresAdmin(admin.ModelAdmin):
     ordering = ("straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id",)
     readonly_fields = ("lat", "lon", "map_url")
 
+    search_fields = ("postcode", "straat", "woonplaats")
+    search_help_text = "zoek op woonplaats, straat of postcode"
+
 @admin.register(Vastgoed)
 class VastgoedAdmin(admin.ModelAdmin):
     list_display = ("GV_key", "adres", "bezit", "bouwjaar","id")

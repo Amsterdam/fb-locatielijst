@@ -24,7 +24,7 @@ class ImporterProcessCSV:
         
     @staticmethod
     def set_empty_to_none(data: dict) -> dict:
-        return {key: (None if value in ('','x', '\'-\'') else value) for key, value in data.items()}
+        return {key: (None if value in ('','x', '\'-\'', '?') else value) for key, value in data.items()}
 
 
     def process_adres(self, row: dict)-> Adres:
@@ -44,6 +44,10 @@ class ImporterProcessCSV:
         }
         data = {key: row.pop(value) for key, value in adres_mapping.items() if value in row}
         adres_data = self.set_empty_to_none(data)
+
+        # data correction before dbstorage
+        if adres_data['postcode'] and len(adres_data['postcode']) > 6:
+            adres_data['postcode'] = adres_data['postcode'].replace(' ', '')
 
         match_keys = ['postcode', 'huisnummer', 'huisletter', 'huisnummertoevoeging']
         match_adres = {key: adres_data[key] for key in match_keys if key in adres_data}
@@ -118,6 +122,10 @@ class ImporterProcessCSV:
 
         data = {key: row.pop(value) for key, value in vg_mapping.items() if value in row}
         vg_data = self.set_empty_to_none(data)
+
+        # data correction before dbstorage
+        if vg_data['bezit'] is None:
+            vg_data['bezit'] = 'ntb' #nader te bepalen
 
         for k in ['vvo', 'bvo']:
             if vg_data.get(k) is not None:
