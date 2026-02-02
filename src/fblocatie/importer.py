@@ -56,7 +56,7 @@ class ImporterProcessCSV:
         adres_data = self.set_empty_to_none(data)
 
         # data correction before dbstorage
-        if adres_data["postcode"] and len(adres_data["postcode"]) > 6:
+        if "postcode" in adres_data and len(adres_data["postcode"]) > 6:
             adres_data["postcode"] = adres_data["postcode"].replace(" ", "")
 
         match_keys = ["postcode", "huisnummer", "huisletter", "huisnummertoevoeging"]
@@ -91,7 +91,7 @@ class ImporterProcessCSV:
             obj = None
         return obj, error
 
-    def get_referentietabellen_fields(self, referentie_tabellen: list, data: dict) -> list:
+    def get_referentietabellen_fields(self, referentie_tabellen: list, data: dict) -> dict:
 
         for field, model in referentie_tabellen:
             if data.get(field) is None:
@@ -107,6 +107,7 @@ class ImporterProcessCSV:
             except ObjectDoesNotExist:
                 self.error_list.append(f" '{data[field]}' is niet aanwezig in de {model} tabel")
                 data[field] = None
+        return data
 
     def process_vastgoed(self, row: dict) -> Vastgoed:
         self.error_list = []
@@ -138,7 +139,7 @@ class ImporterProcessCSV:
         vg_data = self.set_empty_to_none(data)
 
         # data correction before dbstorage
-        if vg_data["bezit"] is None:
+        if "bezit" in vg_data and vg_data["bezit"] is None:
             vg_data["bezit"] = "ntb"  # nader te bepalen
 
         for k in ["vvo", "bvo"]:
@@ -148,7 +149,7 @@ class ImporterProcessCSV:
         # set adres onetoonefield
         vg_data["adres"] = self.adres_obj
         # get referentie fields
-        self.get_referentietabellen_fields(referentie_tabellen, vg_data)
+        vg_data = self.get_referentietabellen_fields(referentie_tabellen, vg_data)
 
         # update or create
         match_keys = ["adres"]
@@ -184,7 +185,7 @@ class ImporterProcessCSV:
         lt_data = self.set_empty_to_none(data)
 
         # get referentie fields
-        self.get_referentietabellen_fields(referentie_tabellen, lt_data)
+        lt_data = self.get_referentietabellen_fields(referentie_tabellen, lt_data)
 
         match_keys = ["nummer", "lt_mail"]
         match_adres = {key: lt_data[key] for key in match_keys if key in lt_data}
@@ -283,9 +284,6 @@ class ImporterProcessCSV:
             data = {key: row.pop(value) for key, value in locatie_mapping.items() if value in row}
             loc_data = self.set_empty_to_none(data)
 
-            self.locatie_id = loc_data["afkorting"]
-            self.pandcode = loc_data["pandcode"]
-
             # connect models in right order
             field_model_ids = [
                 ("adres", self.process_adres),
@@ -294,10 +292,12 @@ class ImporterProcessCSV:
             ]
             for field, func in field_model_ids:
                 func(row)
-                loc_data[field] = getattr(self, field + "_obj")
+                obj = getattr(self, field + "_obj")
+                if obj is not None:
+                    loc_data[field] = obj
 
             # get referentie fields location
-            self.get_referentietabellen_fields(referentie_tabellen, loc_data)
+            loc_data = self.get_referentietabellen_fields(referentie_tabellen, loc_data)
 
             # update or create locatie
             match_keys = ["pandcode", "afkorting"]
@@ -310,17 +310,17 @@ class ImporterProcessCSV:
             }
 
             try:
-                locatie, created = Locatie.objects.update_or_create(defaults=update_fields, **match_loc)
-            except Exception as e:
-                self.error_list.append(e)
+                self.pandcode = loc_data["pandcode"]
+                self.locatie_id = loc_data["afkorting"]
 
-            try:
-                locatie
+                locatie, created = Locatie.objects.update_or_create(defaults=update_fields, **match_loc)
+
                 for f, m in many_to_many_fields:
-                    lst_obj = self._get_many_to_many(string=loc_data[f], model=m)
-                    if self.error_list != []:
-                        continue
-                    getattr(locatie, f).set(lst_obj)
+                    if f in loc_data:
+                        lst_obj = self._get_many_to_many(string=loc_data[f], model=m)
+                        if self.error_list != []:
+                            continue
+                        getattr(locatie, f).set(lst_obj)
             except Exception as e:
                 self.error_list.append(f"locatie niet aangemaakt: {e}")
 
