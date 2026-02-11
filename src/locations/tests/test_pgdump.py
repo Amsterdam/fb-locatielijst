@@ -1,10 +1,12 @@
+import csv
 import os
 import shutil
-import csv
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from django.core.management import call_command
 from model_bakery import baker
+
 from locations.management.commands.pgdump import Command as PgDumpCommand
 from locations.models import Location
 
@@ -22,7 +24,7 @@ class TestPgDumpCommand:
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
         with open(mock_file_path, "w") as f:
             f.write("dummy data")
-            
+
         command.start_dump(["locations"])
 
         # Assert the temporary directory was created
