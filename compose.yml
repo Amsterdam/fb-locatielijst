@@ -62,6 +62,7 @@ services:
       ENVIRONMENT: 'local'
       DEBUG: '1'
       OTEL_EXPORTER: "none"
+      COVERAGE_FILE: /tmp/.coverage
     command:
       pytest
     depends_on:
@@ -82,7 +83,7 @@ services:
       POSTGRES_PASSWORD: insecure
       POSTGRES_DB: fbl
     ports:
-      - "54321:5432"
+      - "5432:5432"
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "fbl", "-U", "fbl" ]
       interval: 10s
