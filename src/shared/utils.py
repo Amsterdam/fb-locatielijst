@@ -28,7 +28,7 @@ def reorder_grouped_objects(sender, instance, raw, **kwargs):
             if object.id == instance.id and instance_order:
                 continue
 
-            # if index is the same as the instance.order, add 1 to the index; otherwise 2 object will have the same index
+            # if index is the same as the instance.order, add 1; otherwise 2 object will have the same index
             if index == instance_order:
                 index += 1
 
@@ -56,7 +56,8 @@ def add_log(instance, action, field, message):
 
 def get_log_parameters(instance) -> list:
     """
-    Return a list of dictionaries containing the field that is modified (attribute_name) and the name the field will have in the log field.
+    Return a list of dictionaries containing the field that is modified (attribute_name)
+    and the name the field will have in the log field.
     The name of the field will default to the verbose_name of the model field,
     but if a tuple is given than the referenced object is used as a name
     """

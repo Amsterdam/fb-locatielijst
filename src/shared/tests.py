@@ -44,12 +44,12 @@ class TestSharedUtils(TestCase):
             short_name="service",
             public=True,
         )
-        location_data = LocationData.objects.create(
+        LocationData.objects.create(
             location=location,
             location_property=location_property,
             _property_option=property_option,
         )
-        location_external_service = LocationExternalService.objects.create(
+        LocationExternalService.objects.create(
             location=location,
             external_service=external_service,
             external_location_code="Code",

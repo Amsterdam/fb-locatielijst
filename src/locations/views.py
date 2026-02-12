@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView, View
 
 from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
@@ -80,7 +79,7 @@ class LocationListView(LoginRequiredMixin, ListView):
     def set_ordering(self):
         # Set column to order on; default is name
         order_by = self.request.GET.get("order_by")
-        if not order_by in ["name", "pandcode"]:
+        if order_by not in ["name", "pandcode"]:
             order_by = "name"
         # Switch ordering
         order = "-" if self.request.GET.get("order") == "desc" else ""
@@ -172,7 +171,7 @@ class LocationCreateView(LoginRequiredMixin, IsStaffMixin, View):
 
             return HttpResponseRedirect(reverse("locations_urls:location-detail", args=[location_data.pandcode]))
 
-        message = f"Niet alle velden zijn juist ingevuld."
+        message = "Niet alle velden zijn juist ingevuld."
         messages.error(request, message)
         context = {"form": form}
         return render(request, template_name=self.template, context=context)
@@ -212,7 +211,7 @@ class LocationUpdateView(LoginRequiredMixin, IsStaffMixin, View):
 
             return HttpResponseRedirect(reverse("locations_urls:location-detail", args=[location_data.pandcode]))
 
-        message = f"Niet alle velden zijn juist ingevuld."
+        message = "Niet alle velden zijn juist ingevuld."
         messages.error(request, message)
         context = {"form": form, "location_data": location_data.get_dict()}
         return render(request, template_name=self.template, context=context)
@@ -237,10 +236,14 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                 try:
                     # Read the file as an utf-8 file
                     csv_reader = csv_file.read().decode("utf-8-sig").splitlines()
-                    # Set the correct format for the csv by 'sniffing' the first line of the csv data and setting the delimiter
+                    # Set the correct format for the csv by 'sniffing' the first line of the csv data
+                    # and setting the delimiter
                     csv_dialect = csv.Sniffer().sniff(sample=csv_reader[0], delimiters=";")
-                except:
-                    message = "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt."
+                except Exception:
+                    message = (
+                        "De locaties kunnen niet ingelezen worden. "
+                        "Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt."
+                    )
                     messages.add_message(request, messages.ERROR, message)
 
                     return HttpResponseRedirect(reverse("locations_urls:location-import"))
@@ -259,13 +262,13 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                 for i, row in enumerate(csv_dict):
                     # Check if a row is missing a value/column
                     if "missing" in row.values():
-                        message = f"Rij {i+1} is niet verwerkt want deze mist een kolom"
+                        message = f"Rij {i + 1} is niet verwerkt want deze mist een kolom"
                         messages.add_message(request, messages.WARNING, message)
                         continue
 
                     # Check if a row has to many values/columns
                     if row.get("excess"):
-                        message = f"Rij {i+1} is niet verwerkt want deze heeft teveel kolommen"
+                        message = f"Rij {i + 1} is niet verwerkt want deze heeft teveel kolommen"
                         messages.add_message(request, messages.WARNING, message)
                         continue
 
@@ -292,7 +295,7 @@ class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
                 message = f"{csv_file.name} is geen gelding CSV bestand."
                 messages.add_message(request, messages.ERROR, message)
         else:
-            message = f"Het formulier is niet juist ingevuld."
+            message = "Het formulier is niet juist ingevuld."
             messages.add_message(request, messages.ERROR, message)
         context = {"form": form}
         if location_added > 0:
@@ -482,10 +485,11 @@ class PropertyOptionCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.location_property = self.location_property
-        # Added try because location_property field is excluded from the form and unqiue constraint is therefore not handled by modelform
+        # Added try because location_property field is excluded from the form and unique constraint
+        # is therefore not handled by modelform
         try:
             self.object = form.save()
-        except IntegrityError as err:
+        except IntegrityError:
             form.add_error(None, f"'{form.instance.option}' bestaat al in {form.instance.location_property.label}.")
             return self.form_invalid(form)
         messages.success(
@@ -508,10 +512,11 @@ class PropertyOptionUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
         return reverse("locations_urls:propertyoption-list", args=[self.object.location_property.id])
 
     def form_valid(self, form):
-        # Added try because location_property field is excluded from the form and unqiue constraint is therefore not handled by modelform
+        # Added try because location_property field is excluded from the form and unique constraint
+        # is therefore not handled by modelform
         try:
             self.object = form.save()
-        except IntegrityError as err:
+        except IntegrityError:
             form.add_error(None, f"'{form.instance.option}' bestaat al in {form.instance.location_property.label}.")
             return self.form_invalid(form)
         messages.success(self.request, f"Optie '{self.object.option}' is gewijzigd.")
@@ -533,7 +538,7 @@ class PropertyOptionDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
         success_url = self.get_success_url()
         try:
             self.object.delete()
-        except (ProtectedError, RestrictedError) as error:
+        except (ProtectedError, RestrictedError):
             messages.error(
                 self.request,
                 f"Optie '{self.object.option}' kan niet verwijderd worden, want er zijn nog locatie(s) aan gekoppeld.",

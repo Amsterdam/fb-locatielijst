@@ -13,7 +13,6 @@ def set_location_property_fields() -> dict:
     location_properties = LocationProcessor().location_property_instances
 
     for location_property in location_properties:
-
         # Matching the property_type to set the correct form type
         match location_property.property_type:
             case "BOOL":
@@ -166,7 +165,6 @@ class LocationImportForm(forms.Form):
 
 
 class LocationListForm(forms.Form):
-
     def __init__(self, *args, **kwargs):
         # Set and remove user argument before calling init
         super().__init__(*args, **kwargs)
@@ -193,7 +191,8 @@ class LocationListForm(forms.Form):
 
         # Create selection lists for any LocationProperty which has the property_type 'CHOICE'
         for location_property in LocationProperty.objects.filter(property_type="CHOICE"):
-            # Only process properties from the location_properties list; because this is list is filtered for access permission
+            # Only process properties from the location_properties list; because this is list is filtered
+            # for access permission
             if location_property in location_properties:
                 # Get all options for the location property
                 options = location_property.propertyoption_set.values_list("option", flat=True)

@@ -3,12 +3,12 @@ import json
 import urllib.request
 from collections import namedtuple
 from contextlib import suppress
-from distutils.version import StrictVersion
 from pathlib import Path
 from subprocess import check_output
 from typing import Iterable, List, NamedTuple
 
 import pkg_resources
+from distutils.version import StrictVersion
 
 
 def git_diff(cwd) -> Iterable[str]:
@@ -82,7 +82,6 @@ def post_package_updates_to_slack(project_package_changes: List):
     messages = []
 
     for package_change in project_package_changes:
-
         if package_change.to_version is not None and package_change.from_version is not None:
             # if one of the versions is not strict, so we can't say anything about if this is a patch
             # release or not so we just show the message to be sure
@@ -92,10 +91,8 @@ def post_package_updates_to_slack(project_package_changes: List):
                 show_message = strict_from_version.version[0] != strict_to_version.version[0]
 
             if package_change.from_version < package_change.to_version:
-                icon_emoji = ":arrow_up:"
                 message = f"{package_change.from_version} ➩ {package_change.to_version}"
             else:
-                icon_emoji = ":arrow_down:"
                 message = f"{package_change.from_version} ➩ {package_change.to_version}"
 
             if show_message:

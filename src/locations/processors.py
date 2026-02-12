@@ -17,7 +17,6 @@ from shared.context import current_user
 
 
 class LocationProcessor:
-
     def _create_or_update(self, location_property, value):
         """Helper function to create or update a LocationData instance"""
         if location_property.multiple:
@@ -42,7 +41,7 @@ class LocationProcessor:
         if location_property.multiple:
             if values := value:
                 # Cast values to list
-                if not type(values) == list:
+                if not isinstance(value, list):
                     values = values.split("|")
             else:
                 values = []
@@ -150,7 +149,7 @@ class LocationProcessor:
             # Replace list values with | seperated string for multiple choice location properties
             object_dict = object.get_dict()
             for key, value in object_dict.items():
-                if type(value) == list:
+                if isinstance(value, list):
                     value = "|".join(value)
                 object_dict[key] = cls._escape_csv_entry(value)
             location_list.append(object_dict)
