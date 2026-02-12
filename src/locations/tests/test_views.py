@@ -156,7 +156,9 @@ class TestLocationListView(TestCase):
         else:
             user = self.plain_user
 
-        # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
+        # Set the name for the parameter holding the search value to the property name if it is
+        # location_property and a choice list
+
         # Set current user
         current_user.set(user)
         location_properties = LocationProcessor().location_properties
@@ -548,11 +550,11 @@ class LocationUpdateViewTest(TestCase):
         response = self.client.get(reverse("locations_urls:location-update", args=[self.location.pandcode]))
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        url = reverse("login") + "?next=" + reverse("locations_urls:location-update", args=[self.location.pandcode])
+        url = reverse("login") + "?next=" + reverse("locations_urls:location-update", args=[self.location.pandcode])  # noqa: E501
         self.assertEqual(response.url, url)
 
-    def test_get_view_anonymous(self):
-        """Test getting the location update page as an anonymous user"""
+    def test_get_view_plain_user(self):
+        """Test getting the location update page as a plain user"""
         # Login as plain user
         self.client.force_login(self.plain_user)
         # Requesting the page
@@ -588,7 +590,7 @@ class LocationUpdateViewTest(TestCase):
         response = self.client.post(path=url, data=data)
         # Verify the response
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("locations_urls:location-detail", args=[self.location.pandcode]))
+        self.assertEqual(response.url, reverse("locations_urls:location-detail", args=[self.location.pandcode]))  # noqa: E501
 
         # Verify the response values for the location after redirection
         response = self.client.get(response.url)
@@ -688,7 +690,7 @@ class TestLocationImportForm(TestCase):
         )
         self.csv_content = [
             "pandcode;naam;bool;date;mail;num;memo;post;str;url;choice;multi",
-            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;"Oranges|Apples";Team 1|Team 2',
+            '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;"Oranges|Apples";Team 1|Team 2',  # noqa: E501
         ]
 
     def test_import_csv_get(self):
@@ -725,7 +727,7 @@ class TestLocationImportForm(TestCase):
         self.assertEqual(set(used_columns), set(headers))
 
         # Success message
-        self.assertEqual(messages[1].message, f"1 locatie(s) geïmporteerd/ge-update.")
+        self.assertEqual(messages[1].message, "1 locatie(s) geïmporteerd/ge-update.")
 
         # Verify that the location instance exists
         location = Location.objects.get(pandcode=25001)
@@ -760,7 +762,7 @@ class TestLocationImportForm(TestCase):
         # CSV data
         csv_content = [
             "pandcode;naam;bool;date;mail;num;memo;post;str;url;choice",
-            "25001;Amstel 1;Misschien;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Yellow",
+            "25001;Amstel 1;Misschien;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;Yellow",  # noqa: E501
         ]
         csv_file = ContentFile("\n".join(csv_content).encode(), name="import-file.csv")
         data = {"csv_file": csv_file}
@@ -775,7 +777,7 @@ class TestLocationImportForm(TestCase):
         self.assertEqual(messages[1].tags, "error")
         self.assertEqual(
             messages[1].message,
-            "Fout bij het importeren voor locatie Amstel 1: [\"'Misschien' is geen geldige boolean.\", \"'Yellow' is geen geldige invoer voor Choice.\"]",
+            "Fout bij het importeren voor locatie Amstel 1: [\"'Misschien' is geen geldige boolean.\", \"'Yellow' is geen geldige invoer voor Choice.\"]",  # noqa: E501
         )
 
     def test_import_csv_wrong_delimiter(self):
@@ -798,11 +800,13 @@ class TestLocationImportForm(TestCase):
         self.assertEqual(messages[0].tags, "error")
         self.assertEqual(
             messages[0].message,
-            "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt.",
+            "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt.",  # noqa: E501
         )
 
     def test_import_csv_with_excess_columns(self):
-        """Test csv import when a data row has more columns than the header; for instance when a value has a semicolon"""
+        """
+        Test csv import when a data row has more columns than the header; for instance when a value has a semicolon
+        """
         csv_content = [
             "pandcode;naam;bool;date;mail;num;memo;post;str;url;choice",
             "25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;;Yellow",
@@ -1163,7 +1167,8 @@ class TestPropertyOptionDeleteView(TestCase):
         property_option = PropertyOption.objects.filter(locationdata__location__isnull=False).first()
         # post delete request
         url = reverse(
-            "locations_urls:propertyoption-delete", args=[property_option.location_property.id, property_option.id]
+            "locations_urls:propertyoption-delete",
+            args=[property_option.location_property.id, property_option.id],  # noqa: E501
         )
         user = User.objects.create(username="testuser", is_superuser=False, is_staff=True)
         self.client.force_login(user)

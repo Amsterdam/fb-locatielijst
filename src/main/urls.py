@@ -30,7 +30,7 @@ class AdminLogin(View):
     def get(self, request, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponseRedirect(
-                reverse("oidc_authentication_init") + (f'?next={request.GET.get("next", "/admin/")}')
+                reverse("oidc_authentication_init") + (f"?next={request.GET.get('next', '/admin/')}")
             )
 
         if not request.user.is_staff:

@@ -97,11 +97,12 @@ class ChoiceValidator:
 
     def __call__(self, value) -> str:
         # get related choice options, compare value in model with value from field
-        # this validation will not work when called from clean() in LocationData because the value should be empty (but this is not enforced in the model)
+        # this validation will not work when called from clean() in LocationData because the value
+        # should be empty (but this is not enforced in the model)
         allowed_options = self.location_property.propertyoption_set.values_list("option", flat=True)
         # Check for multiple flag, because only those values should be split by a pipe character
         if self.location_property.multiple:
-            if not type(value) == list:
+            if not isinstance(value, list):
                 values = value.split("|")
             else:
                 values = value
@@ -118,7 +119,7 @@ def get_locationdata_validator(location_property, value):
     """
     Based upon the location property instance, the appropriate validator will be called for a
     """
-    if value != None:
+    if value is not None:
         # match the property_type to the proper validation method
         match location_property.property_type:
             case "BOOL":

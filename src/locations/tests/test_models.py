@@ -111,7 +111,7 @@ class TestLocationDataValidation(TestCase):
             self.assertEqual(validators.valid_email(value), value)
 
         # Test invalid email values
-        values = ["test@example", "test@example.amsterdam." "test@test@example.nl"]
+        values = ["test@example", "test@example.amsterdam.test@test@example.nl"]
         for value in values:
             self.assertRaises(ValidationError, validators.valid_email, value)
 
@@ -173,7 +173,7 @@ class TestLocationDataValidation(TestCase):
 
         # Test invalid email values
         values = [
-            "example.org" "http:/example.org",
+            "example.orghttp:/example.org",
             "http://www_example.org",
             "http:// example.org",
         ]
@@ -381,7 +381,7 @@ class TestLocationDataModel(TestCase):
         self.assertEqual(validation_error.exception.code, "unique")
         self.assertEqual(
             validation_error.exception.message,
-            f"Waarde %(value)s bestaat al voor eigenschap %(property)s.",
+            "Waarde %(value)s bestaat al voor eigenschap %(property)s.",
         )
 
     def test_for_single_constraint(self):
@@ -401,7 +401,7 @@ class TestLocationDataModel(TestCase):
         self.assertEqual(validation_error.exception.code, "unique")
         self.assertEqual(
             validation_error.exception.message,
-            f"De locatie eigenschap %(property)s bestaat al voor locatie %(location)s.",
+            "De locatie eigenschap %(property)s bestaat al voor locatie %(location)s.",
         )
 
         # Test when multiple is enabled for a property

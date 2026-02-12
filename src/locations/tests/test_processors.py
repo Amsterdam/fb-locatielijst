@@ -254,7 +254,7 @@ class TestLocationProcessor(TestCase):
         mock.side_effect = ValueError
 
         # When saving the object, an ObjectDoesNotExist should be raised because Tomato is not a valid choice value
-        with self.assertRaises(ValueError) as validation_error:
+        with self.assertRaises(ValueError) as validation_error:  # noqa: F841
             location.save()
 
         # Verify that no object has been added to the database
@@ -324,7 +324,7 @@ class TestLocationProcessor(TestCase):
         # Verify the error message
         self.assertEqual(
             validation_error.exception.error_list[0].message,
-            f"'Misschien' is geen geldige boolean.",
+            "'Misschien' is geen geldige boolean.",
         )
 
     def test_location_get_private_properties(self):

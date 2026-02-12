@@ -279,7 +279,9 @@ class TestLogging(TestCase):
     def test_location_property_delete(self):
         """
         Test casceded logging for LocationProperty.
-        When a LocationProperty is deleted, all cascaded LocationData and PropertyOption should be deleted and logged as well.
+
+        When a LocationProperty is deleted, all cascaded LocationData and PropertyOption should be deleted
+        and logged as well.
         """
         # Testing PropertyOption seperately because of dependen on LocationProperty
         # Save the instance

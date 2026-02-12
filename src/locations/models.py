@@ -158,7 +158,7 @@ class LocationData(models.Model):
             models.CheckConstraint(
                 check=~Q(_property_option__isnull=False, _value__isnull=False),
                 name="either_field_filled",
-                violation_error_message=f"Either option or value must be filled.",
+                violation_error_message="Either option or value must be filled.",
             ),
         ]
 
@@ -239,7 +239,8 @@ class ExternalService(models.Model):
 
 class LocationExternalService(models.Model):
     """
-    Join table between external services and the location (pandcode) and the external code for the location (externe pandcode)
+    Join table between external services and the location (pandcode)
+    and the external code for the location (externe pandcode)
     """
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name="Locatie")

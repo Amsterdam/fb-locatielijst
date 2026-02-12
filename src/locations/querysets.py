@@ -6,7 +6,6 @@ from locations.filters import filter_on_archive
 
 
 class LocationQuerySet(QuerySet):
-
     def search_filter(self, params: dict, user: User) -> QuerySet:
         """
         Returns a queryset of locations based on params in a http request.
