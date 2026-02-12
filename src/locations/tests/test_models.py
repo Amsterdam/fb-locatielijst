@@ -111,7 +111,7 @@ class TestLocationDataValidation(TestCase):
             self.assertEqual(validators.valid_email(value), value)
 
         # Test invalid email values
-        values = ["test@example", "test@example.amsterdam.test@test@example.nl"]
+        values = ["test@example", "test@example.amsterdam.", "test@test@example.nl"]
         for value in values:
             self.assertRaises(ValidationError, validators.valid_email, value)
 
@@ -173,7 +173,8 @@ class TestLocationDataValidation(TestCase):
 
         # Test invalid email values
         values = [
-            "example.orghttp:/example.org",
+            "example.org",
+            "http:/example.org",
             "http://www_example.org",
             "http:// example.org",
         ]
