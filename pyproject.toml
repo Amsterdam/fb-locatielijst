@@ -23,14 +23,19 @@ skip_covered = true
 show_missing = true
 sort = "Cover"
 
-[tool.black]
+[tool.ruff]
 line-length = 120
-target-version = ['py313']
-exclude = '''
-/(
-    \.git
-  | \.env
-  | \.venv
-  | venv
-)/
-'''
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (autoflake uses this)
+    "I",   # isort
+]
+ignore-init-module-imports = true
+
+[tool.ruff.lint.per-file-ignores]
+"src/main/settings.py" = ["E402"]
+"tests/**.py" = ["F841"]
+"src/**.py" = ["E722"]
