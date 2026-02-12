@@ -74,7 +74,8 @@ services:
       context: .
       target: linting
     volumes:
-      - ./src:/app/src
+      - .:/app/
+    user: 1000:1000
   
   database:
     image: postgis/postgis:16-3.4-alpine
