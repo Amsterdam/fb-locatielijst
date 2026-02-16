@@ -28,6 +28,9 @@ updates:
       - dependency-name: "Django"
         versions:
           - ">= 6"
+      - dependency-name: "django"
+        versions:
+          - ">= 6"
 
   - package-ecosystem: "github-actions"
     directory: "/"
