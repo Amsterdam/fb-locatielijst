@@ -27,7 +27,7 @@ updates:
           - "> 12.27.1"
       - dependency-name: "Django"
         versions:
-          - "> 6"
+          - ">= 6"
 
   - package-ecosystem: "github-actions"
     directory: "/"
