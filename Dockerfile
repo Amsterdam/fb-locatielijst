@@ -37,9 +37,6 @@ RUN set -eux && \
 COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin
 
-WORKDIR /app/deploy
-COPY deploy .
-
 WORKDIR /app/src
 COPY src .
 
@@ -48,11 +45,10 @@ ARG OIDC_RP_CLIENT_ID=not-used
 ARG OIDC_RP_CLIENT_SECRET=not-used
 ENV DJANGO_SETTINGS_MODULE=main.settings
 RUN python manage.py collectstatic --no-input
-RUN chmod +x /app/deploy/docker-run.sh
 
 USER appuser
 
-CMD ["/app/deploy/docker-run.sh"]
+CMD ["uwsgi", "--ini", "/app/src/main/uwsgi.ini"]
 
 # devserver
 FROM app AS dev
