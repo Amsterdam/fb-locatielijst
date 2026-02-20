@@ -14,6 +14,7 @@ from referentie_tabellen.models import (
     LocatieBezit,
     LocatieSoort,
     MonumentStatus,
+    OnderhoudsContract,
     Persoon,
     ThemaPortefeuille,
     Voorziening,
@@ -237,7 +238,6 @@ class ImporterProcessCSV:
                 "ambtenaar": "ambtenaar",
                 "locatie_soort": "soort",
                 "dvk_naam": "dvk_naam",
-                "dvk_nr": "dvk_nr",
                 "budget_dir": "budget_dir",
                 "routecode": "routecode",
                 "pand_directies": "vlekken",
@@ -277,7 +277,7 @@ class ImporterProcessCSV:
                 ("tsc", Persoon),
                 ("beveiliging", Persoon),
                 ("veiligheid", Persoon),
-                ("perceel_installateur", Persoon),
+                ("perceel_installateur", OnderhoudsContract),
                 ("pas_lc", Leverancier1s1p),
             ]
 

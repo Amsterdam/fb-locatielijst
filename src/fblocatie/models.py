@@ -13,6 +13,7 @@ from referentie_tabellen.models import (
     LocatieBezit,
     LocatieSoort,
     MonumentStatus,
+    OnderhoudsContract,
     Persoon,
     ThemaPortefeuille,
     Voorziening,
@@ -192,7 +193,6 @@ class Locatie(TimeStampMixin):
     ambtenaar = models.BooleanField(verbose_name="Primair huisvesting ambtenaren", default=False)
 
     dvk_naam = models.ForeignKey(DienstverleningsKader, on_delete=models.RESTRICT)
-    dvk_nr = models.IntegerField(blank=True, null=True)
     # navragen: budgethouder directie zelfde opties als pand directies??
     budget_dir = models.ForeignKey(
         Directie, related_name="budgethouder", blank=True, null=True, on_delete=models.RESTRICT
@@ -256,7 +256,7 @@ class Locatie(TimeStampMixin):
         on_delete=models.RESTRICT,
     )
     perceel_installateur = models.ForeignKey(
-        Persoon,
+        OnderhoudsContract,
         verbose_name="E&W perceel installateur",
         related_name="perceel_installateur",
         blank=True,

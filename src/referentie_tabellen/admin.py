@@ -9,6 +9,7 @@ from referentie_tabellen.models import (
     LocatieBezit,
     LocatieSoort,
     MonumentStatus,
+    OnderhoudsContract,
     Persoon,
     ThemaPortefeuille,
     Voorziening,
@@ -20,8 +21,9 @@ class DienstverleningsKaderAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
+        "dvk_nr",
     )
-    ordering = ("name",)
+    ordering = ("dvk_nr", "name")
 
 
 @admin.register(Directie)
@@ -107,6 +109,15 @@ class ThemaPortefeuilleAdmin(admin.ModelAdmin):
 
 @admin.register(Leverancier1s1p)
 class Leverancier1s1pAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "name",
+    )
+    ordering = ("name",)
+
+
+@admin.register(OnderhoudsContract)
+class OnderhoudsContractAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",

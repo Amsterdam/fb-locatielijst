@@ -30,6 +30,7 @@ class GelieerdePartij(models.Model):
 
 class DienstverleningsKader(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    dvk_nr = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -95,6 +96,13 @@ class ThemaPortefeuille(models.Model):
 
 
 class Leverancier1s1p(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class OnderhoudsContract(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
