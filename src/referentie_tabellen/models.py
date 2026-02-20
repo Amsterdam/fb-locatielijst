@@ -15,7 +15,7 @@ class LocatieSoort(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = "Locatiesoorten"
+        verbose_name_plural = "Locatie soorten"
 
 
 class GelieerdePartij(models.Model):
@@ -25,7 +25,7 @@ class GelieerdePartij(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = "GelieerdePartijen"
+        verbose_name_plural = "Gelieerde partijen"
 
 
 class DienstverleningsKader(models.Model):
@@ -43,7 +43,7 @@ class LocatieBezit(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = "Locatiebezit"
+        verbose_name_plural = "Locatie bezit"
 
 
 class MonumentStatus(models.Model):
@@ -53,7 +53,7 @@ class MonumentStatus(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = "Monumentstatussen"
+        verbose_name_plural = "Monument statussen"
 
 
 class Voorziening(models.Model):
@@ -93,13 +93,16 @@ class ThemaPortefeuille(models.Model):
 
     def __str__(self):
         return self.name
-
+        
 
 class Leverancier1s1p(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Leverancier 1s1p"
 
 
 class OnderhoudsContract(models.Model):
@@ -107,3 +110,6 @@ class OnderhoudsContract(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = "Onderhouds contracten"
