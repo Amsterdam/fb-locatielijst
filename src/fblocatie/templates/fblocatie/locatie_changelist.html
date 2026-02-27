@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
 {% block object-tools-items %}
     {{ block.super }}  
-    <li><a href="{% url 'locations_urls:location-import' %}" class="export_link">Import CSV</a></li>
+    <li><a href="{% url 'locations_urls:location-import' %}" class="export_link" target="import_tab">Import CSV</a></li>
 {% endblock %}
