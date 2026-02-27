@@ -57,7 +57,7 @@ class LocatieAdmin(admin.ModelAdmin):
 @admin.register(LocatieTeam)
 class LocatieTeamAdmin(admin.ModelAdmin):
     list_display = ("nummer", "email", "loc_manager", "id")
-    ordering = ("id",)
+    ordering = ("nummer",)
 
 
 @admin.register(Adres)
