@@ -7,12 +7,12 @@ from fblocatie.models import Adres, Locatie, LocatieTeam, Vastgoed
 class LocatieAdmin(admin.ModelAdmin):
     change_list_template = "fblocatie/locatie_changelist.html"
 
-    list_display = ("afkorting", "pandcode", "naam", "locatieteam", "werkplekken", "vastgoed__bezit", "archief")
+    list_display = ("afkorting", "pandcode", "naam", "dvk_naam", "locatie_soort", "vastgoed__bezit", "archief")
     ordering = ("pandcode",)
     search_fields = ("afkorting", "naam", "pandcode")
     search_help_text = "zoek op afkorting, naam of pandcode"
 
-    list_filter = ("archief", "vastgoed__bezit", "locatieteam")
+    list_filter = ("archief",  "dvk_naam", "locatie_soort", "vastgoed__bezit", "locatieteam")
     readonly_fields = ["pandcode", "archief_datum"]
 
     def get_fieldsets(self, request, obj=None):
