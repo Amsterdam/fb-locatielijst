@@ -79,6 +79,8 @@ class Contract(models.Model):
 class Persoon(models.Model):
     voornaam = models.CharField(max_length=50)
     achternaam = models.CharField(max_length=50)
+    telefoonnr = models.CharField(max_length=11, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.voornaam} {self.achternaam}"
