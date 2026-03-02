@@ -77,6 +77,7 @@ class Adres(models.Model):
         adres_str = f"{self.straat} {str(self.huisnummer)}"
         adres_str += f"{self.huisletter}" if self.huisletter else ""
         adres_str += f"{self.huisnummertoevoeging}" if self.huisnummertoevoeging else ""
+        adres_str += f", {self.woonplaats}"
         return adres_str
 
     class Meta:

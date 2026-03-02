@@ -46,7 +46,9 @@ class LocatieAdmin(admin.ModelAdmin):
         ]
         closing_fields = ["notitie"]
         remaining_fields = [
-            field for field in all_fields if field not in (controlled_fields + loc_fields + closing_fields + koppel_fields)
+            field
+            for field in all_fields
+            if field not in (controlled_fields + loc_fields + closing_fields + koppel_fields)
         ]
 
         fieldsets = (
@@ -73,7 +75,7 @@ class LocatieAdmin(admin.ModelAdmin):
                 {
                     "fields": loc_fields,
                 },
-            ),            
+            ),
             (
                 "Koppelvelden",
                 {
@@ -86,13 +88,20 @@ class LocatieAdmin(admin.ModelAdmin):
 
 @admin.register(Adres)
 class AdresAdmin(admin.ModelAdmin):
-    list_display = ("vot_id", "postcode", "straat", "huisnummer", "huisletter", "huisnummertoevoeging", "id")
+    list_display = (
+        "vot_id", 
+        "postcode", 
+        "straat", 
+        "huisnummer", 
+        "huisletter", 
+        "huisnummertoevoeging",
+        "woonplaats",
+        "id")
     ordering = (
         "straat",
         "huisnummer",
         "huisletter",
         "huisnummertoevoeging",
-        "id",
     )
     readonly_fields = ("lat", "lon", "map_url")
 
@@ -103,5 +112,6 @@ class AdresAdmin(admin.ModelAdmin):
 @admin.register(Vastgoed)
 class VastgoedAdmin(admin.ModelAdmin):
     list_display = ("GV_key", "adres", "bezit", "bouwjaar", "id")
-    ordering = ("id",)
+    ordering = ("adres__straat",)
     list_filter = ("bezit",)
+    search_fields = ("adres__straat", "adres__woonplaats")
