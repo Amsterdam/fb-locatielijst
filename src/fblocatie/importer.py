@@ -4,7 +4,7 @@ from typing import Union
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 
-from fblocatie.models import Adres, Locatie, LocatieTeam, Vastgoed
+from fblocatie.models import Adres, Locatie, Vastgoed
 from referentie_tabellen.models import (
     Contract,
     DienstverleningsKader,
@@ -170,41 +170,6 @@ class ImporterProcessCSV:
         # return obj
         self.vastgoed_obj = obj
 
-    def process_locatieteam(self, row: dict) -> Locatie:
-        self.error_list = []
-        # model : row
-        locatieteam_mapping = {
-            "nummer": "lt",
-            "email": "lt_mail",
-            "loc_manager": "lm",
-        }
-        referentie_tabellen = [
-            ("loc_manager", Persoon),
-        ]
-
-        data = {key: row.pop(value) for key, value in locatieteam_mapping.items() if value in row}
-        lt_data = self.set_empty_to_none(data)
-
-        # get referentie fields
-        lt_data = self.get_referentietabellen_fields(referentie_tabellen, lt_data)
-
-        match_keys = ["nummer", "lt_mail"]
-        match_adres = {key: lt_data[key] for key in match_keys if key in lt_data}
-
-        update_fields = {key: value for key, value in lt_data.items() if key not in match_keys}
-
-        try:
-            obj, _ = LocatieTeam.objects.update_or_create(defaults=update_fields, **match_adres)
-        except Exception as e:
-            self.error_list.append(e)
-            obj = None
-
-        if self.error_list != []:
-            self.errors["locatieteam"] = self.error_list
-            self.error_list = []
-        # return obj
-        self.locatieteam_obj = obj
-
     def _get_many_to_many(self, model, string: str, sep="|") -> list:
         objs = []
         if not string:
@@ -244,6 +209,9 @@ class ImporterProcessCSV:
                 "voorzieningen": "voorz",
                 "kantoorkast": "kantoorart",
                 "werkplekken": "werkplek",
+                "locatieteam": "lt",
+                "loc_email": "lt_mail",
+                "loc_manager": "lm",
                 "loc_coordinator": "lc",
                 "contact_dir": "contact",
                 "tom": "tom",
@@ -271,6 +239,7 @@ class ImporterProcessCSV:
                 ("dvk_naam", DienstverleningsKader),
                 ("budget_dir", Directie),
                 ("gelieerd", GelieerdePartij),
+                ("loc_manager", Persoon),
                 ("loc_coordinator", Persoon),
                 ("contact_dir", Persoon),
                 ("tom", Persoon),
@@ -288,7 +257,6 @@ class ImporterProcessCSV:
             field_model_ids = [
                 ("adres", self.process_adres),
                 ("vastgoed", self.process_vastgoed),
-                ("locatieteam", self.process_locatieteam),
             ]
             for field, func in field_model_ids:
                 func(row)

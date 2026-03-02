@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from fblocatie.models import Adres, Locatie, LocatieTeam, Vastgoed
+from fblocatie.models import Adres, Locatie, Vastgoed
 
 
 @admin.register(Locatie)
@@ -13,6 +13,7 @@ class LocatieAdmin(admin.ModelAdmin):
     autocomplete_fields = [
         "adres",
         "bezoekadres",
+        "loc_manager",
         "loc_coordinator",
         "contact_dir",
         "tom",
@@ -30,9 +31,22 @@ class LocatieAdmin(admin.ModelAdmin):
 
         controlled_fields = ["pandcode"]
         koppel_fields = ["pas_loc", "pas_lc", "anet_loc", "emobj", "po", "priva_gbs"]
+        loc_fields = [
+            "locatieteam",
+            "loc_email",
+            "loc_tel",
+            "loc_manager",
+            "loc_coordinator",
+            "contact_dir",
+            "tom",
+            "tsc",
+            "beveiliging",
+            "veiligheid",
+            "perceel_installateur",
+        ]
         closing_fields = ["notitie"]
         remaining_fields = [
-            field for field in all_fields if field not in (controlled_fields + closing_fields + koppel_fields)
+            field for field in all_fields if field not in (controlled_fields + loc_fields + closing_fields + koppel_fields)
         ]
 
         fieldsets = (
@@ -55,6 +69,12 @@ class LocatieAdmin(admin.ModelAdmin):
                 },
             ),
             (
+                "Locatieteamvelden",
+                {
+                    "fields": loc_fields,
+                },
+            ),            
+            (
                 "Koppelvelden",
                 {
                     "fields": koppel_fields,
@@ -62,12 +82,6 @@ class LocatieAdmin(admin.ModelAdmin):
             ),
         )
         return fieldsets
-
-
-@admin.register(LocatieTeam)
-class LocatieTeamAdmin(admin.ModelAdmin):
-    list_display = ("nummer", "email", "loc_manager", "id")
-    ordering = ("nummer",)
 
 
 @admin.register(Adres)

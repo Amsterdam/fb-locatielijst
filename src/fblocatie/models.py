@@ -28,22 +28,6 @@ class TimeStampMixin(models.Model):
         abstract = True
 
 
-class LocatieTeam(TimeStampMixin):
-    nummer = models.IntegerField(verbose_name="Locatieteam", blank=True, null=True)
-    email = models.EmailField(verbose_name="Mailadres", blank=True, null=True)
-    loc_manager = models.ForeignKey(
-        Persoon,
-        verbose_name="Locatiemanager",
-        related_name="loc_manager",
-        blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
-    )
-
-    def __str__(self):
-        return f"Team {str(self.nummer)} '{self.email}'"
-
-
 def calc_lat_lon_from_geometry(rd_x, rd_y) -> dict:
     """Calculate Point latitude and longitude (srid=4326; WGS coordinates) from given geometry in srid=28992 (RD-coordinates)"""
     point_rd = Point(rd_x, rd_y, srid=28992)
@@ -204,7 +188,19 @@ class Locatie(TimeStampMixin):
     voorzieningen = models.ManyToManyField(Voorziening, blank=True)
     contracten = models.ManyToManyField(Contract, blank=True)
     werkplekken = models.IntegerField(blank=True, null=True)
-    locatieteam = models.ForeignKey(LocatieTeam, blank=True, null=True, on_delete=models.RESTRICT)
+
+    locatieteam = models.IntegerField(verbose_name="Locatieteam", blank=True, null=True)
+    loc_email = models.EmailField(verbose_name="Email_algemeen", blank=True, null=True)
+    loc_tel = models.CharField(verbose_name="Pand_telnr", max_length=11, blank=True, null=True)
+
+    loc_manager = models.ForeignKey(
+        Persoon,
+        verbose_name="Locatiemanager",
+        related_name="loc_manager",
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,
+    )
 
     # contactpersonen
     loc_coordinator = models.ForeignKey(
