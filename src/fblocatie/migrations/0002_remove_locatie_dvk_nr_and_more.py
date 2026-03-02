@@ -7,18 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('fblocatie', '0001_initial'),
-        ('referentie_tabellen', '0002_onderhoudscontract_dienstverleningskader_dvk_nr'),
+        ("fblocatie", "0001_initial"),
+        ("referentie_tabellen", "0002_onderhoudscontract_dienstverleningskader_dvk_nr"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='locatie',
-            name='dvk_nr',
+            model_name="locatie",
+            name="dvk_nr",
         ),
         migrations.AlterField(
-            model_name='locatie',
-            name='perceel_installateur',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, related_name='perceel_installateur', to='referentie_tabellen.onderhoudscontract', verbose_name='E&W perceel installateur'),
+            model_name="locatie",
+            name="perceel_installateur",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.RESTRICT,
+                related_name="perceel_installateur",
+                to="referentie_tabellen.onderhoudscontract",
+                verbose_name="E&W perceel installateur",
+            ),
         ),
     ]

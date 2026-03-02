@@ -6,32 +6,32 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('referentie_tabellen', '0002_onderhoudscontract_dienstverleningskader_dvk_nr'),
+        ("referentie_tabellen", "0002_onderhoudscontract_dienstverleningskader_dvk_nr"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='gelieerdepartij',
-            options={'verbose_name_plural': 'Gelieerde partijen'},
+            name="gelieerdepartij",
+            options={"verbose_name_plural": "Gelieerde partijen"},
         ),
         migrations.AlterModelOptions(
-            name='leverancier1s1p',
-            options={'verbose_name_plural': 'Leverancier 1s1p'},
+            name="leverancier1s1p",
+            options={"verbose_name_plural": "Leverancier 1s1p"},
         ),
         migrations.AlterModelOptions(
-            name='locatiebezit',
-            options={'verbose_name_plural': 'Locatie bezit'},
+            name="locatiebezit",
+            options={"verbose_name_plural": "Locatie bezit"},
         ),
         migrations.AlterModelOptions(
-            name='locatiesoort',
-            options={'verbose_name_plural': 'Locatie soorten'},
+            name="locatiesoort",
+            options={"verbose_name_plural": "Locatie soorten"},
         ),
         migrations.AlterModelOptions(
-            name='monumentstatus',
-            options={'verbose_name_plural': 'Monument statussen'},
+            name="monumentstatus",
+            options={"verbose_name_plural": "Monument statussen"},
         ),
         migrations.AlterModelOptions(
-            name='onderhoudscontract',
-            options={'verbose_name_plural': 'Onderhouds contracten'},
+            name="onderhoudscontract",
+            options={"verbose_name_plural": "Onderhouds contracten"},
         ),
     ]

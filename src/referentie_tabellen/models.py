@@ -93,14 +93,14 @@ class ThemaPortefeuille(models.Model):
 
     def __str__(self):
         return self.name
-        
+
 
 class Leverancier1s1p(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name_plural = "Leverancier 1s1p"
 
