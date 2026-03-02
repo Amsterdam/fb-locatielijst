@@ -10,6 +10,7 @@ class LocatieAdmin(admin.ModelAdmin):
     list_display = ("afkorting", "pandcode", "naam", "dvk_naam", "locatie_soort", "vastgoed__bezit", "archief")
     ordering = ("pandcode",)
     search_fields = ("afkorting", "naam", "pandcode")
+    autocomplete_fields = ["adres", "bezoekadres", "loc_coordinator", "contact_dir", "tom", "tsc", "beveiliging", "veiligheid"]
     search_help_text = "zoek op afkorting, naam of pandcode"
 
     list_filter = ("archief",  "dvk_naam", "locatie_soort", "vastgoed__bezit", "locatieteam")
