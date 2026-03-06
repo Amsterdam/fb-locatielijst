@@ -217,7 +217,6 @@ class LocationUpdateView(LoginRequiredMixin, IsStaffMixin, View):
         return render(request, template_name=self.template, context=context)
 
 
-
 class LocationExportView(LoginRequiredMixin, View):
     template = "locations/location-export.html"
 

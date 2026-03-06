@@ -6,6 +6,7 @@ admin.site.site_header = "FB Locatielijst"
 admin.site.index_title = "Beheer"
 admin.site.site_title = "FB Locatielijst - Beheer"
 
+
 @admin.register(Locatie)
 class LocatieAdmin(admin.ModelAdmin):
     change_list_template = "fblocatie/locatie_changelist.html"
@@ -92,14 +93,15 @@ class LocatieAdmin(admin.ModelAdmin):
 @admin.register(Adres)
 class AdresAdmin(admin.ModelAdmin):
     list_display = (
-        "vot_id", 
-        "postcode", 
-        "straat", 
-        "huisnummer", 
-        "huisletter", 
+        "vot_id",
+        "postcode",
+        "straat",
+        "huisnummer",
+        "huisletter",
         "huisnummertoevoeging",
         "woonplaats",
-        "id")
+        "id",
+    )
     ordering = (
         "straat",
         "huisnummer",

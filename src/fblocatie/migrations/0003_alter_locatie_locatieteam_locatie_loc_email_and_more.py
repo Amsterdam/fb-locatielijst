@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("fblocatie", "0002_remove_locatie_dvk_nr_and_more"),
         ("referentie_tabellen", "0004_persoon_email_persoon_telefoonnr"),

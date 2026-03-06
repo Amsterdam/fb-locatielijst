@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 
 
 class ImporterProcessCSV:
-
     def __init__(self):
         self.locatie_id = ""
         self.pandcode = ""
@@ -67,13 +66,13 @@ class ImporterProcessCSV:
     def _get_persoon(naam: str) -> Union[Persoon, str]:
         # TODO: er komen meerdere personen soms via '/' voor -> multi?
         error = ""
-        if naam == None:
+        if naam is None:
             return None, error
 
         try:
             voornm, achternm = naam.split(" ", 1)
             obj = Persoon.objects.get(voornaam=voornm.strip(), achternaam=achternm.strip())
-        except Exception as e:
+        except (ValueError, Persoon.DoesNotExist) as e:
             error = (f"{naam}", e)
             obj = None
         return obj, error
@@ -142,12 +141,12 @@ class ImporterProcessCSV:
             return objs
 
         lijst = string.split(sep)
-        for l in lijst:
+        for lst in lijst:
             try:
-                obj = model.objects.get(name=l)
+                obj = model.objects.get(name=lst)
                 objs.append(obj.id)
             except Exception as e:
-                self.error_list = f"Error {l} from {model}: {e}"
+                self.error_list = f"Error {lst} from {model}: {e}"
 
         return objs
 

@@ -25,7 +25,10 @@ def handle_import_csv(request, csv_file) -> int:
         csv_reader = csv_file.read().decode("utf-8-sig").splitlines()
         csv_dialect = csv.Sniffer().sniff(sample=csv_reader[0], delimiters=";")
     except Exception:
-        message = "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt."
+        message = (
+            "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';'"
+            " als scheidingsteken en UTF-8 als codering gebruikt."
+        )
         messages.add_message(request, messages.ERROR, message)
         return location_added
 
@@ -44,13 +47,13 @@ def handle_import_csv(request, csv_file) -> int:
     for i, row in enumerate(csv_dict):
         # Check if a row is missing a value/column
         if "missing" in row.values():
-            message = f"Rij {i+1} is niet verwerkt want deze mist een kolom"
+            message = f"Rij {i + 1} is niet verwerkt want deze mist een kolom"
             messages.add_message(request, messages.WARNING, message)
             continue
 
         # Check if a row has too many values/columns
         if row.get("excess"):
-            message = f"Rij {i+1} is niet verwerkt want deze heeft teveel kolommen"
+            message = f"Rij {i + 1} is niet verwerkt want deze heeft teveel kolommen"
             messages.add_message(request, messages.WARNING, message)
             continue
 

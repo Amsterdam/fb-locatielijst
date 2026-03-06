@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("fblocatie", "0001_initial"),
         ("referentie_tabellen", "0002_onderhoudscontract_dienstverleningskader_dvk_nr"),
