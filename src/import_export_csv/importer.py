@@ -5,19 +5,16 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 
 from fblocatie.models import Adres, Locatie, Vastgoed
+from import_export_csv.mappings import (
+    ADRES_MAPPING,
+    LOCATIE_MANY_TO_MANY_FIELDS,
+    LOCATIE_MAPPING,
+    LOCATIE_REFERENTIE_TABELLEN,
+    VG_MAPPING,
+    VG_REFERENTIE_TABELLEN,
+)
 from referentie_tabellen.models import (
-    Contract,
-    DienstverleningsKader,
-    Directie,
-    GelieerdePartij,
-    Leverancier1s1p,
-    LocatieBezit,
-    LocatieSoort,
-    MonumentStatus,
-    OnderhoudsContract,
     Persoon,
-    ThemaPortefeuille,
-    Voorziening,
 )
 
 log = logging.getLogger(__name__)
@@ -40,19 +37,8 @@ class ImporterProcessCSV:
 
     def process_adres(self, row: dict) -> Adres:
         self.error_list = []
-        # model : row
-        adres_mapping = {
-            "pand_id": "bag_id",
-            "vot_id": "vbo_id",
-            "straat": "straat",
-            "postcode": "postcode",
-            "huisnummer": "huisnummer",
-            "huisletter": "huisletter",
-            "huisnummertoevoeging": "numtoeg",
-            "woonplaats": "plaats",
-            "rd_x": "rd_x",
-            "rd_y": "rd_y",
-        }
+
+        adres_mapping = ADRES_MAPPING
         data = {key: row.pop(value) for key, value in adres_mapping.items() if value in row}
         adres_data = self.set_empty_to_none(data)
 
@@ -113,28 +99,8 @@ class ImporterProcessCSV:
     def process_vastgoed(self, row: dict) -> Vastgoed:
         self.error_list = []
         # model : row
-        vg_mapping = {
-            "GV_key": "gv",
-            "gv_id": "gv_id",
-            "bezit": "bezit",
-            "bouwjaar": "bouwjaar",
-            "vvo": "vvo",
-            "bvo": "bvo",
-            "energielabel": "energielbl",
-            "monument_gem": "mon_gem",
-            "monument_brkpb": "mon_brkpb",
-            "themagv": "themagv",
-            "asset_manager": "am_gv",
-            "pl_gv": "plgv",
-        }
-        referentie_tabellen = [
-            ("bezit", LocatieBezit),
-            ("monument_gem", MonumentStatus),
-            ("monument_brkpb", MonumentStatus),
-            ("themagv", ThemaPortefeuille),
-            ("asset_manager", Persoon),
-            ("pl_gv", Persoon),
-        ]
+        vg_mapping = VG_MAPPING
+        referentie_tabellen = VG_REFERENTIE_TABELLEN
 
         data = {key: row.pop(value) for key, value in vg_mapping.items() if value in row}
         vg_data = self.set_empty_to_none(data)
@@ -192,63 +158,9 @@ class ImporterProcessCSV:
             # print('start row: ', row)
             self.error_list = []
             # model : row
-            locatie_mapping = {
-                "afkorting": "afkorting",
-                "pandcode": "pandcode",
-                "naam": "naam",
-                "archief": "archief",
-                "beschrijving": "beschrving",
-                "bezoekadres_functie": "adres2_rol",
-                "afstoten": "afstoten",
-                "ambtenaar": "ambtenaar",
-                "locatie_soort": "soort",
-                "dvk_naam": "dvk_naam",
-                "budget_dir": "budget_dir",
-                "routecode": "routecode",
-                "pand_directies": "vlekken",
-                "voorzieningen": "voorz",
-                "kantoorkast": "kantoorart",
-                "werkplekken": "werkplek",
-                "locatieteam": "lt",
-                "loc_email": "lt_mail",
-                "loc_manager": "lm",
-                "loc_coordinator": "lc",
-                "contact_dir": "contact",
-                "tom": "tom",
-                "tsc": "tsc",
-                "beveiliging": "beveiligng",
-                "veiligheid": "veiligheid",
-                "perceel_installateur": "ew",
-                "gelieerd": "gelieerd",
-                "contracten": "contract",
-                "notitie": "notitie",
-                "pas_loc": "pas_loc",
-                "pas_lc": "pas",
-                "anet_loc": "anet_loc",
-                "emobj": "emobj",
-                "po": "po",
-                "priva_gbs": "priva_gbs",
-            }
-            many_to_many_fields = [
-                ("pand_directies", Directie),
-                ("voorzieningen", Voorziening),
-                ("contracten", Contract),
-            ]
-            referentie_tabellen = [
-                ("locatie_soort", LocatieSoort),
-                ("dvk_naam", DienstverleningsKader),
-                ("budget_dir", Directie),
-                ("gelieerd", GelieerdePartij),
-                ("loc_manager", Persoon),
-                ("loc_coordinator", Persoon),
-                ("contact_dir", Persoon),
-                ("tom", Persoon),
-                ("tsc", Persoon),
-                ("beveiliging", Persoon),
-                ("veiligheid", Persoon),
-                ("perceel_installateur", OnderhoudsContract),
-                ("pas_lc", Leverancier1s1p),
-            ]
+            locatie_mapping = LOCATIE_MAPPING
+            many_to_many_fields = LOCATIE_MANY_TO_MANY_FIELDS
+            referentie_tabellen = LOCATIE_REFERENTIE_TABELLEN
 
             data = {key: row.pop(value) for key, value in locatie_mapping.items() if value in row}
             loc_data = self.set_empty_to_none(data)
