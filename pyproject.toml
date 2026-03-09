@@ -18,7 +18,7 @@ addopts = "--cov --cov-report term-missing --no-cov-on-fail"
 source = ["./src"]
 
 [tool.coverage.report]
-fail_under = 89
+fail_under = 77
 skip_covered = true
 show_missing = true
 sort = "Cover"

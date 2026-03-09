@@ -14,8 +14,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView, View
 
-from fblocatie.importer import ImporterProcessCSV
-from locations.forms import LocationDataForm, LocationImportForm, LocationListForm
+from locations.forms import LocationDataForm, LocationListForm
 from locations.models import (
     ExternalService,
     Location,
@@ -216,91 +215,6 @@ class LocationUpdateView(LoginRequiredMixin, IsStaffMixin, View):
         messages.error(request, message)
         context = {"form": form, "location_data": location_data.get_dict()}
         return render(request, template_name=self.template, context=context)
-
-
-class LocationImportView(LoginRequiredMixin, IsStaffMixin, View):
-    form = LocationImportForm
-    template_name = "locations/location-import.html"
-
-    def get(self, request):
-        form = self.form()
-        context = {"form": form}
-
-        return render(request, template_name=self.template_name, context=context)
-
-    def post(self, request):
-        form = self.form(request.POST, request.FILES)
-        if form.is_valid():
-            location_added = 0
-            csv_file = form.cleaned_data.get("csv_file")
-            if csv_file.name.endswith(".csv"):
-                try:
-                    # Read the file as an utf-8 file
-                    csv_reader = csv_file.read().decode("utf-8-sig").splitlines()
-                    # Set the correct format for the csv by 'sniffing' the first line of the csv data
-                    # and setting the delimiter
-                    csv_dialect = csv.Sniffer().sniff(sample=csv_reader[0], delimiters=";")
-                except Exception:
-                    message = (
-                        "De locaties kunnen niet ingelezen worden. "
-                        "Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt."
-                    )
-                    messages.add_message(request, messages.ERROR, message)
-
-                    return HttpResponseRedirect(reverse("locations_urls:location-import"))
-
-                csv_dict = csv.DictReader(csv_reader, dialect=csv_dialect, restval="missing", restkey="excess")
-
-                # Report columns that will be processed during import
-                location_properties = set(LocationProcessor().location_properties)
-                headers = set(csv_dict.fieldnames)
-
-                used_columns = list(headers & location_properties)
-                message = f"Kolommen {used_columns} worden verwerkt."
-                messages.add_message(request, messages.INFO, message)
-
-                # Process the rows from the import file
-                importer = ImporterProcessCSV()
-                for i, row in enumerate(csv_dict):
-                    # Check if a row is missing a value/column
-                    if "missing" in row.values():
-                        message = f"Rij {i + 1} is niet verwerkt want deze mist een kolom"
-                        messages.add_message(request, messages.WARNING, message)
-                        continue
-
-                    # Check if a row has to many values/columns
-                    if row.get("excess"):
-                        message = f"Rij {i + 1} is niet verwerkt want deze heeft teveel kolommen"
-                        messages.add_message(request, messages.WARNING, message)
-                        continue
-
-                    # Initiate a location processor with the row data
-                    # location = LocationProcessor(data=row)
-                    try:
-                        importer.main(row)
-                    #
-                    #     # Save the locationprocessor instance
-                    #     location.save()
-                    #    location_added += 1
-
-                    except ValidationError as err:
-                        importer.errors["main"] = f"Error in main: {err}"
-
-                    if importer.errors != {}:
-                        message = f"Fout importeren locatie {importer.locatie_id}: {importer.errors}"
-                        messages.add_message(request, messages.ERROR, message)
-            else:
-                message = f"{csv_file.name} is geen gelding CSV bestand."
-                messages.add_message(request, messages.ERROR, message)
-        else:
-            message = "Het formulier is niet juist ingevuld."
-            messages.add_message(request, messages.ERROR, message)
-        context = {"form": form}
-        if location_added > 0:
-            # Message for succesful imports
-            message = f"{location_added} locatie(s) geïmporteerd/ge-update."
-            messages.add_message(request, messages.SUCCESS, message)
-        return render(request, template_name=self.template_name, context=context)
 
 
 class LocationExportView(LoginRequiredMixin, View):

@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "storages",
 ]
 LOCAL_APPS = [
+    "import_export_csv",
     "locations",
     # "help_docs",
     "shared",

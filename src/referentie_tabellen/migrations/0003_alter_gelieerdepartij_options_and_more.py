@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("referentie_tabellen", "0002_onderhoudscontract_dienstverleningskader_dvk_nr"),
     ]

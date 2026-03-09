@@ -29,13 +29,15 @@ class TimeStampMixin(models.Model):
 
 
 def calc_lat_lon_from_geometry(rd_x, rd_y) -> dict:
-    """Calculate Point latitude and longitude (srid=4326; WGS coordinates) from given geometry in srid=28992 (RD-coordinates)"""
+    """Calculate Point latitude and longitude (srid=4326; WGS coordinates)
+    from given geometry in srid=28992 (RD-coordinates)"""
     point_rd = Point(rd_x, rd_y, srid=28992)
     point_wgs84 = point_rd.transform(4326, clone=True)
     return {"lat": point_wgs84.y, "lon": point_wgs84.x}
 
 
-# voor toekomstige BAG koppeling: in nummeraanduidingen zijn de koppelsleutels voor verblijfobjecten en openbareuruimtes te vinden
+# voor toekomstige BAG koppeling:
+# in nummeraanduidingen zijn de koppelsleutels voor verblijfobjecten en openbareuruimtes te vinden
 class Adres(models.Model):
     pand_id = models.CharField(verbose_name="Pand identificatie", max_length=16, blank=True, null=True)
     vot_id = models.CharField(verbose_name="Verblijfsobject identificatie", max_length=16, blank=True, null=True)
@@ -297,7 +299,7 @@ class Locatie(TimeStampMixin):
                 self.vastgoed = None
 
         # set archief datum if not set yet
-        if self.archief == "True" and self.archief_datum == None:
+        if self.archief == "True" and self.archief_datum is None:
             self.archief_datum = timezone.now()
 
         # change field ambtenaar if Ja/Nee ipv True/False

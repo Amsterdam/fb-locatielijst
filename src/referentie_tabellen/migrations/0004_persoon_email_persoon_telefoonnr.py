@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("referentie_tabellen", "0003_alter_gelieerdepartij_options_and_more"),
     ]

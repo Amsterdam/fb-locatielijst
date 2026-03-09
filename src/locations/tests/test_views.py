@@ -10,7 +10,8 @@
 #         disconnect_signals()
 #         self.staff_user = User.objects.create(username="staffuser", is_superuser=False, is_staff=True)
 #         self.plain_user = User.objects.create(username="commonuser", is_superuser=False, is_staff=False)
-#         LocationProperty.objects.create(short_name="public", label="Public property", property_type="STR", public=True)
+#         LocationProperty.objects.create(short_name="public", label="Public property",
+#  property_type="STR", public=True)
 #         LocationProperty.objects.create(
 #             short_name="private", label="Private property", property_type="STR", public=False
 #         )
@@ -134,7 +135,8 @@
 #         else:
 #             user = self.plain_user
 
-#         # Set the name for the parameter holding the searchvalue to the property name if it is location_property and a choice list
+#         # Set the name for the parameter holding the searchvalue to the property name if
+#  it is location_property and a choice list
 #         # Set current user
 #         current_user.set(user)
 #         location_properties = LocationProcessor().location_properties
@@ -666,7 +668,8 @@
 #         )
 #         self.csv_content = [
 #             "pandcode;naam;bool;date;mail;num;memo;post;str;url;choice;multi",
-#             '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;"Oranges|Apples";Team 1|Team 2',
+#             '25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;
+#               https://example.org;"Oranges|Apples";Team 1|Team 2',
 #         ]
 
 #     def test_import_csv_get(self):
@@ -753,7 +756,8 @@
 #         self.assertEqual(messages[1].tags, "error")
 #         self.assertEqual(
 #             messages[1].message,
-#             "Fout bij het importeren voor locatie Amstel 1: [\"'Misschien' is geen geldige boolean.\", \"'Yellow' is geen geldige invoer voor Choice.\"]",
+#             "Fout bij het importeren voor locatie Amstel 1: [\"'Misschien' is geen geldige boolean.\", \"
+#                   'Yellow' is geen geldige invoer voor Choice.\"]",
 #         )
 
 #     def test_import_csv_wrong_delimiter(self):
@@ -776,11 +780,13 @@
 #         self.assertEqual(messages[0].tags, "error")
 #         self.assertEqual(
 #             messages[0].message,
-#             "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt.",
+#             "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';'
+#                als scheidingsteken en UTF-8 als codering gebruikt.",
 #         )
 
 #     def test_import_csv_with_excess_columns(self):
-#         """Test csv import when a data row has more columns than the header; for instance when a value has a semicolon"""
+#         """Test csv import when a data row has more columns than the header;
+#               for instance when a value has a semicolon"""
 #         csv_content = [
 #             "pandcode;naam;bool;date;mail;num;memo;post;str;url;choice",
 #             "25001;Amstel 1;Ja;31-12-2023;mail@example.org;99;Memo tekst;1234AB;Tekst;https://example.org;;Yellow",
@@ -854,7 +860,10 @@
 #         self.string_property = LocationProperty.objects.create(
 #             short_name="color", label="building_color", property_type="STR"
 #         )
-#         self.url_property = LocationProperty.objects.create(short_name="url", label="web_address", property_type="URL")
+#         self.url_property = LocationProperty.objects.create(
+#               short_name="url",
+#               label="web_address",
+#               property_type="URL")
 #         self.choice_property = LocationProperty.objects.create(
 #             short_name="type", label="building_type", property_type="CHOICE", required=True
 #         )

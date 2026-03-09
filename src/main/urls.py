@@ -51,6 +51,9 @@ else:
 urlpatterns.extend(
     [
         path("admin/", admin.site.urls),
+        path(
+            "import_export/", include(("import_export_csv.urls", "import_export_csv"), namespace="import_export_urls")
+        ),
         path("locaties/", include(("locations.urls", "locations"), namespace="locations_urls")),
         path("health/", include("health.urls")),
         path("403/", permissiondenied403),

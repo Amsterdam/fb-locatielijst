@@ -2,6 +2,10 @@ from django.contrib import admin
 
 from fblocatie.models import Adres, Locatie, Vastgoed
 
+admin.site.site_header = "FB Locatielijst"
+admin.site.index_title = "Beheer"
+admin.site.site_title = "FB Locatielijst - Beheer"
+
 
 @admin.register(Locatie)
 class LocatieAdmin(admin.ModelAdmin):
@@ -89,14 +93,15 @@ class LocatieAdmin(admin.ModelAdmin):
 @admin.register(Adres)
 class AdresAdmin(admin.ModelAdmin):
     list_display = (
-        "vot_id", 
-        "postcode", 
-        "straat", 
-        "huisnummer", 
-        "huisletter", 
+        "vot_id",
+        "postcode",
+        "straat",
+        "huisnummer",
+        "huisletter",
         "huisnummertoevoeging",
         "woonplaats",
-        "id")
+        "id",
+    )
     ordering = (
         "straat",
         "huisnummer",
