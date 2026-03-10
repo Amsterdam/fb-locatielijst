@@ -97,6 +97,13 @@ LOCATIE_MANY_TO_MANY_FIELDS = [
     ("pand_directies", Directie),
     ("voorzieningen", Voorziening),
     ("contracten", Contract),
+    ("loc_manager", Persoon),
+    ("loc_coordinator", Persoon),
+    ("contact_dir", Persoon),
+    ("tom", Persoon),
+    ("tsc", Persoon),
+    ("beveiliging", Persoon),
+    ("veiligheid", Persoon),
 ]
 
 
@@ -105,13 +112,6 @@ LOCATIE_REFERENTIE_TABELLEN = [
     ("dvk_naam", DienstverleningsKader),
     ("budget_dir", Directie),
     ("gelieerd", GelieerdePartij),
-    ("loc_manager", Persoon),
-    ("loc_coordinator", Persoon),
-    ("contact_dir", Persoon),
-    ("tom", Persoon),
-    ("tsc", Persoon),
-    ("beveiliging", Persoon),
-    ("veiligheid", Persoon),
     ("perceel_installateur", OnderhoudsContract),
     ("pas_lc", Leverancier1s1p),
 ]
