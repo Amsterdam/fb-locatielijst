@@ -196,63 +196,49 @@ class Locatie(TimeStampMixin):
     loc_email = models.EmailField(verbose_name="Email_algemeen", blank=True, null=True)
     loc_tel = models.CharField(verbose_name="Pand_telnr", max_length=11, blank=True, null=True)
 
-    loc_manager = models.ForeignKey(
+    loc_manager = models.ManyToManyField(
         Persoon,
         verbose_name="Locatiemanager",
         related_name="loc_manager",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
 
     # contactpersonen
-    loc_coordinator = models.ForeignKey(
+    loc_coordinator = models.ManyToManyField(
         Persoon,
         verbose_name="Locatiecoordinator",
         related_name="loc_coordinator",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
-    contact_dir = models.ForeignKey(
+    contact_dir = models.ManyToManyField(
         Persoon,
         verbose_name="Contactpersoon vanuit directies",
         related_name="contact_directie",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
-    tom = models.ForeignKey(
+    tom = models.ManyToManyField(
         Persoon,
         verbose_name="Technisch ojectmanager (TOM)",
         related_name="tom",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
-    tsc = models.ForeignKey(
+    tsc = models.ManyToManyField(
         Persoon,
         verbose_name="Technisch service coordinator (TSC)",
         related_name="tsc",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
-    beveiliging = models.ForeignKey(
+    beveiliging = models.ManyToManyField(
         Persoon,
         verbose_name="Adviseur beveiliging",
         related_name="beveiliging",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
-    veiligheid = models.ForeignKey(
+    veiligheid = models.ManyToManyField(
         Persoon,
         verbose_name="Adviseur veiligheid",
         related_name="veiligheid",
         blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
     )
     perceel_installateur = models.ForeignKey(
         OnderhoudsContract,
