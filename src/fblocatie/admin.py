@@ -75,7 +75,7 @@ class LocatieAdmin(admin.ModelAdmin):
                 },
             ),
             (
-                "Locatieteamvelden",
+                "Contactvelden",
                 {
                     "fields": loc_fields,
                 },
