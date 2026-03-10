@@ -139,7 +139,7 @@ class ImporterProcessCSV:
         if not string:
             return objs
 
-        lijst = string.split(sep)
+        lijst = [s.strip() for s in string.split(sep)]
         for lst in lijst:
             try:
                 if model == Persoon:
