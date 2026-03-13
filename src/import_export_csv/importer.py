@@ -140,19 +140,19 @@ class ImporterProcessCSV:
             return objs
 
         lijst = [s.strip() for s in string.split(sep)]
-        for lst in lijst:
+        for item in lijst:
             try:
                 if model == Persoon:
-                    obj, error = self._get_persoon(lst)
+                    obj, error = self._get_persoon(item)
                     if error is not None:
                         self.error_list.append(error)
                     else:
                         objs.append(obj.id)
                 else:
-                    obj = model.objects.get(name=lst)
+                    obj = model.objects.get(name=item)
                     objs.append(obj.id)
             except Exception as e:
-                self.error_list = f"Error {lst} from {model}: {e}"
+                self.error_list.append(f"Error '{item}' from {model}: {e}")
 
         return objs
 
@@ -202,10 +202,10 @@ class ImporterProcessCSV:
 
                 for f, m in many_to_many_fields:
                     if f in loc_data:
-                        lst_obj = self._get_many_to_many(string=loc_data[f], model=m)
+                        item_obj = self._get_many_to_many(string=loc_data[f], model=m)
                         if self.error_list != []:
                             continue
-                        getattr(locatie, f).set(lst_obj)
+                        getattr(locatie, f).set(item_obj)
             except Exception as e:
                 self.error_list.append(f"locatie niet aangemaakt: {e}")
 
