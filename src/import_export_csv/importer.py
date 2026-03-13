@@ -63,15 +63,14 @@ class ImporterProcessCSV:
         self.adres_obj = obj
 
     @staticmethod
-    def _get_persoon(naam: str) -> Union[Persoon, str]:
-        # TODO: er komen meerdere personen soms via '/' voor -> multi?
-        error = ""
+    def _get_persoon(naam: str) -> tuple[Union[Persoon, None], Union[tuple, None]]:
+        error = None
         if naam is None:
             return None, error
 
         try:
-            voornm, achternm = naam.split(" ", 1)
-            obj = Persoon.objects.get(voornaam=voornm.strip(), achternaam=achternm.strip())
+            voornaam, achternaam = naam.strip().split(" ", 1)
+            obj = Persoon.objects.get(voornaam=voornaam.strip(), achternaam=achternaam.strip())
         except (ValueError, Persoon.DoesNotExist) as e:
             error = (f"{naam}", e)
             obj = None
@@ -84,9 +83,9 @@ class ImporterProcessCSV:
                 continue
             try:
                 if model == Persoon:
-                    obj, e = self._get_persoon(data[field])
-                    if e != "":
-                        self.error_list.append(e)
+                    obj, error = self._get_persoon(data[field])
+                    if error is not None:
+                        self.error_list.append(error)
                 else:
                     obj = model.objects.get(name=data[field])
                 data[field] = obj
@@ -140,11 +139,18 @@ class ImporterProcessCSV:
         if not string:
             return objs
 
-        lijst = string.split(sep)
+        lijst = [s.strip() for s in string.split(sep)]
         for lst in lijst:
             try:
-                obj = model.objects.get(name=lst)
-                objs.append(obj.id)
+                if model == Persoon:
+                    obj, error = self._get_persoon(lst)
+                    if error is not None:
+                        self.error_list.append(error)
+                    else:
+                        objs.append(obj.id)
+                else:
+                    obj = model.objects.get(name=lst)
+                    objs.append(obj.id)
             except Exception as e:
                 self.error_list = f"Error {lst} from {model}: {e}"
 
