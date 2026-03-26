@@ -2,4 +2,5 @@
 {% block object-tools-items %}
     {{ block.super }}  
     <li><a href="{% url 'import_export_urls:locatie-import' %}" class="import_link" target="import_tab">Import CSV</a></li>
+    <li><a href="{% url 'import_export_urls:locatie-export' %}" class="export_link" target="export_tab">Export CSV</a></li>
 {% endblock %}
