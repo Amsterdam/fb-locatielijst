@@ -12,6 +12,9 @@ from .mappings import (
 )
 from fblocatie.models import Locatie
 
+def _get_field(obj, field):
+    value = getattr(obj, field, None)
+    return "" if value is None else value
 
 def fetch_locations_for_export():
     return Locatie.objects.select_related(
@@ -31,15 +34,15 @@ def build_csv_row(locatie) -> dict:
         if any(model_field == field for field, _ in LOCATIE_MANY_TO_MANY_FIELDS):
             row[csv_column] = " | ".join(str(item) for item in getattr(locatie, model_field).all())
         else:
-            row[csv_column] = getattr(locatie, model_field, "") or ""
+            row[csv_column] = _get_field(locatie, model_field)
 
     adres = getattr(locatie, "adres", None)
     for model_field, csv_column in ADRES_MAPPING.items():
-        row[csv_column] = getattr(adres, model_field, "") or "" if adres else ""
+        row[csv_column] = _get_field(adres, model_field)
 
     vastgoed = getattr(locatie, "vastgoed", None)
     for model_field, csv_column in VG_MAPPING.items():
-        row[csv_column] = getattr(vastgoed, model_field, "") or "" if vastgoed else ""
+        row[csv_column] = _get_field(vastgoed, model_field)
 
     return row
 
