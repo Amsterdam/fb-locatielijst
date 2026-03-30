@@ -31,6 +31,7 @@ def build_csv_row(locatie) -> dict:
     row = {}
 
     for model_field, csv_column in LOCATIE_MAPPING.items():
+        #Join many to many fields with " | " as separator, for the rest just get the field value
         if any(model_field == field for field, _ in LOCATIE_MANY_TO_MANY_FIELDS):
             row[csv_column] = " | ".join(str(item) for item in getattr(locatie, model_field).all())
         else:
@@ -54,6 +55,8 @@ def get_csv_response(locations) -> HttpResponse:
         content_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="locaties_export_{date}.csv"'},
     )
+
+    # Add BOM to the file; because otherwise Excel won't know what's happening
     response.write("\ufeff".encode("utf-8"))
 
     all_columns = list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(VG_MAPPING.values())
