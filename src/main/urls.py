@@ -55,6 +55,7 @@ urlpatterns.extend(
             "import_export/", include(("import_export_csv.urls", "import_export_csv"), namespace="import_export_urls")
         ),
         path("locaties/", include(("locations.urls", "locations"), namespace="locations_urls")),
+        path("fblocatie/", include(("fblocatie.urls", "fblocatie"), namespace="fblocatie_urls")),
         path("health/", include("health.urls")),
         path("403/", permissiondenied403),
         # path("help/", include(("help_docs.urls", "help_docs"), namespace="help_docs_urls")),

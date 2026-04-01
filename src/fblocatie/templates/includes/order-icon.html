@@ -1,0 +1,14 @@
+<span class="list-order-icon order-{{ direction }}">
+    <span class="icon">
+        {% if direction == 'desc' %}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 10" aria-hidden="true" focusable="false">
+            <path fill-rule="evenodd" d="M.116 8.222L1.64 9.75l5.794-5.809 5.792 5.81 1.524-1.529L7.434.884z"></path>
+        </svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 10" aria-hidden="true" focusable="false">
+            <path fill-rule="evenodd" d="M14.75 2.412L13.226.884 7.433 6.693 1.64.883.116 2.413 7.433 9.75z"></path>
+        </svg>
+        {% endif %}
+    </span>
+    <span class="sr-only" lang="en">Order by {{ direction }}</span>
+</span>
