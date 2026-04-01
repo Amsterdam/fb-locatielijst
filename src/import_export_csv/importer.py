@@ -42,7 +42,7 @@ class ImporterProcessCSV:
         adres_data = self.set_empty_to_none(data)
 
         # data correction before dbstorage
-        if "postcode" in adres_data and len(adres_data["postcode"]) > 6:
+        if "postcode" in adres_data and adres_data["postcode"] is not None and len(adres_data["postcode"]) > 6:
             adres_data["postcode"] = adres_data["postcode"].replace(" ", "")
 
         match_keys = ["postcode", "huisnummer", "huisletter", "huisnummertoevoeging"]
