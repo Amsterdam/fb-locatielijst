@@ -1,0 +1,125 @@
+
+body #header {
+  --accent: var(--header-branding-color);
+  padding: 1.125rem 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+#branding {
+  flex-grow: 1;
+}
+
+#branding h1 {
+  margin: 0;
+}
+
+#branding h1 a {
+  display: flex;
+  text-decoration: none;
+}
+
+#site-logo {
+  display: flex;
+  height: 39px;
+  width: 160px;
+}
+
+#site-logo IMG {
+  height: 100%;
+}
+
+#site-logo .site-logo-large { display: block; }
+#site-logo .site-logo-small { display: none; }
+
+#site-name {
+  font-family: "amsterdam sans", arial, sans-serif;
+  font-style: normal;
+  font-weight: 800;
+  flex-grow: 1;
+  font-size: clamp(1.5rem, 1.5rem + 1 * (100vw - 20rem) / 100, 2.5rem);
+  line-height: clamp(2rem, 2rem + 1 * (100vw - 20rem) / 100, 3rem);
+}
+
+.theme-toggle svg.theme-icon-when-auto,
+.theme-toggle svg.theme-icon-when-dark,
+.theme-toggle svg.theme-icon-when-light {
+  fill: var(--header-link-color);
+  color: var(--header-bg);
+}
+
+@media screen and (max-width: 839px) {
+
+  #site-logo {
+    width: 30px;
+  }
+
+  #site-logo .site-logo-large { display: none; }
+  #site-logo .site-logo-small { display: block; }
+    
+}
+
+
+/*******************************************/
+
+#header nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#header nav ul {
+  display: flex;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: center;
+}
+
+#header nav ul li a,
+#header nav ul li button {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 12px 24px;
+  color: var(--color-black);
+  text-decoration: none;
+  overflow-wrap: break-word;
+  border: none;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 24px;
+}
+
+#header nav ul li a:hover, #header nav ul li a:focus,
+#header nav ul li button:hover, #header nav ul li button:focus {
+  margin: 0;
+  color: var(--color-dark-blue);
+  text-decoration: none;
+}
+
+
+/*******************************************/
+
+div.breadcrumbs {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+div.breadcrumbs a {
+  color: var(--color-blue);
+  text-decoration: none;
+}
+
+div.breadcrumbs a:hover,
+div.breadcrumbs a:focus {
+  text-decoration: underline;
+  color: var(--color-dark-blue);
+}
+
+div.breadcrumbs span {
+  margin: 0 0.5rem;
+}
