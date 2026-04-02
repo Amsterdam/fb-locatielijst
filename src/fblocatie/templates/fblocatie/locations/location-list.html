@@ -59,6 +59,33 @@
                         {% endif %}
                     </a>
                 </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'dvk_naam__name' %}">
+                        DVK Naam
+                        {% get_order request 'dvk_naam__name' as order_dvk_naam %}
+                        {% if order_dvk_naam %}
+                            {% include "includes/order-icon.html" with direction=order_dvk_naam only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'locatie_soort__name' %}">
+                        Locatie Soort
+                        {% get_order request 'locatie_soort__name' as order_locatie_soort %}
+                        {% if order_locatie_soort %}
+                            {% include "includes/order-icon.html" with direction=order_locatie_soort only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'vastgoed__bezit__name' %}">
+                        Eigendom / Huur
+                        {% get_order request 'vastgoed__bezit__name' as order_vastgoed_bezit %}
+                        {% if order_vastgoed_bezit %}
+                            {% include "includes/order-icon.html" with direction=order_vastgoed_bezit only %}
+                        {% endif %}
+                    </a>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +96,15 @@
                 </td>
                 <td>
                     {{ object.naam }}
+                </td>
+                <td>
+                    {{ object.dvk_naam }}
+                </td>
+                <td>
+                    {{ object.locatie_soort }}
+                </td>
+                <td>
+                    {{ object.vastgoed.bezit }}
                 </td>
             </tr>
         {% empty %}

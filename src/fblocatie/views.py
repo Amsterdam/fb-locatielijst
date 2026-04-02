@@ -10,7 +10,7 @@ class LocatieListView(LoginRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related("vastgoed", "vastgoed__bezit")
         search_value = (self.request.GET.get("search") or "").strip()
         if search_value:
             queryset = queryset.filter(naam__icontains=search_value)
@@ -23,7 +23,16 @@ class LocatieListView(LoginRequiredMixin, ListView):
 
     def get_ordering(self):
         order_by = self.request.GET.get("order_by")
-        if order_by not in {"naam", "pandcode"}:
+
+        allowed_order_by = {
+            "pandcode",
+            "naam",
+            "dvk_naam__name",
+            "locatie_soort__name",
+            "vastgoed__bezit__name",
+        }
+
+        if order_by not in allowed_order_by:
             order_by = "naam"
 
         prefix = "-" if self.request.GET.get("order") == "desc" else ""
