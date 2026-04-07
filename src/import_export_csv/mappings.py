@@ -25,6 +25,9 @@ ADRES_MAPPING = {
     "woonplaats": "plaats",
     "rd_x": "rd_x",
     "rd_y": "rd_y",
+    "lat": "latitude",
+    "lon": "longitude",
+    "map_url": "maps",
 }
 
 
