@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from .mappings import (
     ADRES_MAPPING,
+    EXPORT_ONLY_ADRES_MAPPING,
     LOCATIE_MANY_TO_MANY_FIELDS,
     LOCATIE_MAPPING,
     LOCATIE_REFERENTIE_TABELLEN,
@@ -38,7 +39,7 @@ def build_csv_row(locatie) -> dict:
             row[csv_column] = _get_field(locatie, model_field)
 
     adres = getattr(locatie, "adres", None)
-    for model_field, csv_column in ADRES_MAPPING.items():
+    for model_field, csv_column in {**ADRES_MAPPING, **EXPORT_ONLY_ADRES_MAPPING}.items():
         row[csv_column] = _get_field(adres, model_field)
 
     vastgoed = getattr(locatie, "vastgoed", None)
@@ -59,7 +60,7 @@ def get_csv_response(locations) -> HttpResponse:
     # Add BOM to the file; because otherwise Excel won't know what's happening
     response.write("\ufeff".encode("utf-8"))
 
-    all_columns = list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(VG_MAPPING.values())
+    all_columns = list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(EXPORT_ONLY_ADRES_MAPPING.values()) + list(VG_MAPPING.values())
     writer = csv.DictWriter(response, fieldnames=all_columns, delimiter=";")
     writer.writeheader()
 

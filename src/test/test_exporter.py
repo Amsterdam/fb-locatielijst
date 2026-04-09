@@ -10,6 +10,7 @@ import import_export_csv.exporter as exporter
 from fblocatie.models import Adres, Locatie, Vastgoed
 from import_export_csv.mappings import (
     ADRES_MAPPING,
+    EXPORT_ONLY_ADRES_MAPPING,
     LOCATIE_MANY_TO_MANY_FIELDS,
     LOCATIE_MAPPING,
     VG_MAPPING,
@@ -25,7 +26,7 @@ from referentie_tabellen.models import (
 )
 
 def _expected_columns():
-    return list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(VG_MAPPING.values())
+    return list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(EXPORT_ONLY_ADRES_MAPPING.values()) + list(VG_MAPPING.values())
 
 def _parse_csv_response(response):
     decoded = response.content.decode("utf-8-sig")
