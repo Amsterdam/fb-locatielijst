@@ -63,8 +63,25 @@ class Adres(models.Model):
             raise ValidationError(f"{self.pand_id} is geen geldige pandidentificatie.")
         if self.vot_id and self.vot_id[4:6] != "01":  # positie 5-6: 01 = een verblijfsobject
             raise ValidationError(f"{self.vot_id} is geen geldige verblijfsobjectidentificatie.")
+        if self.postcode and self.huisnummer:
+            # check if the combination is unique
+            if Adres.objects.filter(
+                postcode=self.postcode, 
+                huisnummer=self.huisnummer, 
+                huisletter__iexact=self.huisletter,
+                huisnummertoevoeging__iexact=self.huisnummertoevoeging,
+            ).exclude(
+                pk=self.pk
+            ).exists():
+                raise ValidationError(
+                    f"Het adres {self.postcode}, {self.huisnummer}, {self.huisletter if self.huisletter else ''}{self.huisnummertoevoeging if self.huisnummertoevoeging else ''} bestaat al in de database."
+                )
 
     def save(self, *args, **kwargs):
+        if self.straat:
+            self.straat = self.straat[0].upper() + self.straat[1:]
+        if self.woonplaats:
+            self.woonplaats = self.woonplaats[0].upper() + self.woonplaats[1:]
         if None not in (self.rd_x, self.rd_y):
             rd_x = float(self.rd_x)
             rd_y = float(self.rd_y)
