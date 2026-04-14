@@ -24,13 +24,16 @@ from referentie_tabellen.models import (
     Voorziening,
 )
 
+
 def _expected_columns():
     return list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(VG_MAPPING.values())
+
 
 def _parse_csv_response(response):
     decoded = response.content.decode("utf-8-sig")
     reader = csv.DictReader(io.StringIO(decoded), delimiter=";")
     return reader.fieldnames, list(reader)
+
 
 def _make_locatie(*, naam="Locatie", pandcode=1, adres_kwargs=None, locatie_kwargs=None):
     adres_kwargs = adres_kwargs or {}
@@ -62,6 +65,7 @@ def _make_locatie(*, naam="Locatie", pandcode=1, adres_kwargs=None, locatie_kwar
 
     return locatie
 
+
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "csv_column",
@@ -79,6 +83,7 @@ def test_build_csv_row_emits_empty_string_for_null_fields(csv_column):
 
     assert set(row.keys()) == set(_expected_columns())
     assert row[csv_column] == ""
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
@@ -110,11 +115,13 @@ def test_build_csv_row_m2m_fields_export_empty_or_pipe_joined(field_name, model)
     assert " | " in row[csv_column]
     assert set(row[csv_column].split(" | ")) == {str(a), str(b)}
 
+
 @pytest.mark.django_db
 def test_build_csv_row_m2m_fields_list_matches_mapping_constant():
     # Light sanity check: ensures exporter logic stays aligned with mapping config.
     mapping_m2m_fields = {field for field, _ in LOCATIE_MANY_TO_MANY_FIELDS}
     assert mapping_m2m_fields.issubset(set(LOCATIE_MAPPING.keys()))
+
 
 @pytest.mark.django_db
 def test_get_csv_response_roundtrips_special_characters_and_delimiter():
@@ -124,7 +131,7 @@ def test_get_csv_response_roundtrips_special_characters_and_delimiter():
     response = exporter.get_csv_response([locatie])
 
     assert response["Content-Type"].startswith("text/csv")
-    assert response["Content-Disposition"].startswith("attachment; filename=\"locaties_export_")
+    assert response["Content-Disposition"].startswith('attachment; filename="locaties_export_')
     assert response.content.startswith(b"\xef\xbb\xbf")
 
     fieldnames, rows = _parse_csv_response(response)
@@ -206,6 +213,7 @@ def test_export_includes_locatie_information():
 def test_fetch_locations_for_export_returns_queryset():
     qs = exporter.fetch_locations_for_export()
     assert isinstance(qs, QuerySet)
+
 
 @pytest.mark.django_db
 def test__get_field_converts_none_to_empty_string_but_keeps_false():

@@ -65,16 +65,19 @@ class Adres(models.Model):
             raise ValidationError(f"{self.vot_id} is geen geldige verblijfsobjectidentificatie.")
         if self.postcode and self.huisnummer:
             # check if the combination is unique
-            if Adres.objects.filter(
-                postcode=self.postcode, 
-                huisnummer=self.huisnummer, 
-                huisletter__iexact=self.huisletter,
-                huisnummertoevoeging__iexact=self.huisnummertoevoeging,
-            ).exclude(
-                pk=self.pk
-            ).exists():
+            if (
+                Adres.objects.filter(
+                    postcode=self.postcode,
+                    huisnummer=self.huisnummer,
+                    huisletter__iexact=self.huisletter,
+                    huisnummertoevoeging__iexact=self.huisnummertoevoeging,
+                )
+                .exclude(pk=self.pk)
+                .exists()
+            ):
                 raise ValidationError(
-                    f"Het adres {self.postcode}, {self.huisnummer}, {self.huisletter if self.huisletter else ''}{self.huisnummertoevoeging if self.huisnummertoevoeging else ''} bestaat al in de database."
+                    f"Het adres {self.postcode}, {self.huisnummer}, {self.huisletter if self.huisletter else ''}"
+                    f"{self.huisnummertoevoeging if self.huisnummertoevoeging else ''} bestaat al in de database."
                 )
 
     def save(self, *args, **kwargs):
