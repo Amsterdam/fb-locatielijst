@@ -37,7 +37,7 @@ class Command(BaseCommand):
     TMP_DIRECTORY = "/tmp/tmp_pgdump"
 
     def handle(self, *args, **kwargs):
-        app_names = kwargs.get("apps", ["locations"])
+        app_names = kwargs.get("apps", ["fblocatie", "referentie_tabellen"])
 
         self.start_dump(app_names)
 
