@@ -27,6 +27,12 @@ ADRES_MAPPING = {
     "rd_y": "rd_y",
 }
 
+EXPORT_ONLY_ADRES_MAPPING = {
+    "lat": "latitude",
+    "lon": "longitude",
+    "map_url": "maps",
+}
+
 
 VG_MAPPING = {
     "GV_key": "gv",
