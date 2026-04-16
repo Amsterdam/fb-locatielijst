@@ -1,0 +1,120 @@
+
+
+#container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+body #content {
+  padding: 1.125rem 2rem;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/*******************************************/
+
+#container div.breadcrumbs {
+  padding: 1.125rem 2rem;
+}
+
+
+/*******************************************/
+
+ul.data-list > li a {
+  text-decoration: none;
+}
+
+ul.data-list > li a:hover,
+ul.data-list > li a:focus {
+  text-decoration: underline;
+}
+
+ul.data-list > li .icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+ul.data-list > li .icon:after {
+  content: ".";
+  visibility: hidden;
+  width: 0;
+}
+
+ul.data-list > li .icon svg {
+  width: 0.625rem;
+  fill: var(--color-blue)
+}
+
+table.table-adam { margin-bottom: 1rem; }
+table.table-adam .column-pancode { width: 100px; }
+
+/*******************************************/
+
+.data-view {
+  display: block;
+}
+
+.data-view .group {
+  display: inline-block;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.data-view .group h3:first-child{
+  margin-top: 0;
+}
+
+.data-view-row {
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
+  margin-bottom: 2px;
+}
+
+.data-label {
+  flex: 0 1 40%;
+  max-width: 330px;
+  color: var(--body-quiet-color);
+  margin-top: 0;
+  font-weight: normal;
+}
+
+.data-value {
+  flex: 1 1 auto;
+  color: var(--body-loud-color);
+}
+
+.data-label label {
+  color: var(--body-quiet-color);
+  font-size: 1rem;
+  line-height: 2rem;
+}
+
+.data-value > div {
+  margin: 2px 0 7px 0;
+}
+
+.data-value input:not([type=radio],[type=checkbox]),
+.data-value textarea,
+.data-value select {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+}
+
+@media screen and (max-width: 750px) {
+  .data-view-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+}
+
+@media screen and (min-width: 1024px) {
+  .data-view {
+    columns: 2;
+  }  
+}

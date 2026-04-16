@@ -1,0 +1,127 @@
+{% extends 'site-base.html' %}
+{% load i18n utils %}
+
+{% block title %}
+| Locaties
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    {% if user.is_staff %}
+    <span>&rsaquo;</span>
+    <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
+    {% endif %}
+    {% block extra-breadcrumbs %}{% endblock %}
+    <span>&rsaquo;</span>
+    Locaties
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>{% translate 'Locaties' %}</h2>
+
+<div class="page-filter">
+    <form action="." method="GET" novalidate>
+        <div class="filter-option">
+            <label for="id_search">Zoek op naam</label>
+            <input
+                type="text"
+                id="id_search"
+                name="search"
+                value="{{ search }}"
+                autocomplete="off"
+            />
+        </div>
+        <button class="btn btn-primair" type="submit" formaction="{% url 'fblocatie_urls:locatie-list' %}">Zoek</button>
+    </form>
+</div>
+
+<div class="page-content">
+    <table class="table-adam">
+        <thead>
+            <tr>
+                <th scope="col" class="column-pancode">
+                    <a href="?{% set_query request 'order_by' 'pandcode' %}">
+                        Pandcode
+                        {% get_order request 'pandcode' as order_pancode %}
+                        {% if order_pancode %}
+                            {% include "includes/order-icon.html" with direction=order_pancode only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'naam' %}">
+                        Naam
+                        {% get_order request 'naam' as order_name %}
+                        {% if order_name %}
+                            {% include "includes/order-icon.html" with direction=order_name only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'dvk_naam__name' %}">
+                        DVK Naam
+                        {% get_order request 'dvk_naam__name' as order_dvk_naam %}
+                        {% if order_dvk_naam %}
+                            {% include "includes/order-icon.html" with direction=order_dvk_naam only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'locatie_soort__name' %}">
+                        Locatie Soort
+                        {% get_order request 'locatie_soort__name' as order_locatie_soort %}
+                        {% if order_locatie_soort %}
+                            {% include "includes/order-icon.html" with direction=order_locatie_soort only %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="?{% set_query request 'order_by' 'vastgoed__bezit__name' %}">
+                        Eigendom / Huur
+                        {% get_order request 'vastgoed__bezit__name' as order_vastgoed_bezit %}
+                        {% if order_vastgoed_bezit %}
+                            {% include "includes/order-icon.html" with direction=order_vastgoed_bezit only %}
+                        {% endif %}
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    {{object.pandcode}}
+                </td>
+                <td>
+                    {{ object.naam }}
+                </td>
+                <td>
+                    {{ object.dvk_naam }}
+                </td>
+                <td>
+                    {{ object.locatie_soort }}
+                </td>
+                <td>
+                    {{ object.vastgoed.bezit }}
+                </td>
+            </tr>
+        {% empty %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+        {% include "includes/pagination.html" %}
+    {% endif %}
+
+    <div class="h5">{{ page_obj.paginator.count }} {% if is_filtered_result %}van de {{ location_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
+
+    <div class="btn-container">
+        {% if user.is_staff %}
+            <a href="{% url 'locations_urls:location-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
