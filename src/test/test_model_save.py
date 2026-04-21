@@ -86,12 +86,38 @@ def test_clean_vastgoed_invalid():
     assert str(excinfo.value) == "['Het geselecteerde vastgoed behoort niet tot het geselecteerde adres.']"
 
 
-# TODO: onderstaande test goed maken
-# def test_save_vastgoed_matching_adres(self):
-#     """ Check if vastgoed.adres=None and there is a matching adres it adopts """
-#     adres3 = baker.make(Adres)
-#     vastgoed3 = baker.make(Vastgoed, adres = None)
-#     locatie3 = baker.prepare(Locatie, vastgoed=vastgoed3, adres=adres3)
+@pytest.mark.django_db
+def test_save_vastgoed_matching_adres():
+    adres = baker.make(Adres)
+    adres1 = baker.make(Adres)
+    vastgoed = baker.make(Vastgoed, adres=adres)
+    vastgoed1 = baker.make(Vastgoed, adres=adres1)
+    locatie = baker.make(Locatie, vastgoed=vastgoed1, adres=adres)
 
-#     locatie3.save()
-#     assert locatie3.vastgoed == adres3
+    locatie.save()
+    assert locatie.vastgoed == vastgoed
+
+
+@pytest.mark.django_db
+def test_adres_unique_case_insensitive():
+
+    adres1 = Adres.objects.create(
+        straat="Amsterdam",
+        postcode="1234AB",
+        huisnummer=1,
+        huisletter="A",
+        huisnummertoevoeging="1",
+        woonplaats="Amsterdam",
+    )
+    # Try to create another address with same data but different case
+    adres2 = Adres(
+        straat="amsterdam",
+        postcode="1234AB",
+        huisnummer=1,
+        huisletter="a",
+        huisnummertoevoeging="1",
+        woonplaats="amsterdam",
+    )
+    adres1.save()
+    with pytest.raises(ValidationError):
+        adres2.clean()
