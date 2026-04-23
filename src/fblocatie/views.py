@@ -202,6 +202,10 @@ class LocatieDetailView(LoginRequiredMixin, View):
                         "Monument status landelijk",
                         getattr(vastgoed, "monument_brkpb", None) if vastgoed else None,
                     ),
+                    _row(
+                        "Themaportefeuille GV",
+                        getattr(vastgoed, "themagv", None) if vastgoed else None,
+                    ),
                 ],
             },
             {
