@@ -5,7 +5,9 @@ from django.views.generic import View
 
 from import_export_csv.forms import LocatieImportForm
 from import_export_csv.handle_import import handle_import_csv
-from .exporter import get_csv_response, fetch_locations_for_export
+
+from .exporter import fetch_locations_for_export, get_csv_response
+
 
 class IsStaffMixin(UserPassesTestMixin):
     def test_func(self):
@@ -38,6 +40,7 @@ class LocatieImportView(LoginRequiredMixin, IsStaffMixin, View):
             message = f"{location_added} locatie(s) geïmporteerd/ge-update."
             messages.add_message(request, messages.SUCCESS, message)
         return render(request, template_name=self.template_name, context=context)
+
 
 class LocationExportView(LoginRequiredMixin, View):
     template = "import_export_csv/locatie-export.html"
