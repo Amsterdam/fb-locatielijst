@@ -1,9 +1,5 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.utils import timezone
 from django.views import View
 from django.views.generic import ListView
 
@@ -223,4 +219,4 @@ class LocatieDetailView(LoginRequiredMixin, View):
             "detail_groups": detail_groups,
         }
         return render(request=request, template_name=self.template_name, context=context)
-        
+
