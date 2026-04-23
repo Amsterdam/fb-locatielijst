@@ -27,7 +27,10 @@ from referentie_tabellen.models import (
 
 
 def _expected_columns():
-    return list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(EXPORT_ONLY_ADRES_MAPPING.values()) + list(VG_MAPPING.values())
+    return list(LOCATIE_MAPPING.values()) + \
+        list(ADRES_MAPPING.values()) + \
+        list(EXPORT_ONLY_ADRES_MAPPING.values()) + \
+        list(VG_MAPPING.values())
 
 
 def _parse_csv_response(response):
