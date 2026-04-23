@@ -62,7 +62,10 @@ def get_csv_response(locations) -> HttpResponse:
     # Add BOM to the file; because otherwise Excel won't know what's happening
     response.write("\ufeff".encode("utf-8"))
 
-    all_columns = list(LOCATIE_MAPPING.values()) + list(ADRES_MAPPING.values()) + list(EXPORT_ONLY_ADRES_MAPPING.values()) + list(VG_MAPPING.values())
+    all_columns = list(LOCATIE_MAPPING.values()) + \
+        list(ADRES_MAPPING.values()) + \
+        list(EXPORT_ONLY_ADRES_MAPPING.values()) + \
+        list(VG_MAPPING.values())
     writer = csv.DictWriter(response, fieldnames=all_columns, delimiter=";")
     writer.writeheader()
 
