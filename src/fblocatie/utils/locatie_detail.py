@@ -12,7 +12,7 @@ def _display_value(value: Any):
     if isinstance(value, bool):
         return "Ja" if value else "Nee"
 
-    # ManyToMany (prefetched) shows up as a manager
+    # Handle many-to-many values
     if hasattr(value, "all") and callable(value.all):
         items = [str(item) for item in value.all()]
         return items or None
