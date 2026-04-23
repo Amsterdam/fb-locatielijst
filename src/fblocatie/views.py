@@ -137,6 +137,7 @@ class LocatieDetailView(LoginRequiredMixin, View):
                     _row("Routecode indien geen budget FB", locatie.routecode),
                     _row("Directies in het pand", locatie.pand_directies),
                     _row("Voorzieningen", locatie.voorzieningen),
+                    _row("Kantoorartikelkast uitgebreid assortiment", locatie.kantoorkast),
                 ],
             },
             {
