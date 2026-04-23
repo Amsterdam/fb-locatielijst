@@ -85,6 +85,13 @@ class Adres(models.Model):
             self.straat = self.straat[0].upper() + self.straat[1:]
         if self.woonplaats:
             self.woonplaats = self.woonplaats[0].upper() + self.woonplaats[1:]
+            
+        # Validate bag IDs
+        if self.pand_id and self.pand_id[4:6] != "10":  # positie 5-6: 10 = een pand
+            raise ValidationError(f"{self.pand_id} is geen geldige pandidentificatie.")
+        if self.vot_id and self.vot_id[4:6] != "01":  # positie 5-6: 01 = een verblijfsobject
+            raise ValidationError(f"{self.vot_id} is geen geldige verblijfsobjectidentificatie.")
+
         if None not in (self.rd_x, self.rd_y):
             rd_x = float(self.rd_x)
             rd_y = float(self.rd_y)
