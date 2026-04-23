@@ -1,0 +1,72 @@
+{% extends 'site-base.html' %}
+{% load i18n static utils %}
+
+{% block title %}
+| {{ locatie.pandcode }} - {{ locatie.naam }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    {% if user.is_staff %}
+    <span>&rsaquo;</span>
+    <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
+    {% endif %}
+    <span>&rsaquo;</span>
+    <a href="{% url 'fblocatie_urls:locatie-list' %}">Locaties</a>
+    <span>&rsaquo;</span>
+    {{ locatie.naam }}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if locatie.archief %}
+<div class="alert alert-info">
+    <div class="title">Gearchiveerd</div>
+    <p>
+        De locatie is gearchiveerd{% if locatie.archief_datum %} op {{ locatie.archief_datum }}{% endif %}.
+    </p>
+</div>
+{% endif %}
+
+<h2>{{ locatie.pandcode }} - {{ locatie.naam }}</h2>
+<small>
+    gewijzigd op {{ locatie.updated_at }} | aangemaakt op {{ locatie.created_at }}
+</small>
+
+<dl class="data-view">
+    {% for group in detail_groups %}
+    <div class="group">
+        {% if group.title %}<h3>{{ group.title }}</h3>{% endif %}
+        {% for row in group.rows %}
+        <div class="data-view-row">
+            <dt class="data-label">{{ row.label }}</dt>
+            <dd class="data-value">
+                {% if row.value %}
+                    {% if row.is_url %}
+                        <a href="{{ row.value }}" target="_blank" rel="noopener noreferrer">
+                            {% if row.label == 'Kaart (adres)' %}
+                                Klik hier
+                            {% else %}
+                                {{ row.value }}
+                            {% endif %}
+                        </a>
+                    {% elif row.value|get_type == 'list' %}
+                        {{ row.value|join:", " }}
+                    {% else %}
+                        {{ row.value }}
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </dd>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</dl>
+
+<div class="btn-container">
+    <a href="{% url 'fblocatie_urls:locatie-list' %}" class="btn btn-secundair">Terug</a>
+</div>
+{% endblock %}

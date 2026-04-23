@@ -95,7 +95,7 @@
                     {{object.pandcode}}
                 </td>
                 <td>
-                    {{ object.naam }}
+                    <a href="{% url 'fblocatie_urls:locatie-detail' object.pandcode %}">{{ object.naam }}</a>
                 </td>
                 <td>
                     {{ object.dvk_naam }}
