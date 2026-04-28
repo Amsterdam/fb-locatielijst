@@ -1,7 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, render
+from django.views import View
 from django.views.generic import ListView
 
 from fblocatie.models import Locatie
+from fblocatie.utils.locatie_detail import get_locatie_detail_groups
 
 
 class LocatieListView(LoginRequiredMixin, ListView):
@@ -37,4 +40,50 @@ class LocatieListView(LoginRequiredMixin, ListView):
 
         prefix = "-" if self.request.GET.get("order") == "desc" else ""
         return f"{prefix}{order_by}"
+
+
+class LocatieDetailView(LoginRequiredMixin, View):
+    template_name = "fblocatie/locations/location-detail.html"
+
+    def _get_locatie(self, pandcode: int) -> Locatie:
+        return get_object_or_404(
+            Locatie.objects.select_related(
+                "adres",
+                "bezoekadres",
+                "vastgoed",
+                "vastgoed__bezit",
+                "vastgoed__monument_gem",
+                "vastgoed__monument_brkpb",
+                "vastgoed__themagv",
+                "vastgoed__asset_manager",
+                "vastgoed__pl_gv",
+                "locatie_soort",
+                "dvk_naam",
+                "budget_dir",
+                "perceel_installateur",
+                "gelieerd",
+                "pas_lc",
+            ).prefetch_related(
+                "pand_directies",
+                "voorzieningen",
+                "contracten",
+                "loc_manager",
+                "loc_coordinator",
+                "contact_dir",
+                "tom",
+                "tsc",
+                "beveiliging",
+                "veiligheid",
+            ),
+            pandcode=pandcode,
+        )
+
+    def get(self, request, pandcode: int, *args, **kwargs):
+        locatie = self._get_locatie(pandcode)
+
+        context = {
+            "locatie": locatie,
+            "detail_groups": get_locatie_detail_groups(locatie),
+        }
+        return render(request=request, template_name=self.template_name, context=context)
 
