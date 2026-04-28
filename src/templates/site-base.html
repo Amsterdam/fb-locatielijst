@@ -51,7 +51,7 @@
           {% endif %}
           {% if user.is_staff %}
           {#<li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>#}
-          <li><a href="{% url 'locations_urls:location-admin' %}">Beheer</a></li>
+          <li><a href="{{ REQUEST_CHANGE_FORM_URL }}" target="_blank" rel="noopener noreferrer">Wijziging aanvragen</a></li>
           {% endif %}
           {% if user.is_authenticated %}
           <li>
@@ -74,10 +74,8 @@
       <div class="breadcrumbs">
         <a href="/">Home</a>
         {% if user.is_authenticated %}
-        {% if user.is_staff %}
         <span>&rsaquo;</span>
-        <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
-        {% endif %}
+        <a href="{{ REQUEST_CHANGE_FORM_URL }}" target="_blank" rel="noopener noreferrer">Wijziging aanvragen</a>
         <span>&rsaquo;</span>
         <a href="{% url 'locations_urls:location-list' %}">Locaties</a>
         {% endif %}

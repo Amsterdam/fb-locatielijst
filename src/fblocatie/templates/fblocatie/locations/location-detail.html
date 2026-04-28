@@ -8,10 +8,6 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="/">Home</a>
-    {% if user.is_staff %}
-    <span>&rsaquo;</span>
-    <a href="{% url 'locations_urls:location-admin' %}">Beheer</a>
-    {% endif %}
     <span>&rsaquo;</span>
     <a href="{% url 'fblocatie_urls:locatie-list' %}">Locaties</a>
     <span>&rsaquo;</span>

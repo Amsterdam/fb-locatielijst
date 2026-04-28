@@ -89,6 +89,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "shared.context_processors.authentication_urls",
+                "shared.context_processors.request_change_form_url",
             ],
         },
     },
@@ -234,6 +235,9 @@ CONTENT_SECURITY_POLICY = {
 
 # Automatic redirect to HTTPS
 SECURE_SSL_REDIRECT = bool(int(os.getenv("SECURE_SSL_REDIRECT", "0")))
+
+# External form url for requesting changes to locations
+REQUEST_CHANGE_FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=saH8ci4sdkOkRSlNgBloBOwBjFkBWNFBmMA67fbJfg9UQ1c5NTZYMExSQUdVTUhTNEMwRk5URDZKTS4u"
 
 # Authentication settings
 AUTHENTICATION_BACKENDS = [
