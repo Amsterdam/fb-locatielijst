@@ -54,10 +54,10 @@ class Command(BaseCommand):
         """
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
 
-        csv_bytes = get_csv_response(fetch_locations_for_export()).content
+        csv_data = get_csv_response(fetch_locations_for_export()).content
         file_path = os.path.join(self.TMP_DIRECTORY, self.EXPORT_FILE_NAME)
         with open(file_path, "wb") as f:
-            f.write(csv_bytes)
+            f.write(csv_data)
 
     def upload_to_blob(self):
         """
