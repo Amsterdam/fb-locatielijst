@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string as get_storage_class
 
+from import_export_csv.exporter import fetch_locations_for_export, get_csv_response
+
 
 class OverwriteStorage:
     """Set storage to pgdump container
@@ -35,11 +37,10 @@ class Command(BaseCommand):
     help = "Export all models in specified apps to CSV files, compress them into a ZIP, and upload to Azure Storage."
 
     TMP_DIRECTORY = "/tmp/tmp_pgdump"
+    EXPORT_FILE_NAME = "all_locations.csv"
 
     def handle(self, *args, **kwargs):
-        app_names = kwargs.get("apps", ["locations"])
-
-        self.start_dump(app_names)
+        self.create_export_csv()
 
         self.upload_to_blob()
 
@@ -47,50 +48,28 @@ class Command(BaseCommand):
 
         self.stdout.write("Data dump completed successfully.")
 
-    def start_dump(self, app_names):
+    def create_export_csv(self):
         """
-        Dump all models in the specified apps to CSV files.
+        Build the locations CSV export.
         """
         os.makedirs(self.TMP_DIRECTORY, exist_ok=True)
 
-        for app in app_names:
-            for model in apps.get_app_config(app).get_models():
-                self._dump_model_to_csv(model)
-
-    def _dump_model_to_csv(self, model):
-        """
-        Dump a single model's data to a CSV file.
-        """
-        table_name = model._meta.db_table
-        filepath = os.path.join(self.TMP_DIRECTORY, f"{table_name}.csv")
-
-        with open(filepath, "w", newline="", encoding="utf-8") as csv_file:
-            writer = csv.writer(csv_file)
-
-            # Write header (field names)
-            fields = [field.name for field in model._meta.fields]
-            writer.writerow(fields)
-
-            # Write data rows
-            for instance in model.objects.all():
-                writer.writerow([getattr(instance, field) for field in fields])
-
-        return filepath
+        csv_data = get_csv_response(fetch_locations_for_export()).content
+        file_path = os.path.join(self.TMP_DIRECTORY, self.EXPORT_FILE_NAME)
+        with open(file_path, "wb") as f:
+            f.write(csv_data)
 
     def upload_to_blob(self):
         """
-        Upload each CSV file to Azure Storage.
+        Upload the export CSV file to Azure Storage.
         """
         storage = OverwriteStorage()
 
-        for file_name in os.listdir(self.TMP_DIRECTORY):
-            file_path = os.path.join(self.TMP_DIRECTORY, file_name)
+        file_path = os.path.join(self.TMP_DIRECTORY, self.EXPORT_FILE_NAME)
+        with open(file_path, "rb") as f:
+            storage.save_without_postfix(name=self.EXPORT_FILE_NAME, content=f)
 
-            # Upload each file to Azure Storage
-            with open(file_path, "rb") as f:
-                storage.save_without_postfix(name=file_name, content=f)
-
-            self.stdout.write(f"Successfully uploaded {file_name} to Azure Storage.")
+        self.stdout.write(f"Successfully uploaded {self.EXPORT_FILE_NAME} to Azure Storage.")
 
     def remove_dump(self):
         """
