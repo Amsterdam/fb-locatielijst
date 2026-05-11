@@ -19,6 +19,8 @@ from referentie_tabellen.models import (
     Voorziening,
 )
 
+from fblocatie.querysets import LocatieQuerySet
+
 
 class TimeStampMixin(models.Model):
     created_at = models.DateTimeField(verbose_name="Aanmaakdatum", auto_now_add=True)
@@ -289,6 +291,8 @@ class Locatie(TimeStampMixin):
     emobj = models.IntegerField(verbose_name="Energiemissie object", blank=True, null=True)
     po = models.IntegerField(verbose_name="P&O locatie code", blank=True, null=True)
     priva_gbs = models.CharField(verbose_name="Locatie Priva GBS", max_length=200, blank=True, null=True)
+
+    objects = LocatieQuerySet.as_manager()
 
     def __str__(self):
         return f"{self.pandcode}, {self.naam}"

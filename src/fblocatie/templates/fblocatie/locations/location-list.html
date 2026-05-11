@@ -1,5 +1,5 @@
 {% extends 'site-base.html' %}
-{% load i18n utils %}
+{% load i18n static utils %}
 
 {% block title %}
 | Locaties
@@ -19,16 +19,21 @@
 
 <div class="page-filter">
     <form action="." method="GET" novalidate>
-        <div class="filter-option">
-            <label for="id_search">Zoek op naam</label>
-            <input
-                type="text"
-                id="id_search"
-                name="search"
-                value="{{ search }}"
-                autocomplete="off"
-            />
-        </div>
+        {% for field in form %}
+            {% if field.name != 'archive' %}
+            <div class="filter-option">
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% else %}
+                {% if user.is_staff %}
+                <div class="filter-option">
+                    <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
         <button class="btn btn-primair" type="submit" formaction="{% url 'fblocatie_urls:locatie-list' %}">Zoek</button>
     </form>
 </div>

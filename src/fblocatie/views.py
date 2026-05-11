@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views import View
 from django.views.generic import ListView
 
+from fblocatie.forms import LocatieListForm
 from fblocatie.models import Locatie
 from fblocatie.utils.locatie_detail import get_locatie_detail_groups
 
@@ -13,15 +14,27 @@ class LocatieListView(LoginRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related("vastgoed", "vastgoed__bezit")
-        search_value = (self.request.GET.get("search") or "").strip()
-        if search_value:
-            queryset = queryset.filter(naam__icontains=search_value)
-        return queryset
+        queryset = super().get_queryset().select_related(
+            "adres",
+            "dvk_naam",
+            "locatie_soort",
+            "vastgoed",
+            "vastgoed__bezit",
+        )
+        ordering = self.get_ordering()
+        return queryset.search_filter(params=self.request.GET.dict(), user=self.request.user).order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["search"] = (self.request.GET.get("search") or "").strip()
+
+        initial_data = self.request.GET
+        context["form"] = LocatieListForm(initial=initial_data)
+
+        archive = (self.request.GET.get("archive") or "").strip()
+        location_count = Locatie.objects.archive_filter(archive).count()
+        context["location_count"] = location_count
+        context["is_filtered_result"] = context["page_obj"].paginator.count < location_count
+
         return context
 
     def get_ordering(self):
