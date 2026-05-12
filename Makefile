@@ -59,7 +59,7 @@ dev: migrate
 	$(run) --service-ports dev
 
 test:                               ## Run tests
-	echo "passing"              
+	$(run) test pytest $(ARGS)                
 
 clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
