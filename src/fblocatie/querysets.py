@@ -7,125 +7,49 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from fblocatie.filters import filter_on_archive
 
-YES = {"ja", "j", "true", "1", "yes", "y"}
-NO = {"nee", "n", "false", "0", "no"}
+from fblocatie.utils.search_mappings import (
+    DEFAULT_TEXT_LOOKUPS,
+    DEFAULT_INT_LOOKUPS,
+    FOREIGN_KEY_LOOKUPS,
+    INT_FIELD_LOOKUPS,
+    MANY_TO_MANY_LOOKUPS,
+    PERSON_LOOKUP_PREFIXES,
+    TEXT_FIELD_LOOKUPS,
+)
 
+TRUE_STRINGS = {"ja", "j", "true", "1", "yes", "y"}
+FALSE_STRINGS = {"nee", "n", "false", "0", "no"}
 
-def _or(term: str, lookups: tuple[str, ...]) -> Q:
+def _any_icontains(term: str, lookups: tuple[str, ...]) -> Q:
     q = Q()
     for lookup in lookups:
         q |= Q(**{lookup: term})
     return q
 
-
-def _person(term: str, prefix: str) -> Q:
-    return _or(
-        term,
-        (
-            f"{prefix}__voornaam__icontains",
-            f"{prefix}__achternaam__icontains",
-            f"{prefix}__email__icontains",
-        ),
+def _person_name_match(term: str, prefix: str) -> Q:
+    return (
+        Q(**{f"{prefix}__voornaam__icontains": term})
+        | Q(**{f"{prefix}__achternaam__icontains": term})
+        | Q(**{f"{prefix}__email__icontains": term})
     )
 
-
-def _int_prefix_ranges(field: str, prefix: str, *, max_digits: int = 10) -> Q:
-    """Fast prefix search for integer fields without casting.
-
-    Example: prefix '24' matches 24, 24001, 249999, 2400000000, etc.
-    """
-
-    if not prefix.isdigit():
-        return Q(pk__in=[])
-
-    base = int(prefix)
-    n = len(prefix)
-    q = Q()
-    for total_digits in range(n, max_digits + 1):
-        factor = 10 ** (total_digits - n)
-        lower = base * factor
-        upper = (base + 1) * factor
-        q |= Q(**{f"{field}__gte": lower}) & Q(**{f"{field}__lt": upper})
-    return q
-
-
-def _num(params: dict, prop: str) -> str:
-    # We always search using the `search` query param.
+def _extract_search_term(params: dict) -> str:
     return (params.get("search") or "").strip()
-
-
-TEXT = {
-    "naam": "naam__icontains",
-    "afkorting": "afkorting__icontains",
-    "beschrving": "beschrijving__icontains",
-    "lt_mail": "loc_email__icontains",
-    "routecode": "routecode__iexact",
-    "straat": "adres__straat__icontains",
-    "postcode": "adres__postcode__icontains",
-    "huisletter": "adres__huisletter__icontains",
-    "numtoeg": "adres__huisnummertoevoeging__icontains",
-    "plaats": "adres__woonplaats__icontains",
-    "maps": "adres__map_url__icontains",
-    "adres2_rol": "bezoekadres_functie__icontains",
-    "kantoorart": "kantoorkast__icontains",
-    "gv": "vastgoed__GV_key__icontains",
-    "energielbl": "vastgoed__energielabel__icontains",
-    "mon_gem": "vastgoed__monument_gem__name__icontains",
-}
-
-# Default = "Alle tekstvelden" (keep it fast; exclude M2M/person searches)
-DEFAULT_LOOKUPS = tuple(sorted({v for k, v in TEXT.items() if k != "routecode"} | {"routecode__icontains"}))
-
-FK = {
-    "soort": ("locatie_soort_id", "locatie_soort__name__icontains"),
-    "dvk_naam": ("dvk_naam_id", "dvk_naam__name__icontains"),
-    "budget_dir": ("budget_dir_id", "budget_dir__name__icontains"),
-    "themagv": ("vastgoed__themagv_id", "vastgoed__themagv__name__icontains"),
-    "ew": ("perceel_installateur_id", "perceel_installateur__name__icontains"),
-    "bezit": ("vastgoed__bezit_id", "vastgoed__bezit__name__icontains"),
-    "mon_brkpb": ("vastgoed__monument_brkpb_id", "vastgoed__monument_brkpb__name__icontains"),
-}
-
-M2M = {
-    "vlekken": ("pand_directies__id", "pand_directies__name__icontains"),
-    "voorz": ("voorzieningen__id", "voorzieningen__name__icontains"),
-    "contract": ("contracten__id", "contracten__name__icontains"),
-}
-
-INT_EXACT = {
-    "werkplek": "werkplekken",
-    "lt": "locatieteam",
-    "huisnummer": "adres__huisnummer",
-    "bouwjaar": "vastgoed__bouwjaar",
-}
-
-PERSON_PREFIX = {
-    "lm": "loc_manager",
-    "lc": "loc_coordinator",
-    "contact": "contact_dir",
-    "tom": "tom",
-    "tsc": "tsc",
-    "beveiligng": "beveiliging",
-    "veiligheid": "veiligheid",
-    "am_gv": "vastgoed__asset_manager",
-    "plgv": "vastgoed__pl_gv",
-}
-
 
 class LocatieQuerySet(QuerySet):
     def search_filter(self, params: dict, user: User) -> QuerySet:
-        """Return a queryset of `Locatie` filtered by search params.
+        """Return a queryset of locations filtered by search params.
 
-        Query params (mirrors the `locations` app style):
+        Query params:
         - `property`: optional, selects a single field to search in
-        - `search`: the search term (always used in fblocatie)
+        - `search`: the search term
         - `archive`: active|archived|all (default: active)
 
         Non-staff users always only see active locations.
         """
 
         property_value = (params.get("property") or "").strip()
-        search_value = _num(params, property_value)
+        search_value = _extract_search_term(params)
         archive_value = (params.get("archive") or "").strip()
 
         qs = self
@@ -134,21 +58,42 @@ class LocatieQuerySet(QuerySet):
 
         if search_value:
             if property_value == "":
-                qfilter &= _or(search_value, DEFAULT_LOOKUPS)
+                qfilter &= _any_icontains(search_value, DEFAULT_TEXT_LOOKUPS)
                 if search_value.isdigit():
-                    qfilter |= _int_prefix_ranges("pandcode", search_value)
-            elif property_value == "pandcode":
-                qfilter &= _int_prefix_ranges("pandcode", search_value)
+                    for field in DEFAULT_INT_LOOKUPS:
+                        qfilter |= Q(**{field: int(search_value)})
+            elif property_value in INT_FIELD_LOOKUPS:
+                if not search_value.isdigit():
+                    return qs.none()
+                qfilter &= Q(**{INT_FIELD_LOOKUPS[property_value]: int(search_value)})
+            elif property_value in TEXT_FIELD_LOOKUPS:
+                qfilter &= Q(**{TEXT_FIELD_LOOKUPS[property_value]: search_value})
+            elif property_value in FOREIGN_KEY_LOOKUPS:
+                id_lookup, name_lookup = FOREIGN_KEY_LOOKUPS[property_value]
+                qfilter &= Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
+            elif property_value in MANY_TO_MANY_LOOKUPS:
+                id_lookup, name_lookup = MANY_TO_MANY_LOOKUPS[property_value]
+                needs_distinct = True
+                qfilter &= Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
+            elif property_value in PERSON_LOOKUP_PREFIXES:
+                needs_distinct = True
+                qfilter &= _person_name_match(search_value, PERSON_LOOKUP_PREFIXES[property_value])
+            elif property_value in {"vvo", "bvo"}:
+                try:
+                    val = Decimal(search_value)
+                except InvalidOperation:
+                    return qs.none()
+                qfilter &= Q(**{("vastgoed__vvo" if property_value == "vvo" else "vastgoed__bvo"): val})
             elif property_value == "ambtenaar":
                 val = search_value.lower()
-                if val in YES:
+                if val in TRUE_STRINGS:
                     qfilter &= Q(ambtenaar=True)
-                elif val in NO:
+                elif val in FALSE_STRINGS:
                     qfilter &= Q(ambtenaar=False)
                 else:
                     return qs.none()
             elif property_value == "adrs_toeg":
-                qfilter &= _or(
+                qfilter &= _any_icontains(
                     search_value,
                     (
                         "bezoekadres__straat__icontains",
@@ -157,29 +102,7 @@ class LocatieQuerySet(QuerySet):
                     ),
                 )
             elif property_value == "gv_grp":
-                qfilter &= _or(search_value, ("vastgoed__GV_key__icontains", "vastgoed__gv_id__icontains"))
-            elif property_value in INT_EXACT:
-                if not search_value.isdigit():
-                    return qs.none()
-                qfilter &= Q(**{INT_EXACT[property_value]: int(search_value)})
-            elif property_value in TEXT:
-                qfilter &= Q(**{TEXT[property_value]: search_value})
-            elif property_value in FK:
-                id_lookup, name_lookup = FK[property_value]
-                qfilter &= Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
-            elif property_value in M2M:
-                id_lookup, name_lookup = M2M[property_value]
-                needs_distinct = True
-                qfilter &= Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
-            elif property_value in PERSON_PREFIX:
-                needs_distinct = True
-                qfilter &= _person(search_value, PERSON_PREFIX[property_value])
-            elif property_value in {"vvo", "bvo"}:
-                try:
-                    val = Decimal(search_value)
-                except InvalidOperation:
-                    return qs.none()
-                qfilter &= Q(**{("vastgoed__vvo" if property_value == "vvo" else "vastgoed__bvo"): val})
+                qfilter &= _any_icontains(search_value, ("vastgoed__GV_key__icontains", "vastgoed__gv_id__icontains"))
             else:
                 return qs.none()
 
