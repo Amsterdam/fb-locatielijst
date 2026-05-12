@@ -121,7 +121,7 @@
 
     <div class="btn-container">
         {% if user.is_staff %}
-            <a href="{% url 'locations_urls:location-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
+            <a href="{% url 'import_export_urls:locatie-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
         {% endif %}
     </div>
 </div>
