@@ -1,8 +1,6 @@
-import csv
 import os
 import shutil
 
-from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string as get_storage_class

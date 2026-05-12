@@ -5,11 +5,11 @@ from decimal import Decimal, InvalidOperation
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from fblocatie.filters import filter_on_archive
 
+from fblocatie.filters import filter_on_archive
 from fblocatie.utils.search_mappings import (
-    DEFAULT_TEXT_LOOKUPS,
     DEFAULT_INT_LOOKUPS,
+    DEFAULT_TEXT_LOOKUPS,
     FOREIGN_KEY_LOOKUPS,
     INT_FIELD_LOOKUPS,
     MANY_TO_MANY_LOOKUPS,

@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Max
 from django.utils import timezone
 
+from fblocatie.querysets import LocatieQuerySet
 from referentie_tabellen.models import (
     Contract,
     DienstverleningsKader,
@@ -18,8 +19,6 @@ from referentie_tabellen.models import (
     ThemaPortefeuille,
     Voorziening,
 )
-
-from fblocatie.querysets import LocatieQuerySet
 
 
 class TimeStampMixin(models.Model):
