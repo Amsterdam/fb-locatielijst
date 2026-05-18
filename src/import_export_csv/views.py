@@ -47,8 +47,8 @@ class LocationExportView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         if request.GET:
-            all_locations = fetch_locations_for_export()
-            return get_csv_response(all_locations)
+            locations = fetch_locations_for_export().search_filter(params=request.GET.dict(), user=request.user)
+            return get_csv_response(locations)
         return render(request=request, template_name=self.template)
 
     def post(self, request, *args, **kwargs):

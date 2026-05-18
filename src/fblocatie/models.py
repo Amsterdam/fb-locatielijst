@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Max
 from django.utils import timezone
 
+from fblocatie.querysets import LocatieQuerySet
 from referentie_tabellen.models import (
     Contract,
     DienstverleningsKader,
@@ -289,6 +290,8 @@ class Locatie(TimeStampMixin):
     emobj = models.IntegerField(verbose_name="Energiemissie object", blank=True, null=True)
     po = models.IntegerField(verbose_name="P&O locatie code", blank=True, null=True)
     priva_gbs = models.CharField(verbose_name="Locatie Priva GBS", max_length=200, blank=True, null=True)
+
+    objects = LocatieQuerySet.as_manager()
 
     def __str__(self):
         return f"{self.pandcode}, {self.naam}"
