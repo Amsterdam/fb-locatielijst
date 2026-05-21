@@ -120,9 +120,7 @@
     <div class="h5">{{ page_obj.paginator.count }} {% if is_filtered_result %}van de {{ location_count }} {% endif %}locaties gevonden ({{ object_list|length }} getoond)</div>
 
     <div class="btn-container">
-        {% if user.is_staff %}
-            <a href="{% url 'import_export_urls:locatie-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
-        {% endif %}
+        <a href="{% url 'import_export_urls:locatie-export' %}?{% set_query request %}" class="btn btn-primair">Exporteren</a>
     </div>
 </div>
 {% endblock %}
