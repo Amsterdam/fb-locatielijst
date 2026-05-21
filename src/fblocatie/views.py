@@ -14,12 +14,16 @@ class LocatieListView(LoginRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related(
-            "adres",
-            "dvk_naam",
-            "locatie_soort",
-            "vastgoed",
-            "vastgoed__bezit",
+        queryset = (
+            super()
+            .get_queryset()
+            .select_related(
+                "adres",
+                "dvk_naam",
+                "locatie_soort",
+                "vastgoed",
+                "vastgoed__bezit",
+            )
         )
         ordering = self.get_ordering()
         return queryset.search_filter(params=self.request.GET.dict(), user=self.request.user).order_by(ordering)
@@ -99,4 +103,3 @@ class LocatieDetailView(LoginRequiredMixin, View):
             "detail_groups": get_locatie_detail_groups(locatie),
         }
         return render(request=request, template_name=self.template_name, context=context)
-

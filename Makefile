@@ -65,7 +65,7 @@ clean:                              ## Clean docker stuff
 	$(dc) down -v --remove-orphans
 
 lintfix:                            ## Execute lint fixes
-	$(run) linting ruff check /app/ --fix
+	$(run) linting ruff check /app/ --fix --exit-zero
 	$(run) linting ruff format /app/
 
 lint:                               ## Execute lint checks

@@ -20,12 +20,14 @@ from fblocatie.utils.search_mappings import (
 TRUE_STRINGS = {"ja", "j", "true", "1", "yes", "y"}
 FALSE_STRINGS = {"nee", "n", "false", "0", "no"}
 
+
 def _any_icontains(term: str, lookups: tuple[str, ...]) -> Q:
     """Return a Query that ORs icontains filters for the given term across all provided lookups."""
     query = Q()
     for lookup in lookups:
         query |= Q(**{lookup: term})
     return query
+
 
 def _person_name_match(term: str, prefix: str) -> Q:
     return (
@@ -34,8 +36,10 @@ def _person_name_match(term: str, prefix: str) -> Q:
         | Q(**{f"{prefix}__email__icontains": term})
     )
 
+
 def _extract_search_term(params: dict) -> str:
     return (params.get("search") or "").strip()
+
 
 class LocatieQuerySet(QuerySet):
     def search_filter(self, params: dict, user: User) -> QuerySet:
@@ -71,11 +75,15 @@ class LocatieQuerySet(QuerySet):
                 queryfilter &= Q(**{TEXT_FIELD_LOOKUPS[property_value]: search_value})
             elif property_value in FOREIGN_KEY_LOOKUPS:
                 id_lookup, name_lookup = FOREIGN_KEY_LOOKUPS[property_value]
-                queryfilter &= Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
+                queryfilter &= (
+                    Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
+                )
             elif property_value in MANY_TO_MANY_LOOKUPS:
                 id_lookup, name_lookup = MANY_TO_MANY_LOOKUPS[property_value]
                 needs_distinct = True
-                queryfilter &= Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
+                queryfilter &= (
+                    Q(**{id_lookup: int(search_value)}) if search_value.isdigit() else Q(**{name_lookup: search_value})
+                )
             elif property_value in PERSON_LOOKUP_PREFIXES:
                 needs_distinct = True
                 queryfilter &= _person_name_match(search_value, PERSON_LOOKUP_PREFIXES[property_value])
@@ -103,7 +111,9 @@ class LocatieQuerySet(QuerySet):
                     ),
                 )
             elif property_value == "gv_grp":
-                queryfilter &= _any_icontains(search_value, ("vastgoed__GV_key__icontains", "vastgoed__gv_id__icontains"))
+                queryfilter &= _any_icontains(
+                    search_value, ("vastgoed__GV_key__icontains", "vastgoed__gv_id__icontains")
+                )
             else:
                 return query_set.none()
 
