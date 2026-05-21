@@ -1,0 +1,542 @@
+[
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 1,
+        "fields": {
+            "name": "Staf Interne Dienstverlening (Directie)"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 2,
+        "fields": {
+            "name": "Griffie"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 3,
+        "fields": {
+            "name": "Digitalisering en Innovatie"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 14,
+        "fields": {
+            "name": "0"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 24,
+        "fields": {
+            "name": "Digitale Voorzieningen"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 26,
+        "fields": {
+            "name": "_anders"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 33,
+        "fields": {
+            "name": "Toezicht en Handhaving Openbare Ruimte"
+        }
+    },
+    {
+        "model": "referentie_tabellen.directie",
+        "pk": 43,
+        "fields": {
+            "name": "Staf Stadsdelen, Beheer en Dienstverlening (Directie)"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 1,
+        "fields": {
+            "name": "0"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 2,
+        "fields": {
+            "name": "Stadhuis"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 3,
+        "fields": {
+            "name": "Overig"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 4,
+        "fields": {
+            "name": "Ambtswoning"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 5,
+        "fields": {
+            "name": "Kantoor"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 6,
+        "fields": {
+            "name": "Gymzaal"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 7,
+        "fields": {
+            "name": "OKT"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 8,
+        "fields": {
+            "name": "Parkeergarage"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 9,
+        "fields": {
+            "name": "Sportpark/hal"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 12,
+        "fields": {
+            "name": "ntb"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 13,
+        "fields": {
+            "name": "School"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 14,
+        "fields": {
+            "name": "Zwembad"
+        }
+    },
+
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 25,
+        "fields": {
+            "name": "NME"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 26,
+        "fields": {
+            "name": "Werf"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiesoort",
+        "pk": 27,
+        "fields": {
+            "name": "School/gymzaal"
+        }
+    },
+    {
+        "model": "referentie_tabellen.gelieerdepartij",
+        "pk": 1,
+        "fields": {
+            "name": "Brandweer AmsterdamAmstelland"
+        }
+    },
+    {
+        "model": "referentie_tabellen.gelieerdepartij",
+        "pk": 8,
+        "fields": {
+            "name": "Waternet"
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 1,
+        "fields": {
+            "name": "onderdeel van Amstel 1",
+            "dvk_nr": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 2,
+        "fields": {
+            "name": "Externe partij, dus geen rol",
+            "dvk_nr": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 3,
+        "fields": {
+            "name": "Satelliet",
+            "dvk_nr": 3
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 4,
+        "fields": {
+            "name": "Basis",
+            "dvk_nr": 1
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 5,
+        "fields": {
+            "name": "nvt",
+            "dvk_nr": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 6,
+        "fields": {
+            "name": "ntb",
+            "dvk_nr": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 7,
+        "fields": {
+            "name": "Contract",
+            "dvk_nr": 2
+        }
+    },
+    {
+        "model": "referentie_tabellen.dienstverleningskader",
+        "pk": 8,
+        "fields": {
+            "name": "Geen categorie",
+            "dvk_nr": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiebezit",
+        "pk": 1,
+        "fields": {
+            "name": "Eigendom"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiebezit",
+        "pk": 2,
+        "fields": {
+            "name": "Gehuurd"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiebezit",
+        "pk": 3,
+        "fields": {
+            "name": "geen GV"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiebezit",
+        "pk": 4,
+        "fields": {
+            "name": "niet in beheer GV"
+        }
+    },
+    {
+        "model": "referentie_tabellen.locatiebezit",
+        "pk": 5,
+        "fields": {
+            "name": "ntb"
+        }
+    },
+    {
+        "model": "referentie_tabellen.monumentstatus",
+        "pk": 1,
+        "fields": {
+            "name": "gemeentelijk monument"
+        }
+    },
+    {
+        "model": "referentie_tabellen.monumentstatus",
+        "pk": 2,
+        "fields": {
+            "name": "onbekend: buiten Amsterdam"
+        }
+    },
+    {
+        "model": "referentie_tabellen.monumentstatus",
+        "pk": 3,
+        "fields": {
+            "name": "rijksmonument"
+        }
+    },
+    {
+        "model": "referentie_tabellen.monumentstatus",
+        "pk": 4,
+        "fields": {
+            "name": "gemeentelijk en rijksmonument"
+        }
+    },
+    {
+        "model": "referentie_tabellen.monumentstatus",
+        "pk": 5,
+        "fields": {
+            "name": "geen monument"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 1,
+        "fields": {
+            "name": "0"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 2,
+        "fields": {
+            "name": "LED-verlichting"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 3,
+        "fields": {
+            "name": "Rolstoeltoegankelijkheid"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 4,
+        "fields": {
+            "name": "Parkeerplaatsen"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 5,
+        "fields": {
+            "name": "Kolf- en rustruimte"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 6,
+        "fields": {
+            "name": "Stalling van motoren/scooters"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 7,
+        "fields": {
+            "name": "Bedrijfsrestaurant"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 8,
+        "fields": {
+            "name": "Douches"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 9,
+        "fields": {
+            "name": "Bekers voor bezoek"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 10,
+        "fields": {
+            "name": "Gehandicaptentoiletten"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 11,
+        "fields": {
+            "name": "Fietsenstalling"
+        }
+    },
+    {
+        "model": "referentie_tabellen.voorziening",
+        "pk": 12,
+        "fields": {
+            "name": "Beeldbelplekken"
+        }
+    },
+    {
+        "model": "referentie_tabellen.contract",
+        "pk": 1,
+        "fields": {
+            "name": "Catering & Banqueting"
+        }
+    },
+    {
+        "model": "referentie_tabellen.contract",
+        "pk": 2,
+        "fields": {
+            "name": "Warme dranken"
+        }
+    },
+    {
+        "model": "referentie_tabellen.contract",
+        "pk": 3,
+        "fields": {
+            "name": "AV-middelen"
+        }
+    },
+    {
+        "model": "referentie_tabellen.contract",
+        "pk": 4,
+        "fields": {
+            "name": "Schoonmaak kantoren (extern)"
+        }
+    },
+    {
+        "model": "referentie_tabellen.persoon",
+        "pk": 1,
+        "fields": {
+            "voornaam": "Test-test",
+            "achternaam": "Test",
+            "telefoonnr": null,
+            "email": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.persoon",
+        "pk": 2,
+        "fields": {
+            "voornaam": "Test2",
+            "achternaam": "Test2",
+            "telefoonnr": null,
+            "email": null
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 1,
+        "fields": {
+            "name": "Gemeentelijke Huisvesting"
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 2,
+        "fields": {
+            "name": "geen"
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 5,
+        "fields": {
+            "name": "n.v.t."
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 6,
+        "fields": {
+            "name": "Tijdelijke Exploitatie (GREX)"
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 7,
+        "fields": {
+            "name": "Welzijn"
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 8,
+        "fields": {
+            "name": "Sport"
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 9,
+        "fields": {
+            "name": "Grond & Commercieel"
+        }
+    },
+    {
+        "model": "referentie_tabellen.themaportefeuille",
+        "pk": 10,
+        "fields": {
+            "name": "Kunst & Cultuur"
+        }
+    },
+    {
+        "model": "referentie_tabellen.leverancier1s1p",
+        "pk": 1,
+        "fields": {
+            "name": "A"
+        }
+    },
+    {
+        "model": "referentie_tabellen.leverancier1s1p",
+        "pk": 2,
+        "fields": {
+            "name": "B"
+        }
+    },
+    {
+        "model": "referentie_tabellen.onderhoudscontract",
+        "pk": 1,
+        "fields": {
+            "name": "Buiten E&W contract"
+        }
+    },
+    {
+        "model": "referentie_tabellen.onderhoudscontract",
+        "pk": 2,
+        "fields": {
+            "name": "Perceel 1 Spie"
+        }
+    },
+    {
+        "model": "referentie_tabellen.onderhoudscontract",
+        "pk": 6,
+        "fields": {
+            "name": "onbekend"
+        }
+    },
+    {
+        "model": "referentie_tabellen.onderhoudscontract",
+        "pk": 7,
+        "fields": {
+            "name": "ST"
+        }
+    }
+]

@@ -37,24 +37,30 @@ DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # 3rd party
+]
+THIRD_PARTY_APPS = [
     "mozilla_django_oidc",
     "django_extensions",
     "storages",
-    # project app
+]
+LOCAL_APPS = [
+    "import_export_csv",
     "locations",
-    "help_docs",
+    # "help_docs",
     "shared",
     "health",
+    "referentie_tabellen",
+    "fblocatie",
 ]
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -83,6 +89,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "shared.context_processors.authentication_urls",
+                "shared.context_processors.request_change_form_url",
             ],
         },
     },
@@ -228,6 +235,9 @@ CONTENT_SECURITY_POLICY = {
 
 # Automatic redirect to HTTPS
 SECURE_SSL_REDIRECT = bool(int(os.getenv("SECURE_SSL_REDIRECT", "0")))
+
+# External form url for requesting changes to locations
+REQUEST_CHANGE_FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=saH8ci4sdkOkRSlNgBloBOwBjFkBWNFBmMA67fbJfg9UQ1c5NTZYMExSQUdVTUhTNEMwRk5URDZKTS4u"
 
 # Authentication settings
 AUTHENTICATION_BACKENDS = [

@@ -1,0 +1,26 @@
+{% extends 'site-base.html' %}
+{% load i18n admin_urls static %}
+
+{% block title %}
+| Locaties exporteren
+{% endblock %}
+
+{% block extra-breadcrumbs %}
+<span>&rsaquo;</span>
+Export
+{% endblock %}
+
+{% block content %}
+<h2>Exporteer Locaties naar CSV</h2>
+<p>
+    Start een de download van een CSV met alle (actieve) locaties<br>
+</p>
+<form action="." method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="btn-container">
+        <button class="btn btn-primair" type="submit" name="_save" value="Download CSV"
+            formaction="{% url 'import_export_urls:locatie-export' %}">Download export</button>
+    </div>
+</form>
+
+{% endblock %}
