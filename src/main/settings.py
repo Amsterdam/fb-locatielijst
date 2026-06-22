@@ -241,7 +241,7 @@ REQUEST_CHANGE_FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=s
 
 # Authentication settings
 AUTHENTICATION_BACKENDS = [
-    "amsterdam_django_oidc.OIDCAuthenticationBackend",
+    "main.auth.OIDCAuthenticationBackend",
 ]
 LOGIN_URL = "oidc_authentication_init"
 LOGOUT_URL = "oidc_logout"
