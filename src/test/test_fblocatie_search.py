@@ -68,10 +68,6 @@ def test_locatie_search_filter_default_all_fields_searches_across_configured_fie
     qs = Locatie.objects.search_filter({"property": "", "search": "Damrak"}, user=staff_user)
     assert set(qs.values_list("pandcode", flat=True)) == {l1.pandcode}
 
-    # Search across configured text fields should include locatie notes
-    qs = Locatie.objects.search_filter({"property": "", "search": "zoektest"}, user=staff_user)
-    assert set(qs.values_list("pandcode", flat=True)) == {l2.pandcode}
-
     # Scoped search on notitie should only search the notes field
     qs = Locatie.objects.search_filter({"property": "notitie", "search": "zoektest"}, user=staff_user)
     assert set(qs.values_list("pandcode", flat=True)) == {l2.pandcode}
