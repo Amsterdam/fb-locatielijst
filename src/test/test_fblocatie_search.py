@@ -53,6 +53,7 @@ def test_locatie_search_filter_default_all_fields_searches_across_configured_fie
         pandcode=200,
         naam="Stopera",
         afkorting="STO",
+        notitie="Unieke notitie voor zoektest",
         adres=adres2,
         locatie_soort=soort2,
         dvk_naam=dvk2,
@@ -66,6 +67,14 @@ def test_locatie_search_filter_default_all_fields_searches_across_configured_fie
     # Search across configured related fields (e.g. address street)
     qs = Locatie.objects.search_filter({"property": "", "search": "Damrak"}, user=staff_user)
     assert set(qs.values_list("pandcode", flat=True)) == {l1.pandcode}
+
+    # Search across configured text fields should include locatie notes
+    qs = Locatie.objects.search_filter({"property": "", "search": "zoektest"}, user=staff_user)
+    assert set(qs.values_list("pandcode", flat=True)) == {l2.pandcode}
+
+    # Scoped search on notitie should only search the notes field
+    qs = Locatie.objects.search_filter({"property": "notitie", "search": "zoektest"}, user=staff_user)
+    assert set(qs.values_list("pandcode", flat=True)) == {l2.pandcode}
 
     # Numeric search should include pandcode in default mode
     qs = Locatie.objects.search_filter({"property": "", "search": "100"}, user=staff_user)

@@ -2,6 +2,7 @@ TEXT_FIELD_LOOKUPS: dict[str, str] = {
     "naam": "naam__icontains",
     "afkorting": "afkorting__icontains",
     "beschrving": "beschrijving__icontains",
+    "notitie": "notitie__icontains",
     "lt_mail": "loc_email__icontains",
     "routecode": "routecode__icontains",
     "straat": "adres__straat__icontains",
