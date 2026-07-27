@@ -11,6 +11,7 @@ class LocatieListForm(forms.Form):
             ("pandcode", "Pandcode"),
             ("afkorting", "Afkorting"),
             ("beschrving", "Beschrijving"),
+            ("notitie", "Notitie"),
             ("ambtenaar", "Gemeentelijke huisvesting"),
             ("soort", "Soort locatie"),
             ("werkplek", "Aantal werkplekken"),
