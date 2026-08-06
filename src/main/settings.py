@@ -53,7 +53,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "import_export_csv",
     "locations",
-    # "help_docs",
     "shared",
     "health",
     "referentie_tabellen",
