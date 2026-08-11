@@ -83,7 +83,7 @@ def test_handle_import_csv_rejects_non_csv_file():
 
     assert result == 0
     error_messages = [m.message for m in message_storage if m.level == messages.ERROR]
-    assert error_messages == ["locations.txt is geen gelding CSV bestand."]
+    assert error_messages == ["locations.txt is geen geldig CSV bestand."]
 
 
 def test_handle_import_csv_rejects_invalid_payload():
