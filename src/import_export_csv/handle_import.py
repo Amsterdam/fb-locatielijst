@@ -35,7 +35,7 @@ def handle_import_csv(request, csv_file) -> int:
 
     # Report columns that will be processed during import
     processable_columns = set(ADRES_MAPPING.values()) | set(VG_MAPPING.values()) | set(LOCATIE_MAPPING.values())
-    used_columns = [key for key in (csv_dict.fieldnames or []) if key in processable_columns]
+    used_columns = [key for key in csv_dict.fieldnames if key in processable_columns]
     messages.add_message(request, messages.INFO, f"Kolommen {used_columns} worden verwerkt.")
 
     # Process the rows from the import file
