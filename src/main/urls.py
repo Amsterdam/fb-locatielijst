@@ -57,7 +57,6 @@ urlpatterns.extend(
         path("locaties/", include(("fblocatie.urls", "fblocatie"), namespace="fblocatie_urls")),
         path("health/", include("health.urls")),
         path("403/", permissiondenied403),
-        # path("help/", include(("help_docs.urls", "help_docs"), namespace="help_docs_urls")),
         path("", TemplateView.as_view(template_name="home.html"), name="home"),
     ]
 )

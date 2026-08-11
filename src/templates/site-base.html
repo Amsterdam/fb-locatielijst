@@ -49,10 +49,7 @@
           {% if user.is_anonymous %}
           <li><a href="{% url LOGIN_URL %}?next={{ request.path }}">Inloggen</a></li>
           {% endif %}
-          {% if user.is_staff %}
-          {#<li><a href="{% url 'help_docs_urls:documentation-list' %}">Help</a></li>#}
           <li><a href="{{ REQUEST_CHANGE_FORM_URL }}" target="_blank" rel="noopener noreferrer">Wijziging aanvragen</a></li>
-          {% endif %}
           {% if user.is_authenticated %}
           <li>
             <form id="logout-form" method="post" action="{% url LOGOUT_URL %}">
