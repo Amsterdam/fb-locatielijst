@@ -3,9 +3,8 @@ import csv
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 
-from locations.processors import LocationProcessor
-
 from .importer import ImporterProcessCSV
+from .mappings import ADRES_MAPPING, LOCATIE_MAPPING, VG_MAPPING
 
 
 def handle_import_csv(request, csv_file) -> int:
@@ -17,7 +16,7 @@ def handle_import_csv(request, csv_file) -> int:
 
     if not csv_file or not csv_file.name.endswith(".csv"):
         messages.add_message(
-            request, messages.ERROR, f"{getattr(csv_file, 'name', 'Bestand')} is geen gelding CSV bestand."
+            request, messages.ERROR, f"{getattr(csv_file, 'name', 'Bestand')} is geen geldig CSV bestand."
         )
         return location_added
 
@@ -35,12 +34,9 @@ def handle_import_csv(request, csv_file) -> int:
     csv_dict = csv.DictReader(csv_reader, dialect=csv_dialect, restval="missing", restkey="excess")
 
     # Report columns that will be processed during import
-    location_properties = set(LocationProcessor().location_properties)
-    headers = set(csv_dict.fieldnames or [])
-
-    used_columns = list(headers & location_properties)
-    message = f"Kolommen {used_columns} worden verwerkt."
-    messages.add_message(request, messages.INFO, message)
+    processable_columns = set(ADRES_MAPPING.values()) | set(VG_MAPPING.values()) | set(LOCATIE_MAPPING.values())
+    used_columns = [key for key in csv_dict.fieldnames if key in processable_columns]
+    messages.add_message(request, messages.INFO, f"Kolommen {used_columns} worden verwerkt.")
 
     # Process the rows from the import file
     importer = ImporterProcessCSV()
