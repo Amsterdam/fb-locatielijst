@@ -16,7 +16,7 @@ def handle_import_csv(request, csv_file) -> int:
 
     if not csv_file or not csv_file.name.endswith(".csv"):
         messages.add_message(
-            request, messages.ERROR, f"{getattr(csv_file, 'name', 'Bestand')} is geen gelding CSV bestand."
+            request, messages.ERROR, f"{getattr(csv_file, 'name', 'Bestand')} is geen geldig CSV bestand."
         )
         return location_added
 
