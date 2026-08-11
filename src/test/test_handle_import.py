@@ -95,7 +95,8 @@ def test_handle_import_csv_rejects_invalid_payload():
     assert result == 0
     error_messages = [m.message for m in message_storage if m.level == messages.ERROR]
     assert error_messages == [
-        "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' als scheidingsteken en UTF-8 als codering gebruikt."
+        "De locaties kunnen niet ingelezen worden. Zorg ervoor dat je ';' "
+        "als scheidingsteken en UTF-8 als codering gebruikt."
     ]
 
 
