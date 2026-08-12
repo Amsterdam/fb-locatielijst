@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
-
 from locations.models import Log
+
 from shared.context import current_user
 
 
