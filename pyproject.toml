@@ -16,6 +16,7 @@ addopts = "--cov --cov-report term-missing --no-cov-on-fail"
 
 [tool.coverage.run]
 source = ["./src"]
+omit = ["./src/manage.py"]
 
 [tool.coverage.report]
 fail_under = 80
