@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-
 from locations.models import (
     ExternalService,
     Location,
@@ -10,6 +9,7 @@ from locations.models import (
     LocationProperty,
     PropertyOption,
 )
+
 from shared.context import current_user
 from shared.utils import get_log_parameters
 
