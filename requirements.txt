@@ -21,11 +21,11 @@ azure-identity==1.25.3
     # via -r requirements.in
 azure-keyvault==4.2.0
     # via -r requirements.in
-azure-keyvault-certificates==4.11.1
+azure-keyvault-certificates==4.11.2
     # via azure-keyvault
-azure-keyvault-keys==4.11.1
+azure-keyvault-keys==4.11.2
     # via azure-keyvault
-azure-keyvault-secrets==4.11.0
+azure-keyvault-secrets==4.11.2
     # via
     #   -r requirements.in
     #   azure-keyvault
@@ -33,9 +33,9 @@ azure-storage-blob==12.28.0
     # via django-storages
 certifi==2026.7.22
     # via requests
-cffi==2.1.0
+cffi==2.1.1
     # via cryptography
-charset-normalizer==3.4.9
+charset-normalizer==3.5.1
     # via requests
 cryptography==49.0.0
     # via
@@ -45,7 +45,7 @@ cryptography==49.0.0
     #   mozilla-django-oidc
     #   msal
     #   pyjwt
-django==5.2.16
+django==5.2.17
     # via
     #   -r requirements.in
     #   django-csp
@@ -58,11 +58,11 @@ django-extensions==4.1
     # via -r requirements.in
 django-storages[azure]==1.14.6
     # via -r requirements.in
-googleapis-common-protos==1.75.0
+googleapis-common-protos==1.75.2
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.83.0
+grpcio==1.83.1
     # via opentelemetry-exporter-otlp-proto-grpc
-idna==3.18
+idna==3.19
     # via requests
 importlib-metadata==8.7.1
     # via opentelemetry-api
@@ -74,7 +74,7 @@ isodate==0.7.2
     #   azure-storage-blob
 mozilla-django-oidc==5.0.2
     # via amsterdam-django-oidc
-msal==1.37.0
+msal==1.38.0
     # via
     #   azure-identity
     #   msal-extensions
@@ -135,7 +135,7 @@ opentelemetry-util-http==0.60b1
     #   opentelemetry-instrumentation-django
     #   opentelemetry-instrumentation-requests
     #   opentelemetry-instrumentation-wsgi
-packaging==26.2
+packaging==26.3
     # via
     #   django-csp
     #   opentelemetry-instrumentation
@@ -158,7 +158,7 @@ requests==2.34.2
     #   azure-core
     #   mozilla-django-oidc
     #   msal
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via django
 typing-extensions==4.16.0
     # via
