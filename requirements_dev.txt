@@ -6,13 +6,13 @@
 #
 asgiref==3.12.1
     # via django
-cffi==2.1.0
+cffi==2.1.1
     # via cryptography
-coverage[toml]==7.15.2
+coverage[toml]==7.16.0
     # via pytest-cov
 cryptography==49.0.0
     # via pyopenssl
-django==5.2.16
+django==5.2.17
     # via
     #   -r requirements_dev.in
     #   model-bakery
@@ -22,7 +22,7 @@ markupsafe==3.0.3
     # via werkzeug
 model-bakery==1.24.0
     # via -r requirements_dev.in
-packaging==26.2
+packaging==26.3
     # via pytest
 parameterized==0.9.0
     # via -r requirements_dev.in
@@ -32,9 +32,9 @@ pluggy==1.6.0
     #   pytest-cov
 pycparser==3.0
     # via cffi
-pygments==2.20.0
+pygments==2.21.0
     # via pytest
-pyopenssl==26.3.0
+pyopenssl==26.4.0
     # via -r requirements_dev.in
 pytest==9.1.1
     # via
@@ -44,11 +44,11 @@ pytest==9.1.1
     #   pytest-mock
 pytest-cov==7.1.0
     # via -r requirements_dev.in
-pytest-django==4.12.0
+pytest-django==4.14.0
     # via -r requirements_dev.in
 pytest-mock==3.15.1
     # via -r requirements_dev.in
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via django
 werkzeug==3.1.8
     # via -r requirements_dev.in
