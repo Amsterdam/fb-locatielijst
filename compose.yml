@@ -23,7 +23,7 @@ services:
     build:
       context: .
       target: app
-    image: ${REGISTRY:-127.0.0.1:5000}/${REPOSITORY:-opdrachten/fb-locatielijst}:${VERSION:-latest}
+    image: ${REGISTRY:-127.0.0.1:5000}/${REPOSITORY:-ams-opdr/fb-locatielijst}:${VERSION:-latest}
     ports:
       - "8000:8000"
     depends_on:
