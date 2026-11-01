@@ -6,7 +6,7 @@
 #
 amsterdam-django-oidc==0.2.4
     # via -r requirements.in
-asgiref==3.12.1
+asgiref==3.13.0
     # via django
 azure-core==1.41.0
     # via
@@ -17,27 +17,27 @@ azure-core==1.41.0
     #   azure-keyvault-secrets
     #   azure-storage-blob
     #   django-storages
-azure-identity==1.25.3
+azure-identity==1.27.0
     # via -r requirements.in
 azure-keyvault==4.2.0
     # via -r requirements.in
-azure-keyvault-certificates==4.11.2
+azure-keyvault-certificates==4.12.0
     # via azure-keyvault
-azure-keyvault-keys==4.11.2
+azure-keyvault-keys==4.11.3
     # via azure-keyvault
-azure-keyvault-secrets==4.11.2
+azure-keyvault-secrets==4.12.0
     # via
     #   -r requirements.in
     #   azure-keyvault
 azure-storage-blob==12.28.0
     # via django-storages
-certifi==2026.7.22
+certifi==2026.10.23
     # via requests
 cffi==2.1.1
     # via cryptography
-charset-normalizer==3.5.1
+charset-normalizer==3.5.2
     # via requests
-cryptography==50.0.1
+cryptography==50.0.2
     # via
     #   azure-identity
     #   azure-keyvault-keys
@@ -45,7 +45,7 @@ cryptography==50.0.1
     #   mozilla-django-oidc
     #   msal
     #   pyjwt
-django==5.2.17
+django==5.2.18
     # via
     #   -r requirements.in
     #   django-csp
@@ -58,9 +58,9 @@ django-extensions==4.1
     # via -r requirements.in
 django-storages[azure]==1.14.6
     # via -r requirements.in
-googleapis-common-protos==1.75.4
+googleapis-common-protos==1.76.0
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.84.0
+grpcio==1.85.0
     # via opentelemetry-exporter-otlp-proto-grpc
 idna==3.20
     # via requests
@@ -145,9 +145,9 @@ protobuf==6.33.6
     #   opentelemetry-proto
 psycopg2-binary==2.9.13
     # via -r requirements.in
-pycparser==3.0
+pycparser==3.12
     # via cffi
-pyjwt[crypto]==2.15.0
+pyjwt[crypto]==2.15.1
     # via
     #   mozilla-django-oidc
     #   msal
@@ -183,5 +183,5 @@ wrapt==1.17.3
     # via
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-dbapi
-zipp==4.1.0
+zipp==4.1.2
     # via importlib-metadata
